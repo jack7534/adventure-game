@@ -233,7 +233,7 @@
         <li>招式：
             <ul>
                 <li>⚔️ <b>砍擊（物理）</b>：吃 ATK，傷害 = ATK − 怪物 DEF，會被怪物閃避影響。</li>
-                <li>🪄 <b>魔法攻擊</b>：吃 MATK，傷害 = 魔攻 − 怪物 MDEF，<b>絕對命中，不會被閃避</b>。</li>
+                <li>🌠 <b>魔法攻擊</b>：吃 MATK，傷害 = 魔攻 − 怪物 MDEF，<b>絕對命中，不會被閃避</b>。</li>
                 <li>🛡️ <b>盾擊</b>：傷害 = 你目前的 <b>DEF 數值</b>，<b>完全無視怪物所有防禦 (DEF/MDEF)</b>，但會被怪物閃避。</li>
             </ul>
         </li>
@@ -609,11 +609,11 @@
     // 小怪/王：加入 mDef 與 dodge
     const ENEMIES = {
         SMALL: [
-            { name: "哥布林", hp: 40, atk: 12, def: 8,  mDef: 8,  dodge: 5,  lootChance: 0.6, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
-            { name: "骷髏兵", hp: 45, atk: 10, def: 16, mDef: 6,  dodge: 6,  lootChance: 0.6, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
-            { name: "野狼",  hp: 50, atk: 11, def: 6,  mDef: 18, dodge: 12, lootChance: 0.6, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
-            { name: "石頭人", hp: 60, atk: 8,  def: 24, mDef: 4,  dodge: 2,  lootChance: 0.5, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
-            { name: "蝙蝠", hp: 36, atk: 15, def: 4,  mDef: 22, dodge: 20, lootChance: 0.7, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
+            { name: "哥布林", hp: 32, atk: 12, def: 8,  mDef: 8,  dodge: 20,  lootChance: 0.6, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
+            { name: "骷髏兵", hp: 45, atk: 10, def: 16, mDef: 6,  dodge: 5,  lootChance: 0.6, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
+            { name: "野狼",  hp: 42, atk: 11, def: 6,  mDef: 18, dodge: 15, lootChance: 0.6, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
+            { name: "石頭人", hp: 60, atk: 8,  def: 24, mDef: 4,  dodge: 5,  lootChance: 0.5, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
+            { name: "蝙蝠", hp: 22, atk: 14, def: 4,  mDef: 22, dodge: 35, lootChance: 0.7, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
         ],
         BOSS: [
             { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
@@ -1180,7 +1180,7 @@
         updateBattleView();
         setCommands(
             { text: "⚔️ 砍擊 (物理)", value: '⚔️' },
-            { text: "🪄 魔法攻擊 (必中)", value: '🛡️' },
+            { text: "🌠 魔法攻擊 (必中)", value: '🛡️' },
             { text: "🛡️ 盾擊 (DEF 無視防禦)", value: '🚫' },
             handleBattleAction,
             'BATTLE'
@@ -1525,6 +1525,8 @@ ${art.join('\n')}
         if (gameState !== 'BATTLE') return;
         disableCommands(true);
         let battleEnded = false;
+        let heroWonTie = false;         // 平手時是否由我方獲勝
+        let monsterShouldAttack = false; // 本回合最後怪物是否要攻擊
 
         try {
             // 每回合開始先處理灼燒等狀態
@@ -1593,12 +1595,13 @@ ${art.join('\n')}
                 log(`🤝 雙方出招相同 (${playerMove})，進入平手機率判定!`);
                 const tieWinChance = hero.currentTieWinRate / 100;
                 if (Math.random() < tieWinChance) {
+                    heroWonTie = true;     // ✅ 記下這次平手是勇者贏
                     log(`✨ 判定成功! 勇者獲得優勢!`);
-
+            
                     let damage = 0;
                     let isPhysical = false;
                     let attackKind = null;
-
+            
                     if (playerMove === '⚔️') {
                         damage = baseSwordDmg;
                         isPhysical = true;
@@ -1616,7 +1619,7 @@ ${art.join('\n')}
                             log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
                         }
                     }
-
+            
                     if (enemyDodged(playerMove)) {
                         log(`😈 ${currentEnemy.name} 在平手判定中成功閃避你的攻擊！`);
                         damage = 0;
@@ -1631,7 +1634,7 @@ ${art.join('\n')}
                         log(`✅ 勇者造成 ${damage} 點傷害!`);
                         flashBattleView('hero-hit');
                     }
-
+            
                     if (playerMove === '🚫' && !enemyDodged('🚫')) {
                         if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
                             const heal = hero.equipment.RING.ability.effect(hero);
@@ -1642,7 +1645,7 @@ ${art.join('\n')}
                     }
                 } else {
                     log(`💀 判定失敗... 怪物獲得優勢!`);
-                    monsterAttack(monsterMove);
+                    monsterShouldAttack = true;   // ❗記下等一下要讓怪物打
                 }
             } else if (isMonsterWin) {
                 log(`🚫 勇者 ${playerMove} 被 ${monsterMove} 克制，招式被擋開。`);
@@ -1679,13 +1682,14 @@ ${art.join('\n')}
                 return;
             }
 
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            if (isHeroWin) {
-                log(`🛡️ 怪物 ${monsterMove} 被 ${playerMove} 克制，招式無效。`);
-            } else if (isMonsterWin || playerMove === monsterMove) {
-                monsterAttack(monsterMove);
-            }
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        if (isHeroWin) {
+            log(`🛡️ 怪物 ${monsterMove} 被 ${playerMove} 克制，招式無效。`);
+        } else if (isMonsterWin || monsterShouldAttack) {
+            // 只有：怪物克制你，或平手判定怪物贏，才會打你
+            monsterAttack(monsterMove);
+        }
 
             updateStatus();
             if (hero.hp <= 0) {
@@ -2129,3 +2133,4 @@ ${art.join('\n')}
 
 </body>
 </html>
+

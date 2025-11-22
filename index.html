@@ -232,26 +232,24 @@
     <ul>
         <li>招式：
             <ul>
-                <li>⚔️ <b>砍擊（物理）</b>：吃 ATK，會被防禦與石頭人高物防影響。</li>
-                <li>🛡️ <b>盾擊</b>：傷害 = 你目前的 <b>DEF 數值</b>，<b>完全無視怪物所有防禦</b>，防禦越高越痛。</li>
-                <li>🚫 <b>防禦打擊</b>：以防禦進行反擊，用於克制對方攻擊或平手時反殺。</li>
+                <li>⚔️ <b>砍擊（物理）</b>：吃 ATK，傷害 = ATK − 怪物 DEF，會被怪物閃避影響。</li>
+                <li>🪄 <b>魔法攻擊</b>：吃 MATK，傷害 = 魔攻 − 怪物 MDEF，<b>絕對命中，不會被閃避</b>。</li>
+                <li>🛡️ <b>盾擊</b>：傷害 = 你目前的 <b>DEF 數值</b>，<b>完全無視怪物所有防禦 (DEF/MDEF)</b>，但會被怪物閃避。</li>
             </ul>
         </li>
-        <li><b>克制關係：</b> ⚔️ > 🛡️ > 🚫 > ⚔️。</li>
+        <li><b>克制關係：</b> ⚔️ > 魔法 > 盾擊 > ⚔️（實際按鈕依圖示顯示）。</li>
         <li><b>克制：</b> 勝方造成傷害，被克制方該回合完全失效。</li>
         <li><b>平手：</b> 出同一招，依「平手勝率」判定是我方打還是怪打。</li>
-        <li><b>防禦打擊傷害：</b> 依照 <b>DEF 的一定比例</b> 來算反擊傷害，生命戒指會再把比例拉高；
-            石頭人特別怕防禦打擊，對石頭人時再加倍。</li>
-        <li>🛡️ 盾擊：不看任何防禦，直接吃你目前 DEF（包括裝備、精練、戒指加成）。</li>
+        <li><b>盾擊傷害：</b> 不看任何防禦，直接吃 DEF，防禦堆越高，盾擊越痛。</li>
     </ul>
 
     <h3>😈 怪物與弱點</h3>
     <ul>
-        <li><b>哥布林：</b> 砍擊偏多，物防普通；盾擊或魔攻類玩法都行。</li>
-        <li><b>骷髏兵：</b> 防禦偏高，習慣防禦打擊，砍擊效果好。</li>
-        <li><b>野狼：</b> 砍擊頻繁，適合用防禦打擊反擊。</li>
-        <li><b>石頭人：</b> 超高物防、魔防低，特別怕 <b>防禦打擊</b>，也吃盾擊（因為盾擊無視防）。</li>
-        <li><b>蝙蝠：</b> 閃避高，喜歡盾擊，血不多但痛，建議用高 ATK 砍擊收掉。</li>
+        <li><b>哥布林：</b> 均衡型，小小 dodge，物防/魔防普通。</li>
+        <li><b>骷髏兵：</b> 物防高、魔防低 → 推薦魔法攻擊。</li>
+        <li><b>野狼：</b> 魔防高、物防低，自己 dodge 也偏高 → 推薦砍擊。</li>
+        <li><b>石頭人：</b> 超高物防、魔防很低，防禦也很厚，最怕 <b>盾擊</b>（用 DEF 打穿一切）。</li>
+        <li><b>蝙蝠：</b> 魔防高又很會閃 → 魔法攻擊必中最穩。</li>
     </ul>
 
     <h3>📊 能力值說明</h3>
@@ -260,10 +258,9 @@
         <li><b>DEF：</b> 減少怪物物理傷害，並決定：
             <ul>
                 <li>🛡️ 盾擊傷害 = DEF（無視防禦）。</li>
-                <li>🚫 防禦打擊傷害 = DEF 的一定比例。</li>
             </ul>
         </li>
-        <li><b>MATK：</b> 魔攻，用來提升部份技能效果（回血量等）與武器精練加成。</li>
+        <li><b>MATK：</b> 魔攻，用來計算魔法攻擊傷害與部份回復量。</li>
         <li><b>閃避：</b> 有機率完全閃掉敵方攻擊（敏捷戒指、盾牌詞條可提升）。</li>
         <li><b>平手勝率：</b> 雙方出同招時，我方被判定為「贏」的機率。</li>
         <li><b>爆擊：</b> 有幸運戒指時大幅提高；砍擊 / 盾擊都有機會爆擊，造成雙倍傷害。</li>
@@ -273,16 +270,15 @@
     <ul>
         <li><b>幸運戒指 (CRIT)</b>
             <ul>
-                <li>效果：提高爆擊機率，並略微提升魔法傷害相關效果。</li>
+                <li>效果：提高暴擊機率，並略微提升魔法相關傷害。</li>
                 <li>爆擊率：約 20% (Lv1) → 50% (Lv4)。</li>
-                <li>爆擊發生時，砍擊/盾擊/魔法傷害 ×2。</li>
+                <li>爆擊發生時，砍擊/盾擊傷害 ×2。</li>
             </ul>
         </li>
         <li><b>生命戒指 (HEAL)</b>
             <ul>
-                <li>效果：防禦成功時會回復 HP，同時提高 DEF 與防禦打擊傷害。</li>
+                <li>效果：防禦成功時回復 HP，並提升 DEF。</li>
                 <li>防禦成功回復：約 8~24 HP（隨等級上升）。</li>
-                <li>額外提升防禦最多約 +20%，防禦打擊用到的比例也一起增加。</li>
             </ul>
         </li>
         <li><b>敏捷指環 (DODGE)</b>
@@ -293,21 +289,17 @@
         </li>
         <li><b>魔導指環 (MAGIC)</b>
             <ul>
-                <li>效果：大幅提升魔法相關傷害 / 回復計算中的 MATK。</li>
-                <li>魔法傷害加成：約 +25%~+100%（Lv1~Lv4）。</li>
+                <li>效果：大幅提升魔法攻擊傷害。</li>
             </ul>
         </li>
         <li><b>狂戰士指環 (BERSERKER)</b>
             <ul>
-                <li>效果：犧牲最大 HP 換取大量 ATK，並有機會多段攻擊。</li>
-                <li>將最大 HP 的約 30%~60% 轉成額外 ATK，同時 DEF 會下降一部份。</li>
-                <li>物理攻擊時有機會 2～3 連擊（等級越高觸發率越高）。</li>
+                <li>效果：犧牲最大 HP 換取大量 ATK，物理攻擊有機會多段攻擊。</li>
             </ul>
         </li>
         <li><b>平衡指環 (BALANCE)</b>
             <ul>
                 <li>效果：提高平手時由勇者獲勝的機率。</li>
-                <li>平手勝率額外 +10%~+40%，讓你出同招時更容易由你打人。</li>
             </ul>
         </li>
     </ul>
@@ -330,19 +322,19 @@
     </ul>
 
     <h3>🧲 武器 / 盾牌詞條說明</h3>
-    <p><b>武器詞條（會套用在砍擊、部分技能）</b></p>
+    <p><b>武器詞條（會套用在砍擊、盾擊等物理行為）</b></p>
     <ul>
-        <li><b>追加攻擊 (W_EXTRA_HIT)：</b> 砍擊時有 20% 機率再打一次相同傷害。</li>
-        <li><b>銳利之刃 (W_ATK_UP)：</b> 提升少量物理 ATK。</li>
-        <li><b>魔力導管 (W_MAGIC_UP)：</b> 提升少量 MATK。</li>
+        <li><b>追加攻擊 (W_EXTRA_HIT)：</b> 物理攻擊時有 20% 機率再追加一次相同傷害。</li>
+        <li><b>銳利之刃 (W_ATK_UP)：</b> 增加少量 ATK。</li>
+        <li><b>魔力導管 (W_MAGIC_UP)：</b> 增加少量 MATK。</li>
         <li><b>破甲 (W_ARMOR_PEN)：</b> 砍擊時略微無視敵方防禦。</li>
-        <li><b>吸血 (W_LIFESTEAL)：</b> 造成傷害的一部份會回復自身 HP。</li>
+        <li><b>吸血 (W_LIFESTEAL)：</b> 造成傷害的一部分會回復自身 HP。</li>
         <li><b>戰鬥本能 (W_BALANCE)：</b> 平手時稍微提高我方判定勝率。</li>
     </ul>
     <p><b>盾牌詞條（防禦相關）</b></p>
     <ul>
         <li><b>格擋 (S_BLOCK)：</b> 受到傷害時有 20% 機率再減半。</li>
-        <li><b>魔力護罩 (S_MAGIC_GUARD)：</b> 使用盾擊 / 魔法相關行為時有 20% 機率啟動 3 回合 50% 減傷。</li>
+        <li><b>魔力護罩 (S_MAGIC_GUARD)：</b> 使用魔法攻擊 / 盾擊時有 20% 機率啟動 3 回合 50% 減傷。</li>
         <li><b>厚重護甲 (S_DEF_UP)：</b> 提升少量 DEF。</li>
         <li><b>冷靜判斷 (S_TIE_UP)：</b> 提升少量平手勝率。</li>
         <li><b>荊棘護盾 (S_REFLECT)：</b> 受到傷害時將一部份反射給敵人。</li>
@@ -357,7 +349,7 @@
                 <li>換成新的武器時，精練等級與精練詞條會<b>完整保留</b>，自動套用在新武器上。</li>
             </ul>
         </li>
-        <li><b>盾牌精練：</b> 綁在該面盾牌上，換盾會換掉（符合「盾本身變厚」的概念）。</li>
+        <li><b>盾牌精練：</b> 綁在該面盾牌上，換盾會換掉。</li>
         <li><b>分解：</b>
             <ul>
                 <li>灰裝不能分解，其它裝備分解成素材：綠 1 / 藍 2 / 紫 3 / 橘 4 / 紅 5。</li>
@@ -368,14 +360,6 @@
             <ul>
                 <li>武器素材：每累積 5 點 → 進行一次武器精練。</li>
                 <li>盾牌素材：每累積 5 點 → 進行一次盾牌精練（綁在目前裝備的盾）。</li>
-            </ul>
-        </li>
-        <li><b>精練效果：</b>
-            <ul>
-                <li>武器精練：提升 MATK（魔攻），並在特定等級給予武器詞條。</li>
-                <li>盾牌精練：提高盾牌防禦力，並在特定等級給予盾牌詞條。</li>
-                <li>每 5 級精練會增加一條詞條（最多 6 條），失敗跌破門檻會收回一條。</li>
-                <li>紫武起手 1 條、橘武 2 條、紅武 3 條基礎詞條。</li>
             </ul>
         </li>
     </ul>
@@ -397,14 +381,12 @@
         <li>練回原本等級：
             <ul>
                 <li>升回舊的最高等級時，只會補回因降級失去的 HP，不會再多一次能力成長。</li>
-                <li>只有超過歷史最高等級（例如第一次到達 Lv.16）時，才會再往上抽一次成長數值。</li>
             </ul>
         </li>
         <li>Boss 最低難度：
             <ul>
                 <li>每隻 Boss 有自己的基準等級（例如 Boss1=1, Boss2=2, Boss3=3）。</li>
                 <li>Boss 的實際強度使用 <code>max(你的等級, Boss基準等級×5)</code> 去計算。</li>
-                <li>就算你一次死到只剩 Lv.3，最終 Boss 仍會至少當作 Lv.15 的敵人，不會變成弱雞。</li>
             </ul>
         </li>
     </ul>
@@ -472,7 +454,6 @@
         weaponRefineAffixes: []
     };
 
-    // 盾牌精練顯示用
     function getShieldRefineLevel() {
         return hero.equipment.SHIELD.refine || 0;
     }
@@ -486,9 +467,9 @@
     let healCooldownTimer = null;
 
     const CLASH_RULES = {
-        '⚔️': '🛡️',
-        '🛡️': '🚫',
-        '🚫': '⚔️'
+        '⚔️': '🛡️',  // 砍擊克魔法
+        '🛡️': '🚫',  // 魔法克盾擊
+        '🚫': '⚔️'   // 盾擊克砍擊
     };
 
     const RING_ABILITIES = [
@@ -501,7 +482,7 @@
         {
             id: 'HEAL',
             name: '生命戒指',
-            desc: '防禦成功時回復 HP，並提升防禦與防禦打擊傷害',
+            desc: '防禦成功時回復 HP，並提升防禦',
             effect: (hero) => {
                 const tier = hero.equipment.RING.tier;
                 const heal = 8 + tier * 4;
@@ -550,7 +531,7 @@
 
     const SHIELD_AFFIX_POOL = [
         { id: 'S_BLOCK',        name: '格擋',       desc: '受到傷害時有 20% 機率減少 50% 傷害。' },
-        { id: 'S_MAGIC_GUARD',  name: '魔力護罩',   desc: '施放盾擊 / 魔法時有 20% 機率獲得 3 回合 50% 減傷效果。' },
+        { id: 'S_MAGIC_GUARD',  name: '魔力護罩',   desc: '施放魔法 / 盾擊時有 20% 機率獲得 3 回合 50% 減傷效果。' },
         { id: 'S_DEF_UP',       name: '厚重護甲',   desc: '提高少量防禦力。' },
         { id: 'S_TIE_UP',       name: '冷靜判斷',   desc: '稍微提高平手勝率。' },
         { id: 'S_REFLECT',      name: '荊棘護盾',   desc: '受到傷害時反彈部分傷害給敵人。' },
@@ -618,18 +599,19 @@
         'Mythic': 'Rarity-Mythic'
     };
 
+    // 小怪/王：加入 mDef 與 dodge
     const ENEMIES = {
         SMALL: [
-            { name: "哥布林", hp: 30, atk: 12, def: 5,  mDef: 5,  lootChance: 0.6, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
-            { name: "骷髏兵", hp: 35, atk: 10, def: 8,  mDef: 4,  lootChance: 0.6, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
-            { name: "野狼",  hp: 40, atk: 8,  def: 6,  mDef: 6,  lootChance: 0.6, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
-            { name: "石頭人", hp: 50, atk: 6,  def: 18, mDef: 2,  lootChance: 0.5, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
-            { name: "蝙蝠", hp: 20, atk: 15, def: 3,  mDef: 9,  lootChance: 0.7, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
+            { name: "哥布林", hp: 30, atk: 12, def: 6,  mDef: 6,  dodge: 5,  lootChance: 0.6, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
+            { name: "骷髏兵", hp: 35, atk: 10, def: 14, mDef: 4,  dodge: 6,  lootChance: 0.6, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
+            { name: "野狼",  hp: 40, atk: 11, def: 4,  mDef: 16, dodge: 12, lootChance: 0.6, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
+            { name: "石頭人", hp: 50, atk: 8,  def: 22, mDef: 3,  dodge: 2,  lootChance: 0.5, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
+            { name: "蝙蝠", hp: 24, atk: 15, def: 3,  mDef: 20, dodge: 20, lootChance: 0.7, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
         ],
         BOSS: [
-            { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 8,  mDef: 12, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
-            { level: 2, name: "火焰巨龍", hp: 380, atk: 28, def: 12, mDef: 10, lootChance: 1.0, exp: 160, bias: { '⚔️': 0.5, '🛡️': 0.2, '🚫': 0.3 } },
-            { level: 3, name: "遠古魔神", hp: 650, atk: 45, def: 14, mDef: 14, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } }
+            { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
+            { level: 2, name: "火焰巨龍", hp: 380, atk: 28, def: 24, mDef: 12, dodge: 12, lootChance: 1.0, exp: 160, bias: { '⚔️': 0.5, '🛡️': 0.2, '🚫': 0.3 } },
+            { level: 3, name: "遠古魔神", hp: 650, atk: 45, def: 26, mDef: 26, dodge: 15, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } }
         ]
     };
 
@@ -747,17 +729,6 @@
         return base;
     }
 
-    function getDefCounterDamage() {
-        const baseRatio = 0.15;
-        let extraRatio = 0;
-        if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
-            const tier = hero.equipment.RING.tier;
-            extraRatio = Math.min(0.15, 0.05 * tier);
-        }
-        const ratio = baseRatio + extraRatio;
-        return Math.max(1, Math.floor(hero.currentDefense * ratio));
-    }
-
     function getMagicAttackValue() {
         let magic = hero.currentMagicAtk;
         const ring = hero.equipment.RING;
@@ -779,7 +750,7 @@
         if (ring && ring.ability && ring.ability.id === 'CRIT') {
             return (0.10 + ring.tier * 0.10) * 100;
         }
-        return 5; // 基礎爆擊 5%
+        return 5;
     }
 
     function getWeaponRefineSuccessRate(nextRefineLevel) {
@@ -868,7 +839,6 @@
         hero.currentDefense = hero.baseDefense + shieldPower;
         hero.healRingDefBonus = 0;
 
-        // 生命戒指防禦加成
         if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
             const tier = hero.equipment.RING.tier;
             const ratio = Math.min(0.20, 0.05 * tier);
@@ -986,7 +956,7 @@
             ringDetailText += `<span style="color:red;"> (ATK+${hero.berserkerBonus}, DEF-${hero.berserkerPenalty}，物攻有機會多段攻擊)</span>`;
         } else if (ringId === 'HEAL' && hero.healRingDefBonus > 0) {
             const extraRatio = Math.min(0.20, 0.05 * tier) * 100;
-            ringDetailText += `<span style="color:#2196F3;"> (防禦+${hero.healRingDefBonus}，防禦加成約 +${extraRatio.toFixed(0)}%，防禦打擊傷害提高)</span>`;
+            ringDetailText += `<span style="color:#2196F3;"> (防禦+${hero.healRingDefBonus}，防禦加成約 +${extraRatio.toFixed(0)}%)</span>`;
         } else if (ringId === 'MAGIC') {
             const rate = (MAGIC_RING_MAGIC_RATE[tier] || 0) * 100;
             ringDetailText += `<span style="color:#9c27b0;"> (魔法傷害 +${rate.toFixed(0)}%)</span>`;
@@ -1087,7 +1057,6 @@
 
     function enterMap() {
         if (gameState === 'CREDITS') {
-            // 結局後回地圖的話重設戰鬥畫面
             mainView.style.whiteSpace = 'pre';
         }
         gameState = 'MAP';
@@ -1178,7 +1147,6 @@
             if (bossLevel > ENEMIES.BOSS.length) return;
             const enemyData = ENEMIES.BOSS[bossLevel - 1];
 
-            // Boss 最低難度：使用 max(英雄等級, Boss.level * 5)
             const effectiveLevel = Math.max(hero.level, enemyData.level * 5);
             const levelFactor = 1 + (effectiveLevel - 1) * 0.15;
 
@@ -1222,8 +1190,8 @@
         updateBattleView();
         setCommands(
             { text: "⚔️ 砍擊 (物理)", value: '⚔️' },
-            { text: "🛡️ 盾擊 (DEF 無視防禦)", value: '🛡️' },
-            { text: "🚫 防禦打擊", value: '🚫' },
+            { text: "🪄 魔法攻擊 (必中)", value: '🛡️' },
+            { text: "🛡️ 盾擊 (DEF 無視防禦)", value: '🚫' },
             handleBattleAction,
             'BATTLE'
         );
@@ -1320,6 +1288,13 @@ ${art.join('\n')}
         return dmg;
     }
 
+    // ★ 怪物閃避：只會閃 砍擊 & 盾擊，魔法攻擊必定命中
+    function enemyDodged(playerMove) {
+        if (playerMove === '🛡️') return false; // 魔法攻擊必中
+        const dodge = currentEnemy.dodge || 0;
+        return Math.random() * 100 < dodge;
+    }
+
     async function handleBattleAction(playerMove) {
         if (gameState !== 'BATTLE') return;
         disableCommands(true);
@@ -1340,76 +1315,82 @@ ${art.join('\n')}
             const isHeroWin    = CLASH_RULES[playerMove] === monsterMove;
             const isMonsterWin = CLASH_RULES[monsterMove] === playerMove;
 
-            const baseSwordDmg = Math.max(1, hero.currentAttack - (currentEnemy.def || 0));
-
-            // 盾擊：用 DEF 當傷害，不看防禦
-            const SHIELD_DMG = Math.max(1, hero.currentDefense);
-
-            const DEFENSIVE_COUNTER_DMG = getDefCounterDamage();
+            const baseSwordDmg  = Math.max(1, hero.currentAttack - (currentEnemy.def || 0));
+            const baseMagicDmg  = Math.max(1, getMagicAttackValue() - (currentEnemy.mDef || currentEnemy.def || 0));
+            const SHIELD_DMG    = Math.max(1, hero.currentDefense); // 盾擊=DEF，完全無視防禦
 
             if (isHeroWin) {
                 let damage = 0;
                 let isPhysical = false;
+                let isMagic = false;
 
                 if (playerMove === '⚔️') {
                     damage = baseSwordDmg;
                     isPhysical = true;
                 } else if (playerMove === '🛡️') {
+                    damage = baseMagicDmg;
+                    isMagic = true;
+                } else if (playerMove === '🚫') {
                     damage = SHIELD_DMG;
-                    isPhysical = true; // 盾擊當物理處理（可吃狂戰、多段、吸血）
+                    isPhysical = true;
+                    if (currentEnemy.name === '石頭人') {
+                        damage *= 2;
+                        log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
+                    }
                 }
 
-                const ring = hero.equipment.RING;
-                if (isPhysical &&
-                    ring.ability &&
-                    ring.ability.id === 'CRIT' &&
-                    ring.ability.effect(ring.tier)) {
-                    damage = Math.floor(damage * 2);
-                    log(`⚡ 戒指效果啟動: 暴擊!`);
-                    flashBattleView('crit');
+                if (enemyDodged(playerMove)) {
+                    log(`😈 ${currentEnemy.name} 成功閃避了你的攻擊！`);
+                    damage = 0;
+                } else {
+                    const ring = hero.equipment.RING;
+                    if (isPhysical &&
+                        ring.ability &&
+                        ring.ability.id === 'CRIT' &&
+                        ring.ability.effect(ring.tier)) {
+                        damage = Math.floor(damage * 2);
+                        log(`⚡ 戒指效果啟動: 暴擊!`);
+                        flashBattleView('crit');
+                    }
+                    if (isPhysical && damage > 0) {
+                        damage = applyHeroAttackEffects(damage, true);
+                    }
+                    if (playerMove === '🛡️' || playerMove === '🚫') {
+                        tryTriggerMagicGuard();
+                    }
+                    currentEnemy.hp -= damage;
+                    log(`✅ 勇者 ${playerMove} 贏了 ${monsterMove}，造成 ${damage} 點傷害!`);
+                    flashBattleView('hero-hit');
                 }
-
-                if (isPhysical && damage > 0) {
-                    damage = applyHeroAttackEffects(damage, true);
-                }
-
-                if (playerMove === '🛡️') {
-                    tryTriggerMagicGuard();
-                }
-
-                currentEnemy.hp -= damage;
-                log(`✅ 勇者 ${playerMove} 贏了 ${monsterMove}，造成 ${damage} 點傷害!`);
-                flashBattleView('hero-hit');
             } else if (playerMove === monsterMove) {
                 log(`🤝 雙方出招相同 (${playerMove})，進入平手機率判定!`);
                 const tieWinChance = hero.currentTieWinRate / 100;
                 if (Math.random() < tieWinChance) {
                     log(`✨ 判定成功! 勇者獲得優勢!`);
-                    if (playerMove === '🚫') {
-                        let counterDmg = DEFENSIVE_COUNTER_DMG;
+
+                    let damage = 0;
+                    let isPhysical = false;
+                    let isMagic = false;
+
+                    if (playerMove === '⚔️') {
+                        damage = baseSwordDmg;
+                        isPhysical = true;
+                    } else if (playerMove === '🛡️') {
+                        damage = baseMagicDmg;
+                        isMagic = true;
+                    } else if (playerMove === '🚫') {
+                        damage = SHIELD_DMG;
+                        isPhysical = true;
                         if (currentEnemy.name === '石頭人') {
-                            counterDmg *= 2;
-                            log('💥 石頭人特別怕防禦打擊，傷害加倍！');
+                            damage *= 2;
+                            log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
                         }
-                        currentEnemy.hp -= counterDmg;
-                        log(`💥 防禦打擊成功! 造成 ${counterDmg} 點反擊傷害。`);
-                        if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
-                            hero.equipment.RING.ability.effect(hero);
-                            log(`💖 生命戒指: 防禦成功，恢復 HP!`);
-                            flashBattleView('heal');
-                            updateStatus();
-                        }
+                    }
+
+                    if (enemyDodged(playerMove)) {
+                        log(`😈 ${currentEnemy.name} 在平手判定中成功閃避你的攻擊！`);
+                        damage = 0;
                     } else {
-                        let damage = 0;
-                        let isPhysical = false;
-                        if (playerMove === '⚔️') {
-                            damage = baseSwordDmg;
-                            isPhysical = true;
-                        } else if (playerMove === '🛡️') {
-                            damage = SHIELD_DMG;
-                            isPhysical = true;
-                            tryTriggerMagicGuard();
-                        }
                         const ring = hero.equipment.RING;
                         if (isPhysical &&
                             ring.ability &&
@@ -1422,10 +1403,22 @@ ${art.join('\n')}
                         if (isPhysical && damage > 0) {
                             damage = applyHeroAttackEffects(damage, true);
                         }
+                        if (playerMove === '🛡️' || playerMove === '🚫') {
+                            tryTriggerMagicGuard();
+                        }
                         currentEnemy.hp -= damage;
                         log(`✅ 勇者造成 ${damage} 點傷害!`);
+                        flashBattleView('hero-hit');
                     }
-                    flashBattleView('hero-hit');
+
+                    if (playerMove === '🚫' && !enemyDodged('🚫')) {
+                        if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
+                            const heal = hero.equipment.RING.ability.effect(hero);
+                            log(`💖 生命戒指: 防禦成功，恢復 ${heal} HP!`);
+                            flashBattleView('heal');
+                            updateStatus();
+                        }
+                    }
                 } else {
                     log(`💀 判定失敗... 怪物獲得優勢!`);
                     let monsterDamage = Math.max(1, currentEnemy.atk - hero.currentDefense);
@@ -1436,19 +1429,34 @@ ${art.join('\n')}
             } else if (isMonsterWin) {
                 log(`🚫 勇者 ${playerMove} 被 ${monsterMove} 克制，招式被擋開。`);
                 if (playerMove === '🚫' && monsterMove === '⚔️') {
-                    let counterDmg = DEFENSIVE_COUNTER_DMG;
+                    let damage = SHIELD_DMG;
                     if (currentEnemy.name === '石頭人') {
-                        counterDmg *= 2;
-                        log('💥 石頭人特別怕防禦打擊，傷害加倍！');
+                        damage *= 2;
+                        log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
                     }
-                    currentEnemy.hp -= counterDmg;
-                    log(`💥 防禦打擊! 造成 ${counterDmg} 點反擊傷害。`);
-                    flashBattleView('hero-hit');
-                    if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
-                        hero.equipment.RING.ability.effect(hero);
-                        log(`💖 生命戒指: 防禦成功，恢復 HP!`);
-                        flashBattleView('heal');
-                        updateStatus();
+                    if (enemyDodged('🚫')) {
+                        log(`😈 ${currentEnemy.name} 閃過了你的盾擊反擊！`);
+                        damage = 0;
+                    } else {
+                        const ring = hero.equipment.RING;
+                        if (ring.ability &&
+                            ring.ability.id === 'CRIT' &&
+                            ring.ability.effect(ring.tier)) {
+                            damage = Math.floor(damage * 2);
+                            log(`⚡ 戒指效果啟動: 暴擊!`);
+                            flashBattleView('crit');
+                        }
+                        damage = applyHeroAttackEffects(damage, true);
+                        tryTriggerMagicGuard();
+                        currentEnemy.hp -= damage;
+                        log(`💥 盾擊反擊! 造成 ${damage} 點傷害。`);
+                        flashBattleView('hero-hit');
+                        if (hero.equipment.RING.ability && hero.equipment.RING.ability.id === 'HEAL') {
+                            const heal = hero.equipment.RING.ability.effect(hero);
+                            log(`💖 生命戒指: 防禦成功，恢復 ${heal} HP!`);
+                            flashBattleView('heal');
+                            updateStatus();
+                        }
                     }
                 }
             }
@@ -1464,7 +1472,7 @@ ${art.join('\n')}
 
             if (isHeroWin) {
                 log(`🛡️ 怪物 ${monsterMove} 被 ${playerMove} 克制，招式無效。`);
-            } else if (isMonsterWin) {
+            } else if (isMonsterWin || playerMove === monsterMove) {
                 if (hero.equipment.RING.ability &&
                     hero.equipment.RING.ability.id === 'DODGE' &&
                     Math.random() * 100 < hero.currentDodge) {
@@ -1473,7 +1481,7 @@ ${art.join('\n')}
                 } else {
                     let monsterDamage = Math.max(1, currentEnemy.atk - hero.currentDefense);
                     applyDamageToHero(monsterDamage);
-                    log(`💥 ${currentEnemy.name} ${monsterMove} 贏了 ${playerMove}，造成 ${monsterDamage} 點傷害!`);
+                    log(`💥 ${currentEnemy.name} ${monsterMove} 攻擊，造成 ${monsterDamage} 點傷害!`);
                     flashBattleView('monster-hit');
                 }
             }
@@ -1625,7 +1633,6 @@ ${art.join('\n')}
             const oldLevel = hero.level;
             hero.level = Math.max(1, hero.level - 1);
 
-            // 調整 expToNextLevel
             let currentExpToNext = 10;
             let tempLevel = 2;
             while (tempLevel <= hero.level) {
@@ -1635,7 +1642,6 @@ ${art.join('\n')}
             hero.expToNextLevel = currentExpToNext;
             hero.exp = Math.max(0, hero.expToNextLevel + hero.exp);
 
-            // 只扣 HP，不動已成長的能力
             hero.maxHp = Math.max(HERO_MAX_HP_START + (hero.level - 1) * HP_PER_LEVEL, HERO_MAX_HP_START);
             hero.hp = hero.maxHp;
             log(`⬇️ 等級從 Lv.${oldLevel} 降到 Lv.${hero.level}，最大 HP 跟著降低，其餘能力保留。`);
@@ -1681,7 +1687,6 @@ ${art.join('\n')}
         else if (phase === 1) table = baseTable1;
         else table = baseTable2;
 
-        // 戒指不跟紅武紅盾綁死，最高給到橘／少量紫
         if (lootType === 'RING') {
             table = [
                 { rarity: 'Mythic',    weight: 0 },
@@ -1796,7 +1801,6 @@ ${art.join('\n')}
             else if (lootRIndex === curRIndex && loot.power > currentW.power) isBetter = true;
 
             if (isBetter) {
-                // 先把舊武拆掉
                 const matOld = RARITY_MATERIAL_VALUE[currentW.rarity] || 0;
                 if (matOld > 0 && currentW.name !== "徒手") {
                     weaponMaterials += matOld;
@@ -1826,7 +1830,6 @@ ${art.join('\n')}
             return;
         }
 
-        // 盾牌
         const currentS = hero.equipment.SHIELD;
         if (!currentS || currentS.name === "無") {
             hero.equipment.SHIELD = loot;

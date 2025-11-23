@@ -648,11 +648,11 @@
     // 小怪 / 王
     const ENEMIES = {
         SMALL: [
-            { name: "哥布林", hp: 32, atk: 12, def: 8,  mDef: 8,  dodge: 20, lootChance: 0.80, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
-            { name: "骷髏兵", hp: 45, atk: 10, def: 16, mDef: 6,  dodge: 5,  lootChance: 0.75, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
-            { name: "野狼",  hp: 42, atk: 11, def: 6,  mDef: 18, dodge: 15, lootChance: 0.80, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
-            { name: "石頭人", hp: 60, atk: 8,  def: 24, mDef: 4,  dodge: 5,  lootChance: 0.75, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
-            { name: "蝙蝠", hp: 22, atk: 14, def: 4,  mDef: 22, dodge: 35, lootChance: 0.85, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
+            { name: "哥布林", hp: 32, atk: 10, def: 8,  mDef: 12,  dodge: 35, lootChance: 0.80, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
+            { name: "骷髏兵", hp: 45, atk: 8, def: 16, mDef: 6,  dodge: 5,  lootChance: 0.75, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
+            { name: "野狼",  hp: 42, atk: 9, def: 6,  mDef: 24, dodge: 20, lootChance: 0.80, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
+            { name: "石頭人", hp: 60, atk: 7,  def: 30, mDef: 4,  dodge: 5,  lootChance: 0.75, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
+            { name: "蝙蝠", hp: 22, atk: 12, def: 4,  mDef: 8, dodge: 60, lootChance: 0.85, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
         ],
         BOSS: [
             { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
@@ -725,14 +725,14 @@
     };
 
     const ENEMY_INTRO_LINES = {
-        "哥布林": "哥布林：『人不是我殺的，我只是負責收屍。』",
-        "骷髏兵": "骷髏兵：『我先說，勞健保沒幫我保。』",
-        "野狼":   "野狼：『我只咬加班的人。』",
-        "石頭人": "石頭人：『我防禦超高，攻擊超低，跟我薪水一樣。』",
-        "蝙蝠":   "蝙蝠：『我不是吸血鬼，我只是想喝無糖。』",
-        "不死巫妖": "不死巫妖：『你來陪我加班到天亮。』",
-        "火焰巨龍": "火焰巨龍：『我只對起火的人噴火。』",
-        "遠古魔神": "遠古魔神：『我就是你壓力的具象化。』"
+        "哥布林": "哥布林：『對面有個叫Jack的叫我來這，說這有好康?』",
+        "骷髏兵": "骷髏兵：『唉~房貸還沒繳完就死了，只好回來加班。』",
+        "野狼":   "野狼：『我剛剛UBER點的午餐就是你嗎?』",
+        "石頭人": "石頭人：『我的皮很硬，我的肝更硬。』",
+        "蝙蝠":   "蝙蝠：『什麼動物不用休息？』..................答：『蝙蝠，因為"不休蝙蝠"』",
+        "不死巫妖": "不死巫妖：『你問我永生的秘訣？每天睡滿八小時，然後多運動，就這麼簡單。』",
+        "火焰巨龍": "火焰巨龍：『我會噴火是因為我有嚴重的胃食道逆流，晚餐吃太辣了。』",
+        "遠古魔神": "遠古魔神：『我就是資本主義的具象化，你每天都得幫我打工。』"
     };
 
     const mainView = document.getElementById('main-view');
@@ -1202,7 +1202,7 @@
         const index = Math.floor(Math.random() * ENEMIES.SMALL.length);
         const enemyData = ENEMIES.SMALL[index];
 
-        const levelFactor = 1 + (hero.level - 1) * 0.45; // ← 小怪整體成長倍率
+        const levelFactor = 1 + (hero.level - 1) * 0.55; // ← 小怪整體成長倍率
         const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
         const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
         const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.22)); // ← 小怪def成長
@@ -2606,6 +2606,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

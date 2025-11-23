@@ -2128,61 +2128,130 @@ ${art.join('\n')}
         setTimeout(enterMap, 2000);
     }
 
-    function getRandomRarity(lootType, isBoss = false) {
-        let phase = 0;
-        if (hero.level >= 8) phase = 1;   // 成長階段 1：升級後紫色略提高
-        if (hero.level >= 15) phase = 2;  // 成長階段 2：橘紅開始更常見
-        if (hero.level >= 22) phase = 3;  // 成長階段 3：灰綠極低，紫橘紅比率大幅提高
-
-        const baseTable0 = [
-            { rarity: 'Mythic',    weight: 0 },
-            { rarity: 'Legendary', weight: 0 },
-            { rarity: 'Epic',      weight: 15 },
-            { rarity: 'Rare',      weight: 18 },
-            { rarity: 'Magic',     weight: 23 },
-            { rarity: 'Normal',    weight: 30 }
-        ];
-        const baseTable1 = [
-            { rarity: 'Mythic',    weight: 0 },
-            { rarity: 'Legendary', weight: 10 },
-            { rarity: 'Epic',      weight: 15 },
-            { rarity: 'Rare',      weight: 18 },
-            { rarity: 'Magic',     weight: 23 },
-            { rarity: 'Normal',    weight: 30 }
-        ];
-        const baseTable2 = [
-            { rarity: 'Mythic',    weight: 4 },
-            { rarity: 'Legendary', weight: 10 },
-            { rarity: 'Epic',      weight: 15 },
-            { rarity: 'Rare',      weight: 18 },
-            { rarity: 'Magic',     weight: 23 },
-            { rarity: 'Normal',    weight: 30 }
-        ];
-
-        let table;
-        if (phase === 0) table = baseTable0;
-        else if (phase === 1) table = baseTable1;
-        else table = baseTable2;
-
-        if (lootType === 'RING') {
-            table = [
-                { rarity: 'Mythic',    weight: 0 },
-                { rarity: 'Legendary', weight: 5 },
-                { rarity: 'Epic',      weight: 12 },
-                { rarity: 'Rare',      weight: 20 },
-                { rarity: 'Magic',     weight: 25 },
-                { rarity: 'Normal',    weight: 20 }
+        function getRandomRarity(lootType, isBoss = false) {
+            // ===== 依等級切換成長階段 =====
+            let phase = 0;
+            if (hero.level >= 8)  phase = 1;  // 成長階段 1
+            if (hero.level >= 15) phase = 2;  // 成長階段 2
+            if (hero.level >= 22) phase = 3;  // 成長階段 3
+        
+            // ===============================
+            // 一般裝備（武器 / 盾牌）掉落表
+            // 等級越高 → 灰綠下降、藍紫橘紅上升
+            // ===============================
+            const equipTable0 = [ // Lv 1–7：灰綠為主
+                { rarity: 'Normal',    weight: 45 },
+                { rarity: 'Magic',     weight: 35 },
+                { rarity: 'Rare',      weight: 15 },
+                { rarity: 'Epic',      weight: 5  },
+                { rarity: 'Legendary', weight: 0  },
+                { rarity: 'Mythic',    weight: 0  }
             ];
+            const equipTable1 = [ // Lv 8–14：開始看到紫
+                { rarity: 'Normal',    weight: 30 },
+                { rarity: 'Magic',     weight: 30 },
+                { rarity: 'Rare',      weight: 25 },
+                { rarity: 'Epic',      weight: 12 },
+                { rarity: 'Legendary', weight: 3  },
+                { rarity: 'Mythic',    weight: 0  }
+            ];
+            const equipTable2 = [ // Lv 15–21：紫為主，橘開始出現
+                { rarity: 'Normal',    weight: 15 },
+                { rarity: 'Magic',     weight: 20 },
+                { rarity: 'Rare',      weight: 30 },
+                { rarity: 'Epic',      weight: 25 },
+                { rarity: 'Legendary', weight: 8  },
+                { rarity: 'Mythic',    weight: 2  }
+            ];
+            const equipTable3 = [ // Lv 22+：紫橘很多，紅開始掉
+                { rarity: 'Normal',    weight: 8  },
+                { rarity: 'Magic',     weight: 12 },
+                { rarity: 'Rare',      weight: 25 },
+                { rarity: 'Epic',      weight: 30 },
+                { rarity: 'Legendary', weight: 18 },
+                { rarity: 'Mythic',    weight: 7  }
+            ];
+        
+            // ===============================
+            // 戒指掉落表（本來就比一般裝備更高稀有）
+            // 一樣分 4 個階段，但整體偏向 Rare 以上
+            // ===============================
+            const ringTable0 = [ // Lv 1–7
+                { rarity: 'Normal',    weight: 25 },
+                { rarity: 'Magic',     weight: 30 },
+                { rarity: 'Rare',      weight: 25 },
+                { rarity: 'Epic',      weight: 15 },
+                { rarity: 'Legendary', weight: 5  },
+                { rarity: 'Mythic',    weight: 0  }
+            ];
+            const ringTable1 = [ // Lv 8–14
+                { rarity: 'Normal',    weight: 15 },
+                { rarity: 'Magic',     weight: 25 },
+                { rarity: 'Rare',      weight: 30 },
+                { rarity: 'Epic',      weight: 20 },
+                { rarity: 'Legendary', weight: 8  },
+                { rarity: 'Mythic',    weight: 2  }
+            ];
+            const ringTable2 = [ // Lv 15–21
+                { rarity: 'Normal',    weight: 10 },
+                { rarity: 'Magic',     weight: 18 },
+                { rarity: 'Rare',      weight: 28 },
+                { rarity: 'Epic',      weight: 25 },
+                { rarity: 'Legendary', weight: 14 },
+                { rarity: 'Mythic',    weight: 5  }
+            ];
+            const ringTable3 = [ // Lv 22+
+                { rarity: 'Normal',    weight: 6  },
+                { rarity: 'Magic',     weight: 12 },
+                { rarity: 'Rare',      weight: 24 },
+                { rarity: 'Epic',      weight: 28 },
+                { rarity: 'Legendary', weight: 20 },
+                { rarity: 'Mythic',    weight: 10 }
+            ];
+        
+            // ===== 先依裝備類型選 table =====
+            let table;
+        
+            if (lootType === 'RING') {
+                // 戒指用戒指專用表
+                if      (phase === 0) table = ringTable0;
+                else if (phase === 1) table = ringTable1;
+                else if (phase === 2) table = ringTable2;
+                else                  table = ringTable3;
+            } else {
+                // 武器 / 盾牌用一般裝備表
+                if      (phase === 0) table = equipTable0;
+                else if (phase === 1) table = equipTable1;
+                else if (phase === 2) table = equipTable2;
+                else                  table = equipTable3;
+            }
+        
+            // ===== Boss 掉落額外偏向高稀有 =====
+            if (isBoss) {
+                table = table.map(entry => {
+                    let factor = 1;
+                    switch (entry.rarity) {
+                        case 'Normal':    factor = 0.5; break;  // 灰↓
+                        case 'Magic':     factor = 0.7; break;  // 綠↓
+                        case 'Rare':      factor = 1.0; break;
+                        case 'Epic':      factor = 1.4; break;  // 紫↑
+                        case 'Legendary': factor = 1.8; break;  // 橘↑↑
+                        case 'Mythic':    factor = 2.2; break;  // 紅↑↑↑
+                    }
+                    return { ...entry, weight: entry.weight * factor };
+                });
+            }
+        
+            // ===== 實際抽選 =====
+            const total = table.reduce((sum, e) => sum + e.weight, 0) || 1;
+            let r = Math.random() * total;
+            for (const e of table) {
+                if (r < e.weight) return e.rarity;
+                r -= e.weight;
+            }
+            return 'Normal';
         }
 
-        const total = table.reduce((sum, e) => sum + e.weight, 0) || 1;
-        let r = Math.random() * total;
-        for (const e of table) {
-            if (r < e.weight) return e.rarity;
-            r -= e.weight;
-        }
-        return 'Normal';
-    }
 
     function getPowerRange(rarity, isWeapon, isBoss) {
         const base = isWeapon ? 10 : 5;
@@ -2263,70 +2332,78 @@ ${art.join('\n')}
             return;
         }
 
-        if (lootType === 'WEAPON') {
-            const currentW = hero.equipment.WEAPON;
-
-            if (!currentW || currentW.name === "徒手") {
-                hero.equipment.WEAPON = loot;
-                log(`👍 裝備了新的 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
-                updateStatus();
+            if (lootType === 'WEAPON') {
+                const currentW = hero.equipment.WEAPON;
+        
+                // 1. 沒武器 / 徒手 → 直接裝上
+                if (!currentW || currentW.name === "徒手") {
+                    hero.equipment.WEAPON = loot;
+                    log(`👍 裝備了新的 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
+                    updateStatus();
+                    return;
+                }
+        
+                // 2. 判斷新武器有沒有比較好
+                const lootRIndex = RARITY_ORDER.indexOf(loot.rarity);
+                const curRIndex  = RARITY_ORDER.indexOf(currentW.rarity);
+        
+                let isBetter = false;
+                if (lootRIndex > curRIndex) isBetter = true;
+                else if (lootRIndex === curRIndex && loot.power > currentW.power) isBetter = true;
+        
+                if (isBetter) {
+                    // 2-1. 先把舊武器的資料全部存起來（要沿用的東西）
+                    const oldAffix         = currentW.affixes ? [...currentW.affixes] : [];
+                    const oldRefineLevel   = hero.weaponRefineLevel || 0;
+                    const oldRefineAffixes = hero.weaponRefineAffixes ? [...hero.weaponRefineAffixes] : [];
+        
+                    // 2-2. 舊武器拆成素材
+                    const matOld = (RARITY_MATERIAL_VALUE[currentW.rarity] || 0);
+                    if (matOld > 0 && currentW.name !== "徒手") {
+                        weaponMaterials += matOld;
+                        log(`🔧 原本的 <span class="${RARITY_COLORS[currentW.rarity]}">${currentW.name}</span> 被分解為武器素材 x${matOld}。 (武器素材: ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
+                        while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
+                            weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
+                            attemptWeaponRefine();
+                        }
+                    }
+        
+                    // 2-3. 換上新武器本體
+                    hero.equipment.WEAPON = loot;
+        
+                    // 2-4. 新武器自帶詞條 + 舊武器詞條 → 合併
+                    const newOwnAffix = loot.affixes || [];
+                    hero.equipment.WEAPON.affixes = [...new Set([...newOwnAffix, ...oldAffix])];
+        
+                    // 2-5. 精練等級與精練詞條完整沿用
+                    hero.weaponRefineLevel   = oldRefineLevel;
+                    hero.weaponRefineAffixes = [...oldRefineAffixes];
+        
+                    log(`⭐ 新武器更強！已更換為 <span class="${RARITY_COLORS[loot.rity]}">${loot.name}</span>（保留舊武器詞條與精練效果）！`);
+                    updateStatus();
+                } else {
+                    // 3. 新武器比較爛 → 直接拆成素材（不動原本武器）
+                    let mat = RARITY_MATERIAL_VALUE[loot.rarity] || 0;
+                    const sMatMod = hero.equipment.SHIELD.affixes && hero.equipment.SHIELD.affixes.includes('S_MAT_BOOST') ? 1 : 0;
+                    if (sMatMod && mat > 0 && Math.random() < 0.3) {
+                        mat += 1;
+                        log("🛠「打鐵兼收」發動，多出一點素材。");
+                    }
+                    if (mat > 0) {
+                        weaponMaterials += mat;
+                        log(`🔧 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span> 被分解為武器素材 x${mat}。 (武器素材: ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
+                        while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
+                            weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
+                            attemptWeaponRefine();
+                        }
+                    } else {
+                        log(`👎 灰色武器品質太差，被丟棄。`);
+                    }
+                    updateStatus();
+                }
                 return;
             }
 
-            const lootRIndex = RARITY_ORDER.indexOf(loot.rarity);
-            const curRIndex  = RARITY_ORDER.indexOf(currentW.rarity);
-
-            let isBetter = false;
-            if (lootRIndex > curRIndex) isBetter = true;
-            else if (lootRIndex === curRIndex && loot.power > currentW.power) isBetter = true;
-
-            if (isBetter) {
-                const matOld = RARITY_MATERIAL_VALUE[currentW.rarity] || 0;
-                if (matOld > 0 && currentW.name !== "徒手") {
-                    weaponMaterials += matOld;
-                    log(`🔧 原本的 <span class="${RARITY_COLORS[currentW.rarity]}">${currentW.name}</span> 被分解為武器素材 x${matOld}。 (武器素材: ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
-                    while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
-                        weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
-                        attemptWeaponRefine();
-                    }
-                }
-                // === 保留原詞條 ===
-                const oldAffix = hero.equipment.WEAPON.affixes || [];
-                const oldRefine = hero.weaponRefineLevel;
-                const oldRefineAffix = hero.weaponRefineAffixes || [];
-                hero.weaponRefineLevel = oldRefine;
-                hero.equipment.WEAPON = loot;
-
-                // 套回玩家原有的詞條（不覆蓋掉新掉落的）
-                hero.equipment.WEAPON.affixes = [...new Set([...loot.affixes, ...oldAffix])];
-
-                // 精練等級沿用
-                hero.weaponRefineLevel = oldRefine;
-                hero.weaponRefineAffixes = [...oldRefineAffix];
-
-                log(`⭐ 新武器更強！已更換為 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
-                updateStatus();
-            } else {
-                let mat = RARITY_MATERIAL_VALUE[loot.rarity] || 0;
-                const sMatMod = hero.equipment.SHIELD.affixes && hero.equipment.SHIELD.affixes.includes('S_MAT_BOOST') ? 1 : 0;
-                if (sMatMod && mat > 0 && Math.random() < 0.3) {
-                    mat += 1;
-                    log("🛠「打鐵兼收」發動，多出一點素材。");
-                }
-                if (mat > 0) {
-                    weaponMaterials += mat;
-                    log(`🔧 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span> 被分解為武器素材 x${mat}。 (武器素材: ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
-                    while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
-                        weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
-                        attemptWeaponRefine();
-                    }
-                } else {
-                    log(`👎 灰色武器品質太差，被丟棄。`);
-                }
-                updateStatus();
-            }
-            return;
-        }
 
         const currentS = hero.equipment.SHIELD;
         if (!currentS || currentS.name === "無") {
@@ -2431,4 +2508,5 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 

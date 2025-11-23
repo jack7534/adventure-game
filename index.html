@@ -1220,12 +1220,12 @@
         if (r < 0.5) {
             const lost = Math.max(1, Math.floor(hero.maxHp * 0.2));
             hero.hp = Math.max(1, hero.hp - lost);
-            log(`💔 你遇到一位自稱「只差你這個投資人就退休」的愛情騙子，被騙走了 ${lost} 點 HP（氣到內傷）。`);
+            log(`💔 你遇到一位自稱「會永遠愛你的」的愛情騙子，被騙走了 ${lost} 點 HP（氣到內傷）。`);
         } else {
             const maxLoss = Math.floor(hero.expToNextLevel * 0.3);
             const realLoss = Math.min(hero.exp, maxLoss);
             hero.exp -= realLoss;
-            log(`📉 對方說「幫你操作帳戶」，結果你少了 ${realLoss} 點經驗值，但還好沒有掉級。`);
+            log(`📉 對方說「幫你作股票投資」，結果投資失利，你少了 ${realLoss} 點經驗值，但還好沒有掉級。`);
         }
         updateStatus();
         setTimeout(enterMap, 800);
@@ -1236,13 +1236,13 @@
 
         if (action === 'Small') {
             const roll = Math.random();
-            if (roll < 0.55) {               // 普通小怪
+            if (roll < 0.58) {               // 普通小怪
                 startSmallBattle();
-            } else if (roll < 0.65) {        // 菁英怪
+            } else if (roll < 0.73) {        // 菁英怪
                 startEliteBattle();
-            } else if (roll < 0.80) {        // 寶箱
+            } else if (roll < 0.85) {        // 寶箱
                 adventureTreasure();
-            } else if (roll < 0.90) {        // 治療泉水
+            } else if (roll < 0.92) {        // 治療泉水
                 adventureSpring();
             } else if (roll < 0.97) {        // 好心人
                 adventureNiceGuy();
@@ -2130,8 +2130,9 @@ ${art.join('\n')}
 
     function getRandomRarity(lootType, isBoss = false) {
         let phase = 0;
-        if (bossLevel > 1) phase = 1;
-        if (bossLevel > 2) phase = 2;
+        if (hero.level >= 8) phase = 1;   // 成長階段 1：升級後紫色略提高
+        if (hero.level >= 15) phase = 2;  // 成長階段 2：橘紅開始更常見
+        if (hero.level >= 22) phase = 3;  // 成長階段 3：灰綠極低，紫橘紅比率大幅提高
 
         const baseTable0 = [
             { rarity: 'Mythic',    weight: 0 },
@@ -2215,9 +2216,9 @@ ${art.join('\n')}
         const name = isWeapon ? `${rarity}之劍` : `${rarity}之盾`;
         const equip = {
             type, name, power, rarity,
-            refine: type === 'SHIELD' ? 0 : undefined,
+            refine: 0,
+            refineSlots: 0,
             affixes: [],
-            refineSlots: type === 'SHIELD' ? 0 : undefined
         };
 
         const baseSlotsByRarity = {
@@ -2289,7 +2290,20 @@ ${art.join('\n')}
                         attemptWeaponRefine();
                     }
                 }
+                // === 保留原詞條 ===
+                const oldAffix = hero.equipment.WEAPON.affixes || [];
+                const oldRefine = hero.weaponRefineLevel;
+                const oldRefineAffix = hero.weaponRefineAffixes || [];
+                hero.weaponRefineLevel = oldRefine;
                 hero.equipment.WEAPON = loot;
+
+                // 套回玩家原有的詞條（不覆蓋掉新掉落的）
+                hero.equipment.WEAPON.affixes = [...new Set([...loot.affixes, ...oldAffix])];
+
+                // 精練等級沿用
+                hero.weaponRefineLevel = oldRefine;
+                hero.weaponRefineAffixes = [...oldRefineAffix];
+
                 log(`⭐ 新武器更強！已更換為 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
                 updateStatus();
             } else {
@@ -2417,3 +2431,4 @@ ${art.join('\n')}
 
 </body>
 </html>
+

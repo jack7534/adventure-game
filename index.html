@@ -486,9 +486,9 @@
     let healCooldownTimer = null;
 
     const CLASH_RULES = {
-        '⚔️': '🛡️',
-        '🛡️': '🚫',
-        '🚫': '⚔️'
+        '⚔️': '🌠',
+        '🌠': '🛡️',
+        '🛡️': '⚔️'
     };
 
     const RING_ABILITIES = [
@@ -648,16 +648,16 @@
     // 小怪 / 王
     const ENEMIES = {
         SMALL: [
-            { name: "哥布林", hp: 32, atk: 10, def: 8,  mDef: 12,  dodge: 35, lootChance: 0.80, exp: 8,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
-            { name: "骷髏兵", hp: 45, atk: 8, def: 16, mDef: 6,  dodge: 5,  lootChance: 0.75, exp: 10, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } },
-            { name: "野狼",  hp: 42, atk: 9, def: 6,  mDef: 24, dodge: 20, lootChance: 0.80, exp: 11, bias: { '⚔️': 0.6, '🛡️': 0.2, '🚫': 0.2 } },
-            { name: "石頭人", hp: 60, atk: 7,  def: 30, mDef: 4,  dodge: 5,  lootChance: 0.75, exp: 14, bias: { '⚔️': 0.1, '🛡️': 0.6, '🚫': 0.3 } },
-            { name: "蝙蝠", hp: 22, atk: 12, def: 4,  mDef: 8, dodge: 60, lootChance: 0.85, exp: 7,  bias: { '⚔️': 0.3, '🛡️': 0.4, '🚫': 0.3 } }
+            { name: "哥布林", hp: 32, atk: 9, def: 8,  mDef: 12,  dodge: 35, lootChance: 0.80, exp: 8,  bias: { '⚔️': 0.3, '🌠': 0.4, '🛡️': 0.3 } },
+            { name: "骷髏兵", hp: 45, atk: 8, def: 16, mDef: 6,  dodge: 5,  lootChance: 0.75, exp: 10, bias: { '⚔️': 0.3, '🌠': 0.3, '🛡️': 0.4 } },
+            { name: "野狼",  hp: 42, atk: 9, def: 6,  mDef: 24, dodge: 20, lootChance: 0.80, exp: 11, bias: { '⚔️': 0.6, '🌠': 0.2, '🛡️': 0.2 } },
+            { name: "石頭人", hp: 60, atk: 8,  def: 30, mDef: 4,  dodge: 5,  lootChance: 0.75, exp: 14, bias: { '⚔️': 0.6, '🌠': 0.1, '🛡️': 0.3 } },
+            { name: "蝙蝠", hp: 22, atk: 10, def: 4,  mDef: 8, dodge: 60, lootChance: 0.85, exp: 7,  bias: { '⚔️': 0.2, '🌠': 0.5, '🛡️': 0.3 } }
         ],
         BOSS: [
-            { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.4, '🛡️': 0.3, '🚫': 0.3 } },
-            { level: 2, name: "火焰巨龍", hp: 380, atk: 28, def: 24, mDef: 12, dodge: 12, lootChance: 1.0, exp: 160, bias: { '⚔️': 0.5, '🛡️': 0.2, '🚫': 0.3 } },
-            { level: 3, name: "遠古魔神", hp: 650, atk: 45, def: 26, mDef: 26, dodge: 15, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🛡️': 0.3, '🚫': 0.4 } }
+            { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.2, '🌠': 0.5, '🛡️': 0.3 } },
+            { level: 2, name: "火焰巨龍", hp: 380, atk: 28, def: 24, mDef: 12, dodge: 12, lootChance: 1.0, exp: 160, bias: { '⚔️': 0.5, '🌠': 0.2, '🛡️': 0.3 } },
+            { level: 3, name: "遠古魔神", hp: 650, atk: 45, def: 26, mDef: 26, dodge: 15, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🌠': 0.3, '🛡️': 0.4 } }
         ]
     };
 
@@ -1202,7 +1202,7 @@
         const index = Math.floor(Math.random() * ENEMIES.SMALL.length);
         const enemyData = ENEMIES.SMALL[index];
 
-        const levelFactor = 1 + (hero.level - 1) * 0.55; // ← 小怪整體成長倍率
+        const levelFactor = 1 + (hero.level - 1) * 0.52; // ← 小怪整體成長倍率
         const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
         const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
         const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.22)); // ← 小怪def成長
@@ -1409,8 +1409,8 @@
         updateBattleView();
         setCommands(
             { text: "⚔️ 砍擊 (物理)", value: '⚔️' },
-            { text: "🌠 魔法攻擊 (必中)", value: '🛡️' },
-            { text: "🛡️ 盾擊 (DEF 無視防禦)", value: '🚫' },
+            { text: "🌠 魔法攻擊 (必中)", value: '🌠' },
+            { text: "🛡️ 盾擊 (DEF 無視防禦)", value: '🛡️' },
             handleBattleAction,
             'BATTLE'
         );
@@ -1559,7 +1559,7 @@ ${art.join('\n')}
     function doShieldStrikeFollowUp(label) {
         if (!currentEnemy || currentEnemy.hp <= 0) return 0;
         const SHIELD_DMG = Math.max(1, hero.currentDefense);
-        if (enemyDodged('🚫')) {
+        if (enemyDodged('🛡️')) {
             log(`😈 ${currentEnemy.name} 閃過了你的追加盾擊！`);
             return 0;
         }
@@ -1883,8 +1883,8 @@ ${art.join('\n')}
             const r = Math.random();
             let cumulative = 0;
             if (r < (cumulative += bias['⚔️'])) monsterMove = '⚔️';
-            else if (r < (cumulative += bias['🛡️'])) monsterMove = '🛡️';
-            else monsterMove = '🚫';
+            else if (r < (cumulative += bias['🌠'])) monsterMove = '🌠';
+            else monsterMove = '🛡️';
 
             log(`--- 雙方同時出招 ---`);
             log(`勇者出招: ${playerMove} | 怪物出招: ${monsterMove}`);
@@ -1918,11 +1918,11 @@ ${art.join('\n')}
                     damage = baseSwordDmg;
                     isPhysical = true;
                     attackKind = 'SWORD';
-                } else if (playerMove === '🛡️') {
+                } else if (playerMove === '🌠') {
                     damage = baseMagicDmg;
                     isPhysical = false;
                     attackKind = 'MAGIC';
-                } else if (playerMove === '🚫') {
+                } else if (playerMove === '🛡️') {
                     damage = SHIELD_DMG;
                     isPhysical = true;
                     attackKind = 'SHIELD';
@@ -1946,14 +1946,14 @@ ${art.join('\n')}
                             log(`🧿 遠古魔神遭受你的魔法反噬，額外多承受 ${extra} 點傷害！`);
                         }
                     }
-                    if (playerMove === '🛡️' || playerMove === '🚫') {
+                    if (playerMove === '🌠' || playerMove === '🛡️') {
                         tryTriggerMagicGuard();
                     }
                     currentEnemy.hp -= damage;
                     log(`✅ 勇者造成 ${damage} 點傷害!`);
                     flashBattleView('hero-hit');
 
-                    if (playerMove === '🚫' && damage > 0) {
+                    if (playerMove === '🛡️' && damage > 0) {
                         healFromLifeRing('SHIELD');
                     }
                     if (damage > 0) {
@@ -1974,11 +1974,11 @@ ${art.join('\n')}
                         damage = baseSwordDmg;
                         isPhysical = true;
                         attackKind = 'SWORD';
-                    } else if (playerMove === '🛡️') {
+                    } else if (playerMove === '🌠') {
                         damage = baseMagicDmg;
                         isPhysical = false;
                         attackKind = 'MAGIC';
-                    } else if (playerMove === '🚫') {
+                    } else if (playerMove === '🛡️') {
                         damage = SHIELD_DMG;
                         isPhysical = true;
                         attackKind = 'SHIELD';
@@ -2001,14 +2001,14 @@ ${art.join('\n')}
                                 log(`🧿 遠古魔神遭受你的魔法反噬，額外多承受 ${extra} 點傷害！`);
                             }
                         }
-                        if (playerMove === '🛡️' || playerMove === '🚫') {
+                        if (playerMove === '🌠' || playerMove === '🛡️') {
                             tryTriggerMagicGuard();
                         }
                         currentEnemy.hp -= damage;
                         log(`✅ 勇者造成 ${damage} 點傷害!`);
                         flashBattleView('hero-hit');
 
-                        if (playerMove === '🚫' && damage > 0) {
+                        if (playerMove === '🛡️' && damage > 0) {
                             healFromLifeRing('SHIELD');
                         }
                         if (damage > 0) {
@@ -2020,15 +2020,15 @@ ${art.join('\n')}
                     monsterAttack(monsterMove);
                 }
             } else if (isMonsterWin) {
-                log(`🚫 勇者 ${playerMove} 被 ${monsterMove} 克制，招式被擋開。`);
-                if (playerMove === '🚫' && monsterMove === '⚔️') {
+                log(`🛡️ 勇者 ${playerMove} 被 ${monsterMove} 克制，招式被擋開。`);
+                if (playerMove === '🛡️' && monsterMove === '⚔️') {
                     let damage = SHIELD_DMG;
                     let attackKind = 'SHIELD';
                     if (currentEnemy.name === '石頭人') {
                         damage *= 2;
                         log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
                     }
-                    if (enemyDodged('🚫')) {
+                    if (enemyDodged('🛡️')) {
                         log(`😈 ${currentEnemy.name} 閃過了你的盾擊反擊！`);
                         damage = 0;
                     } else {
@@ -2567,7 +2567,7 @@ ${art.join('\n')}
 </p>
         `;
         btnDecYes.textContent = decisionText;
-        btnDecNo.textContent = `🚫 保留 Lv.${currentRing.tier} 的 ${currentRing.name} (丟棄新)`;
+        btnDecNo.textContent = `⭕ 保留 Lv.${currentRing.tier} 的 ${currentRing.name} (丟棄新)`;
     }
 
     function handleRingDecision(choice) {
@@ -2606,6 +2606,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

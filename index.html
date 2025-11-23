@@ -1191,8 +1191,8 @@
         const levelFactor = 1 + (hero.level - 1) * 0.45; // ← 小怪整體成長倍率
         const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
         const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
-        const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.18));
-        const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (hero.level - 1) * 0.18));
+        const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.22)); // ← 小怪def成長
+        const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (hero.level - 1) * 0.22));// ← 小怪Mdef成長
 
         currentEnemy = {
             ...enemyData,
@@ -2592,6 +2592,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

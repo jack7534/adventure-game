@@ -301,18 +301,102 @@
     </ul>
 
     <h3>🧲 武器 / 盾牌詞條說明（各 12 種）</h3>
-    <p><b>武器詞條</b>（全部都有實際效果）：</p>
-    <ul>
-        <li>再揮一下、削骨菜刀、魔力飲料、一刀拆甲、見血回春、打不贏跑、暴擊體質、貓步走位、熱血過勞、老練老屁股、火大亂砍、越砍越爽</li>
-    </ul>
-    <p><b>盾牌詞條</b>（有「詞上加詞」鏈）：</p>
-    <ul>
-        <li>擋一下、魔法雨衣、厚臉皮、冷靜一下、有刺的盾、滑步護盾、王戰保險、小怪無感、邊躺邊補、打鐵兼收、擋完再敲、擋完再砍</li>
-    </ul>
-    <p>
-        「擋完再敲」、「擋完再砍」會在你已經有「擋一下」的盾牌上，才有機會出現。<br>
-        格檔成功後會自動追加盾擊 / 砍擊，細節在戰鬥 Log 會顯示。
-    </p>
+        <p><b>武器詞條</b>（括號內為實際效果）：</p>
+        <ul>
+            <li>
+                <b>再揮一下</b>：物理攻擊時，有 <b>20%</b> 機率多打一擊。
+            </li>
+            <li>
+                <b>削骨菜刀</b>：預定效果：提高勇者物理攻擊力
+                （※ 目前程式尚未實作數值加成，之後版本可再補上）。
+            </li>
+            <li>
+                <b>魔力飲料</b>：勇者魔法攻擊（MATK）<b>+10%</b>。
+            </li>
+            <li>
+                <b>一刀拆甲</b>：砍擊時計算傷害時，無視敵人<b>30%</b>防禦力。
+            </li>
+            <li>
+                <b>見血回春</b>：本次物理攻擊造成的「總傷害」的 <b>20%</b> 會轉成自我回血（至少 1 點）。
+            </li>
+            <li>
+                <b>打不贏跑</b>：預定效果：提升平手時勇者獲勝機率
+                （※ 目前程式尚未實作，之後版本可再補上）。
+            </li>
+            <li>
+                <b>暴擊體質</b>：基本暴擊率 +<b>5%</b>（由 5% → 10%）。
+            </li>
+            <li>
+                <b>貓步走位</b>：閃避率 +<b>3%</b>。
+            </li>
+            <li>
+                <b>熱血過勞</b>：當 HP 低於最大值的 <b>30%</b> 時：
+                物攻 +<b>15%</b>，暴擊率額外 +<b>10%</b>。
+            </li>
+            <li>
+                <b>老練老屁股</b>：每一擊砍擊額外附加相當於勇者魔攻 <b>30%</b> 的魔法傷害。
+            </li>
+            <li>
+                <b>火大亂砍</b>：物理攻擊時，有 <b>5%</b> 機率直接變成「至少」<b>3 連擊</b>。
+            </li>
+            <li>
+                <b>越砍越爽</b>：同一回合內的連擊會越打越痛：
+                第 2 擊傷害 +<b>15%</b>，第 3 擊 +<b>30%</b>，第 4 擊以上依序再 +15% 疊上去。
+            </li>
+        </ul>
+        
+        <p><b>盾牌詞條</b>（有「詞上加詞」鏈）：</p>
+        <ul>
+            <li>
+                <b>擋一下</b>：受到攻擊時，有 <b>20%</b> 機率本次傷害減半，
+                並可觸發後續「擋完再敲 / 擋完再砍」等效果。
+            </li>
+            <li>
+                <b>魔法雨衣</b>：施放魔法或盾擊時，有 <b>20%</b> 機率獲得
+                <b>3 回合</b>「受到傷害減半」的魔法護盾。
+            </li>
+            <li>
+                <b>厚臉皮</b>：防禦力（DEF）<b>+10%</b>。
+            </li>
+            <li>
+                <b>冷靜一下</b>：平手時勇者獲勝的機率 +<b>5%</b>。
+            </li>
+            <li>
+                <b>有刺的盾</b>：受到傷害時，反彈本次實際傷害的 <b>20%</b>
+                給敵人（至少 1 點）。
+            </li>
+            <li>
+                <b>滑步護盾</b>：閃避率 +<b>5%</b>。
+            </li>
+            <li>
+                <b>王戰保險</b>：被 Boss 攻擊時，承受的最終傷害 -<b>10%</b>。
+            </li>
+            <li>
+                <b>小怪無感</b>：被一般小怪攻擊時，承受的最終傷害 -<b>10%</b>。
+            </li>
+            <li>
+                <b>邊躺邊補</b>：每場戰鬥開始時獲得持續回復效果，
+                大約 <b>3 回合</b>、每回合回復約最大 HP 的 <b>3%</b>（至少 2 點 HP）。
+            </li>
+            <li>
+                <b>打鐵兼收</b>：裝備被分解成素材時，若原本會得到素材，
+                有 <b>30%</b> 機率額外多出 <b>1</b> 份素材。
+            </li>
+            <li>
+                <b>擋完再敲</b>：需要先有「擋一下」。
+                當「擋一下」格檔成功時，會再追加一次以「目前防禦力」為基礎的盾擊攻擊。
+            </li>
+            <li>
+                <b>擋完再砍</b>：需要先有「擋一下」。
+                當「擋一下」格檔成功時，會再補上一刀普通砍擊，
+                會吃到所有物理相關效果（暴擊、多段攻擊、越砍越爽等）。
+            </li>
+        </ul>
+        <p>
+            「擋完再敲」、「擋完再砍」只會出現在已經擁有「擋一下」的盾牌上。<br>
+            發動時機與多段傷害細節會在戰鬥 Log 中逐條顯示。
+        </p>
+
 
     <h3>🛠 精練系統（+3 解鎖詞條）</h3>
     <ul>
@@ -1104,7 +1188,7 @@
         const index = Math.floor(Math.random() * ENEMIES.SMALL.length);
         const enemyData = ENEMIES.SMALL[index];
 
-        const levelFactor = 1 + (hero.level - 1) * 0.30;
+        const levelFactor = 1 + (hero.level - 1) * 0.45; // ← 小怪整體成長倍率
         const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
         const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
         const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.18));
@@ -1253,13 +1337,13 @@
             if (bossLevel > ENEMIES.BOSS.length) return;
             const enemyData = ENEMIES.BOSS[bossLevel - 1];
 
-            const effectiveLevel = Math.max(hero.level, enemyData.level * 5);
-            const levelFactor = 1 + (effectiveLevel - 1) * 0.15;
+            const effectiveLevel = Math.max(hero.level, enemyData.level * 7); //這個決定「即使你等級很低，Boss 至少會被當作幾等在算」
+            const levelFactor = 1 + (effectiveLevel - 1) * 0.25;  // ← Boss 成長倍率（Boss HP / ATK 成長速度）
 
             const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
             const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
-            const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (effectiveLevel - 1) * 0.08));
-            const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (effectiveLevel - 1) * 0.08));
+            const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (effectiveLevel - 1) * 0.14)); //（Boss DEF 成長速度）
+            const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (effectiveLevel - 1) * 0.14)); //（Boss MDEF 成長速度）
 
             currentEnemy = {
                 ...enemyData,
@@ -1540,7 +1624,7 @@ ${art.join('\n')}
                 log('👑「王戰保險」生效：對 Boss 傷害略為降低。');
             }
             if (!isBoss && shield.affixes.includes('S_SMALL_GUARD')) {
-                dmg = Math.floor(dmg * 0.9);
+                dmg = Math.floor(dmg * 0.95);
                 log('🐀「小怪無感」生效：一般小怪打你有點不痛。');
             }
             if (shield.affixes.includes('S_REFLECT') && dmg > 0) {
@@ -2508,5 +2592,6 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 

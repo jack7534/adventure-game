@@ -2797,28 +2797,23 @@ ${art.join('\n')}
         enterMap();
     }
 
-            // ===== 頁面載入後：先處理稱號，再啟動遊戲 =====
-        window.addEventListener('load', () => {
-            initTitleSelectBox();
-        
-            // 若你想「下次開頁面自動沿用上次稱號、直接進遊戲」：
-            const savedTitle = localStorage.getItem('playerTitle');
-        
-            if (savedTitle) {
-                hero.name = savedTitle;
-                document.getElementById("titleSelectBox").style.display = "none";
-                log(`🔁 已沿用上次的稱號：「${savedTitle}」。`);
-                startGame();
-            } else {
-                // 沒有舊稱號 → 顯示選單、等玩家選完才開始
-                document.getElementById("titleSelectBox").style.display = "flex";
-            }
-        });
+    // ===== 頁面載入後：先處理稱號，再啟動遊戲 =====
+    window.addEventListener('load', () => {
+        initTitleSelectBox();
+    
+        // 直接顯示稱號選單，等玩家選完才 startGame()
+        const box = document.getElementById("titleSelectBox");
+        if (box) {
+            box.style.display = "flex";
+        }
+    });
+
 
 </script>
 
 </body>
 </html>
+
 
 
 

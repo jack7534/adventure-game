@@ -224,29 +224,23 @@
 <div id="game-container"> 
     <h1>🗺️ 勇者模擬器：打寶與養成</h1>
 
-           <div id="status-box">
-                <span>
+          <div id="status-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
                     勇者<span id="hero-title"></span>: Lv.<span id="hero-level">1</span>
-                    (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)
-                </span>
-                <span id="turn-counter">
-                    回合：<span id="turn-count">0</span>
-                </span>
-
+                    (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)<br>
+                    HP: <span id="hero-hp">20</span> / <span id="hero-max-hp">20</span><br>
+                    ATK: <span id="hero-atk-val">15</span> |
+                    DEF: <span id="hero-def-val">10</span> |
+                    MATK: <span id="hero-matk-val">20</span>
+                </div>
         
-            HP: <span id="hero-hp">20</span> /
-                <span id="hero-max-hp">20</span><br>
-            ATK: <span id="hero-atk-val">15</span> |
-            DEF: <span id="hero-def-val">10</span> |
-            MATK: <span id="hero-matk-val">20</span>
+                <!-- ⭐⭐ 這行是你要的：右上角回合顯示 ⭐⭐ -->
+                <div id="turn-count" style="font-weight:bold; font-size:14px; margin-right:10px;">
+                    回合：0
+                </div>
+            </div>
         </div>
-
-        <div id="extra-status">
-            閃避: <span id="hero-dodge-val">5</span>% |
-            平手勝率: <span id="hero-tie-win-rate-val">30</span>% |
-            爆擊: <span id="hero-crit-val">5</span>%
-        </div>
-    </div>
 
     <div id="main-view">
         <p>歡迎來到冒險世界！</p>
@@ -1175,6 +1169,8 @@
         shieldRefineLevelSpan.textContent = getShieldRefineLevel();
         weaponMaterialsSpan.textContent = weaponMaterials;
         shieldMaterialsSpan.textContent = shieldMaterials;
+
+        document.getElementById("turn-count").textContent = `回合：${turnCount}`;
     }
 
      // ★ 更新回合數小工具
@@ -2886,6 +2882,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

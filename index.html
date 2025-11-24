@@ -215,7 +215,7 @@
     <h1>🗺️ 勇者模擬器：打寶與養成</h1>
 
     <div id="status-box">
-        勇者: Lv.<span id="hero-level">1</span>
+        勇者<span id="hero-title"></span>: Lv.<span id="hero-level">1</span>
         (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)<br>
         HP: <span id="hero-hp">20</span> / <span id="hero-max-hp">20</span><br>
         <div id="equipment-status">
@@ -855,6 +855,8 @@
     const heroLevelSpan = document.getElementById('hero-level');
     const heroExpSpan = document.getElementById('hero-exp');
     const heroExpMaxSpan = document.getElementById('hero-exp-max');
+    // 把稱號塞進 hero-title在這裡加 ↓
+    const heroTitleSpan = document.getElementById('hero-title');
     const weaponRefineLevelSpan = document.getElementById('weapon-refine-level');
     const shieldRefineLevelSpan = document.getElementById('shield-refine-level');
     const weaponMaterialsSpan = document.getElementById('weapon-materials');
@@ -1086,6 +1088,13 @@
         heroLevelSpan.textContent = hero.level;
         heroExpSpan.textContent = hero.exp;
         heroExpMaxSpan.textContent = hero.expToNextLevel;
+
+        // 更新稱號顯示：「勇者 称號: Lv...」
+        const title = hero.title || '';   // 看你稱號是存 hero.title 還是 heroTitle
+        if (heroTitleSpan) {
+            heroTitleSpan.textContent = title ? ` ${title}` : '';
+        }
+
 
         heroAtkVal.textContent = hero.currentAttack;
         heroDefVal.textContent = hero.currentDefense;
@@ -2809,6 +2818,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

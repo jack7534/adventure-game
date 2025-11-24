@@ -1346,8 +1346,10 @@
         const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.22)); // ← 小怪def成長
         const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (hero.level - 1) * 0.22));// ← 小怪Mdef成長
 
-        currentEnemy = {
+       currentEnemy = {
+            // 先把原始怪物資料展開（名字、exp、lootChance 等）
             ...enemyData,
+            // 再覆蓋成長後的數值
             originalHp: scaledHp,
             hp: scaledHp,
             atk: scaledAtk,
@@ -1500,7 +1502,9 @@
             const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (effectiveLevel - 1) * 0.14)); //（Boss MDEF 成長速度）
 
             currentEnemy = {
+                // 先展開原始 Boss 資料（名字、exp、lootChance、弱點等）
                 ...enemyData,
+                // 再覆蓋成長後的數值
                 originalHp: scaledHp,
                 hp: scaledHp,
                 atk: scaledAtk,
@@ -2643,24 +2647,12 @@ ${art.join('\n')}
         log(`✨ ${enemy.name} 掉落了 <span class="${RARITY_COLORS[loot.rarity] || 'Rarity-Rare'}">${loot.name}</span>!`);
 
         if (lootType === 'RING') {
-            const currentRing = hero.equipment.RING;
-            if (currentRing.ability && currentRing.ability.id === loot.ability.id && currentRing.ability.id !== 'NONE') {
-                if (currentRing.tier < 4) {
-                    currentRing.tier = Math.min(4, currentRing.tier + 1);
-                    if (RARITY_ORDER.indexOf(loot.rarity) > RARITY_ORDER.indexOf(currentRing.rarity)) {
-                        currentRing.rarity = loot.rarity;
-                    }
-                    log(`💍 打到相同戒指：${currentRing.name} 升級為 Lv.${currentRing.tier}！`);
-                } else {
-                    log(`💍 ${currentRing.name} 已是 Lv.4，相同戒指自動分解（目前不給額外效果）。`);
-                }
-                updateStatus();
-                return;
-            }
+            // 不在這裡自動升級，全部丟去戒指選擇畫面處理
             newLoot = loot;
             enterRingDecision();
             return;
         }
+
 
             if (lootType === 'WEAPON') {
                 const currentW = hero.equipment.WEAPON;
@@ -2778,46 +2770,89 @@ ${art.join('\n')}
         gameState = 'LOOT_RING_DECISION';
         commandMenu.style.display = 'none';
         decisionMenu.style.display = 'flex';
-
+    
         const currentRing = hero.equipment.RING;
         const newRing = newLoot;
-
+    
         const currentRingColor = RARITY_COLORS[currentRing.rarity];
         const newRingColor = RARITY_COLORS[newRing.rarity];
-
+    
         const currentRingNameHtml = `<span class="${currentRingColor}">${currentRing.name}</span>`;
         const newRingNameHtml = `<span class="${newRingColor}">${newRing.name}</span>`;
-
-        let decisionText = `💍 換上 Lv.${newRing.tier} 的 ${newRing.name}`;
-
+    
+        // ── 判斷是否為「同一種戒指」且還可以升級 ──
+        const isSameAbility =
+            currentRing.ability &&
+            newRing.ability &&
+            currentRing.ability.id === newRing.ability.id &&
+            currentRing.ability.id !== 'NONE';
+    
+        const canLevelUp = isSameAbility && currentRing.tier < 4;
+    
+        let decisionText;
+    
+        if (canLevelUp) {
+            const nextTier = Math.min(4, currentRing.tier + 1);
+            decisionText = `💍 升級 ${currentRing.name}：Lv.${currentRing.tier} → Lv.${nextTier}（消耗新戒指）`;
+            btnDecYes.textContent = decisionText;
+            btnDecNo.textContent = `⭕ 不升級，保留 Lv.${currentRing.tier} 的 ${currentRing.name}（丟棄新）`;
+        } else {
+            decisionText = `💍 換上 Lv.${newRing.tier} 的 ${newRing.name}`;
+            btnDecYes.textContent = decisionText;
+            btnDecNo.textContent = `⭕ 保留 Lv.${currentRing.tier} 的 ${currentRing.name} (丟棄新)`;
+        }
+    
         mainView.style.backgroundColor = '#2c3e50';
         mainView.innerHTML = `
-<p style="color:#ffcc00;">🔔 發現新戒指! 請手動選擇是否替換或升級</p>
-<p style="text-align: left; padding: 0 20px;">
-【現有戒指】：${currentRingNameHtml} (${currentRing.ability.desc}, Lv.${currentRing.tier})<br>
-【新戒指】：${newRingNameHtml} (${newRing.ability.desc}, Lv.${newRing.tier})
-</p>
+    <p style="color:#ffcc00;">🔔 發現新戒指! 請手動選擇是否替換或升級</p>
+    <p style="text-align: left; padding: 0 20px;">
+    【現有戒指】：${currentRingNameHtml} (${currentRing.ability.desc}, Lv.${currentRing.tier})<br>
+    【新戒指】：${newRingNameHtml} (${newRing.ability.desc}, Lv.${newRing.tier})
+    </p>
         `;
-        btnDecYes.textContent = decisionText;
-        btnDecNo.textContent = `⭕ 保留 Lv.${currentRing.tier} 的 ${currentRing.name} (丟棄新)`;
     }
+
 
     function handleRingDecision(choice) {
         if (gameState !== 'LOOT_RING_DECISION') return;
         const currentRing = hero.equipment.RING;
         const newRing = newLoot;
-
+    
+        const isSameAbility =
+            currentRing.ability &&
+            newRing.ability &&
+            currentRing.ability.id === newRing.ability.id &&
+            currentRing.ability.id !== 'NONE';
+    
+        const canLevelUp = isSameAbility && currentRing.tier < 4;
+    
         if (choice === 'YES') {
-            hero.equipment.RING = newRing;
-            log(`💍 手動確認: 成功換上了 Lv.${newRing.tier} 的 <span class="${RARITY_COLORS[newRing.rarity]}">${newRing.name}</span>!`);
+            if (canLevelUp) {
+                // ── 升級舊戒指，吃掉新戒指 ──
+                const oldTier = currentRing.tier;
+                currentRing.tier = Math.min(4, currentRing.tier + 1);
+    
+                // 如果新戒指稀有度比較高，順便提升稀有度
+                if (RARITY_ORDER.indexOf(newRing.rarity) > RARITY_ORDER.indexOf(currentRing.rarity)) {
+                    currentRing.rarity = newRing.rarity;
+                }
+    
+                log(`💍 ${currentRing.name} 升級：Lv.${oldTier} → Lv.${currentRing.tier}！（新戒指被吸收）`);
+            } else {
+                // ── 不升級就是單純換戒指 ──
+                hero.equipment.RING = newRing;
+                log(`💍 手動確認: 成功換上了 Lv.${newRing.tier} 的 <span class="${RARITY_COLORS[newRing.rarity]}">${newRing.name}</span>!`);
+            }
         } else {
             log(`🗑️ 手動確認: 放棄了 <span class="${RARITY_COLORS[newRing.rarity]}">${newRing.name}</span>。`);
         }
+    
         newLoot = null;
         updateStatus();
         decisionMenu.style.display = 'none';
         setTimeout(enterMap, 500);
     }
+
 
     function disableCommands(disabled) {
         commandMenu.querySelectorAll('.command-btn').forEach(btn => btn.disabled = disabled);
@@ -2876,6 +2911,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

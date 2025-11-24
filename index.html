@@ -34,16 +34,6 @@
             text-align: left;
             font-size: 14px;
         }
-        /*#status-box .status-header {
-            display: flex;
-            justify-content: space-between;  /* 左右兩邊貼邊 
-            align-items: center;
-        }
-        #turn-counter {
-            font-weight: bold;
-        }*/
-
-        
         #equipment-status {
             margin-top: 4px;
         }
@@ -224,23 +214,21 @@
 <div id="game-container"> 
     <h1>🗺️ 勇者模擬器：打寶與養成</h1>
 
-          <div id="status-box">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    勇者<span id="hero-title"></span>: Lv.<span id="hero-level">1</span>
-                    (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)<br>
-                    HP: <span id="hero-hp">20</span> / <span id="hero-max-hp">20</span><br>
-                    ATK: <span id="hero-atk-val">15</span> |
-                    DEF: <span id="hero-def-val">10</span> |
-                    MATK: <span id="hero-matk-val">20</span>
-                </div>
-        
-                <!-- ⭐⭐ 這行是你要的：右上角回合顯示 ⭐⭐ -->
-                <div id="turn-count" style="font-weight:bold; font-size:14px; margin-right:10px;">
-                    回合：0
-                </div>
-            </div>
+    <div id="status-box">
+        勇者<span id="hero-title"></span>: Lv.<span id="hero-level">1</span>
+        (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)<br>
+        HP: <span id="hero-hp">20</span> / <span id="hero-max-hp">20</span><br>
+        <div id="equipment-status">
+            ATK: <span id="hero-atk-val">15</span> |
+            DEF: <span id="hero-def-val">10</span> |
+            MATK: <span id="hero-matk-val">20</span>
         </div>
+        <div id="extra-status">
+            閃避: <span id="hero-dodge-val">5</span>% |
+            平手勝率: <span id="hero-tie-win-rate-val">30</span>% |
+            爆擊: <span id="hero-crit-val">5</span>%
+        </div>
+    </div>
 
     <div id="main-view">
         <p>歡迎來到冒險世界！</p>
@@ -585,7 +573,6 @@
     let healCooldown = 30000;
     let lastHealTime = 0;
     let healCooldownTimer = null;
-    let turnCount = 0;
 
     const CLASH_RULES = {
         '⚔️': '🌠',
@@ -871,7 +858,6 @@
     const heroExpMaxSpan = document.getElementById('hero-exp-max');
     // 把稱號塞進 hero-title在這裡加 ↓
     const heroTitleSpan = document.getElementById('hero-title');
-    const turnCountSpan = document.getElementById('turn-count');  // ← 新增
     const weaponRefineLevelSpan = document.getElementById('weapon-refine-level');
     const shieldRefineLevelSpan = document.getElementById('shield-refine-level');
     const weaponMaterialsSpan = document.getElementById('weapon-materials');
@@ -1109,10 +1095,7 @@
         if (heroTitleSpan) {
             heroTitleSpan.textContent = title ? ` ${title}` : '';
         }
-        // ★ 新增：更新回合數
-        if (turnCountSpan) {
-            turnCountSpan.textContent = turnCount;
-        }
+
 
         heroAtkVal.textContent = hero.currentAttack;
         heroDefVal.textContent = hero.currentDefense;
@@ -1169,14 +1152,6 @@
         shieldRefineLevelSpan.textContent = getShieldRefineLevel();
         weaponMaterialsSpan.textContent = weaponMaterials;
         shieldMaterialsSpan.textContent = shieldMaterials;
-
-        document.getElementById("turn-count").textContent = `回合：${turnCount}`;
-    }
-
-     // ★ 更新回合數小工具
-    function spendTurn(n = 1) {
-        turnCount += n;
-        updateStatus();
     }
 
     function setCommands(c1, c2, c3, actionHandler, state) {
@@ -2828,64 +2803,38 @@ ${art.join('\n')}
 
 
     // ===== 頁面載入後：先處理稱號，再啟動遊戲 =====
-    // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-    // 称號選單邏輯（你已經寫好的區域）
-    // ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
-    
     window.addEventListener('load', () => {
         initTitleSelectBox();
     
-        document.getElementById("titleSelectBox").style.display = "flex";
+        const btnConfirmTitle = document.getElementById("btnConfirmTitle");
+    
+        btnConfirmTitle.addEventListener("click", () => {
+    
+            const selectedA = document.getElementById("sel-A").value;
+            const selectedB = document.getElementById("sel-B").value;
+            const selectedC = document.getElementById("sel-C").value;
+    
+            const selectedTitle = `${selectedA}的${selectedB}${selectedC}`;
+    
+            hero.title = selectedTitle;
+    
+            // ★ 選完就立即更新（這會修正你現在遇到的「一開始不顯示」問題）
+            updateStatus();
+    
+            // 隱藏稱號選單
+            document.getElementById("titleSelectBox").style.display = "none";
+    
+            // 正式開始遊戲
+            startGame();
+        });
     });
-    
-    const btnConfirmTitle = document.getElementById("btnConfirmTitle");
-    
-    btnConfirmTitle.addEventListener("click", () => {
-        const selectedA = document.getElementById("sel-A").value;
-        const selectedB = document.getElementById("sel-B").value;
-        const selectedC = document.getElementById("sel-C").value;
-    
-        const selectedTitle = `${selectedA}的${selectedB}${selectedC}`;
-        hero.title = selectedTitle;
-    
-        updateStatus();
-        document.getElementById("titleSelectBox").style.display = "none";
-    
-        startGame();
-    });
-    
-    
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ★ 在這裡加入回合數按鈕監聽（正確位置）★
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    
-    // 出發冒險按鈕
-    btnAdventure.addEventListener('click', () => {
-        spendTurn();          // ← 先加回合
-        startSmallBattle();   // 再進入小戰鬥
-    });
-    
-    // 挑戰 Boss
-    btnBoss1.addEventListener('click', () => {
-        spendTurn();
-        startBossBattle(1);
-    });
-    
-    // 休息
-    btnRest.addEventListener('click', () => {
-        spendTurn();
-        restHero();
-    });
+
 
 
 </script>
 
 </body>
 </html>
-
-
-
-
 
 
 

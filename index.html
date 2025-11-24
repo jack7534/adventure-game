@@ -169,8 +169,49 @@
     </style>
 </head>
 <body>
+<!-- ===== 勇者稱號選單（進遊戲前出現） ===== -->
+<div id="titleSelectBox" style="
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+">
+  <div style="
+      background:#fffbea;
+      border:3px solid #333;
+      padding:16px 20px;
+      min-width:320px;
+      box-shadow:4px 4px 0 #333;
+      font-family:'Courier New',monospace;
+  ">
+    <h3 style="margin-top:0;">🧾 請先幫自己選一個稱號</h3>
+    <p style="font-size:14px;margin-top:0;">
+      組合方式：<b>A形容詞</b> + 的 + <b>B形容詞</b> + <b>C名詞</b><br>
+      直接按「開始冒險」沒選的話，會自動幫你抽一組隨機稱號。
+    </p>
+    <div style="margin-bottom:8px;">
+      A：
+      <select id="titleA"></select>
+    </div>
+    <div style="margin-bottom:8px;">
+      B：
+      <select id="titleB"></select>
+    </div>
+    <div style="margin-bottom:12px;">
+      C：
+      <select id="titleC"></select>
+    </div>
+    <div style="text-align:right;">
+      <button onclick="randomTitleOnly()" style="margin-right:8px;">🎲 隨機一組看看</button>
+      <button onclick="confirmTitle()">✅ 開始冒險</button>
+    </div>
+  </div>
+</div>
+<!-- ===== 稱號選單結束 ===== -->
 
-<div id="game-container">
+
+    <!-- 遊戲主視窗介面 -->
+<div id="game-container"> 
     <h1>🗺️ 勇者模擬器：打寶與養成</h1>
 
     <div id="status-box">
@@ -408,6 +449,24 @@
 
 <script>
     let gameState = 'MAP';
+    let totalTurnCount = 0;   // 總回合數（每次行動+1，破關排序用）
+
+    // ===== 稱號文字庫 =====
+    // 你之後想要 30 個就一直加
+    const TITLE_A = [
+      '偉大的','暴走的','神秘的','無情的','熱血的',
+      '悠哉的','傳說中的','孤獨的','勇敢的','佛系的'
+    ];
+    const TITLE_B = [
+      '帥氣','陰沉','暴怒','冷靜','邊緣',
+      '早睡','打寶狂','非洲','歐洲','開外掛'
+    ];
+    const TITLE_C = [
+      '老闆','勇者','上班族','廢人','魔王',
+      '菜鳥','摸魚王','爆肝者','旅人','掛網者'
+    ];
+
+    
     const HERO_MAX_HP_START = 20;
     const MAX_LEVEL = 25;
     const HP_PER_LEVEL = 5;
@@ -473,6 +532,35 @@
         regenAmount: 0
     };
 
+        //初始化稱號選單
+    function initTitleSelectBox() {
+        const selA = document.getElementById('titleA');
+        const selB = document.getElementById('titleB');
+        const selC = document.getElementById('titleC');
+    
+        // 先塞一個「不選」選項
+        function fillSelect(sel, arr) {
+            sel.innerHTML = '';
+            const optEmpty = document.createElement('option');
+            optEmpty.value = '';
+            optEmpty.textContent = '（隨機）';
+            sel.appendChild(optEmpty);
+    
+            arr.forEach(txt => {
+                const opt = document.createElement('option');
+                opt.value = txt;
+                opt.textContent = txt;
+                sel.appendChild(opt);
+            });
+        }
+    
+        fillSelect(selA, TITLE_A);
+        fillSelect(selB, TITLE_B);
+        fillSelect(selC, TITLE_C);
+    }
+
+
+    
     function getShieldRefineLevel() {
         return hero.equipment.SHIELD.refine || 0;
     }
@@ -1332,6 +1420,8 @@
     function handleMapAction(action) {
         if (gameState !== 'MAP') return;
 
+        totalTurnCount++;   // 地圖上的每個動作都算 1 回合
+        
         if (action === 'Small') {
             const roll = Math.random();
             if (roll < 0.58) {               // 普通小怪
@@ -1868,6 +1958,7 @@ ${art.join('\n')}
 
     async function handleBattleAction(playerMove) {
         if (gameState !== 'BATTLE') return;
+        totalTurnCount++;   // 每一回合戰鬥也算 1 回合
         disableCommands(true);
         let battleEnded = false;
 
@@ -2125,6 +2216,44 @@ ${art.join('\n')}
         }
     }
 
+//通關時把角色快照存到 localStorage
+            function recordClearRun() {
+            const snapshot = {
+                title: hero.name,
+                level: hero.level,
+                maxHp: hero.maxHp,
+                baseAttack: hero.baseAttack,
+                baseDefense: hero.baseDefense,
+                baseMagicAtk: hero.baseMagicAtk,
+                currentAttack: hero.currentAttack,
+                currentDefense: hero.currentDefense,
+                currentMagicAtk: getMagicAttackValue(),
+                ring: hero.equipment.RING,
+                weapon: hero.equipment.WEAPON,
+                shield: hero.equipment.SHIELD,
+                totalTurn: totalTurnCount,
+                time: Date.now()
+            };
+        
+            let list = [];
+            try {
+                list = JSON.parse(localStorage.getItem('clearRecords') || '[]');
+            } catch (e) {
+                list = [];
+            }
+        
+            list.push(snapshot);
+            // 越少回合越前面
+            list.sort((a, b) => a.totalTurn - b.totalTurn);
+            // 只留前 10 名
+            list = list.slice(0, 10);
+        
+            localStorage.setItem('clearRecords', JSON.stringify(list));
+        
+            log(`📒 已將你的通關紀錄存入前 10 名候補（目前回合：${snapshot.totalTurn}）。`);
+        }
+
+
     function showCredits() {
         gameState = 'CREDITS';
         disableCommands(true);
@@ -2184,10 +2313,16 @@ ${art.join('\n')}
         const isFinalBoss = result === 'win' &&
             ENEMIES.BOSS.length > 0 &&
             currentEnemy.name === ENEMIES.BOSS[ENEMIES.BOSS.length - 1].name;
-
+        
+        if (isFinalBoss) {
+            // 通關時記錄一次角色資料
+            recordClearRun();
+        }
+        
         if (!isFinalBoss && gameState !== 'LOOT_RING_DECISION' && gameState !== 'CREDITS') {
             setTimeout(enterMap, 2000);
         }
+
     }
 
     function applyDeathPenalty() {
@@ -2226,8 +2361,54 @@ ${art.join('\n')}
         setTimeout(enterMap, 2000);
     }
 
+            //稱號確認 & 隨機按鈕
+        function buildRandomTitle() {
+            let aPart = TITLE_A[Math.floor(Math.random() * TITLE_A.length)];
+            let bPart = TITLE_B[Math.floor(Math.random() * TITLE_B.length)];
+            let cPart = TITLE_C[Math.floor(Math.random() * TITLE_C.length)];
+            return `${aPart}的${bPart}${cPart}`;
+        }
+        
+        // 只單純抽一組給玩家看，不開始遊戲
+        function randomTitleOnly() {
+            const title = buildRandomTitle();
+            alert(`抽到的稱號是：\n「${title}」\n如果喜歡，可以自己從下拉選單挑一樣的組合；\n不改直接按「開始冒險」會再重抽一次。`);
+        }
+        
+        function confirmTitle() {
+            const A = document.getElementById("titleA").value;
+            const B = document.getElementById("titleB").value;
+            const C = document.getElementById("titleC").value;
+        
+            let finalTitle;
+        
+            if (!A && !B && !C) {
+                // 三個都沒選 → 完全隨機
+                finalTitle = buildRandomTitle();
+            } else {
+                // 有選就用玩家的選項，沒選的部位用隨機補
+                let aPart = A || TITLE_A[Math.floor(Math.random() * TITLE_A.length)];
+                let bPart = B || TITLE_B[Math.floor(Math.random() * TITLE_B.length)];
+                let cPart = C || TITLE_C[Math.floor(Math.random() * TITLE_C.length)];
+                finalTitle = `${aPart}的${bPart}${cPart}`;
+            }
+        
+            hero.name = finalTitle;                     // 設定勇者名稱
+            localStorage.setItem("playerTitle", finalTitle);  // 存檔給之後用
+        
+            // 關掉遮罩
+            document.getElementById("titleSelectBox").style.display = "none";
+        
+            log(`🧾 你的稱號是「${finalTitle}」。祝你武運昌隆！`);
+        
+            // 開始遊戲
+            startGame();
+        }
+
+
+        // ===== 依等級切換成長階段 =====
         function getRandomRarity(lootType, isBoss = false) {
-            // ===== 依等級切換成長階段 =====
+            
             let phase = 0;
             if (hero.level >= 8)  phase = 1;  // 成長階段 1
             if (hero.level >= 15) phase = 2;  // 成長階段 2
@@ -2599,13 +2780,36 @@ ${art.join('\n')}
         tier: 0,
         rarity: 'Normal'
     };
-    calculateHeroStats();
-    updateStatus();
-    enterMap();
+    
+    function startGame() {
+        calculateHeroStats();
+        updateStatus();
+        enterMap();
+    }
+
+            // ===== 頁面載入後：先處理稱號，再啟動遊戲 =====
+        window.addEventListener('load', () => {
+            initTitleSelectBox();
+        
+            // 若你想「下次開頁面自動沿用上次稱號、直接進遊戲」：
+            const savedTitle = localStorage.getItem('playerTitle');
+        
+            if (savedTitle) {
+                hero.name = savedTitle;
+                document.getElementById("titleSelectBox").style.display = "none";
+                log(`🔁 已沿用上次的稱號：「${savedTitle}」。`);
+                startGame();
+            } else {
+                // 沒有舊稱號 → 顯示選單、等玩家選完才開始
+                document.getElementById("titleSelectBox").style.display = "flex";
+            }
+        });
+
 </script>
 
 </body>
 </html>
+
 
 
 

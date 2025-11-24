@@ -2792,27 +2792,50 @@ ${art.join('\n')}
     };
     
     function startGame() {
-        calculateHeroStats();
+    
+        // ★ 如果 hero.title 已經設定，這裡立即更新畫面（最重要）
         updateStatus();
+    
+        calculateHeroStats();
+        updateStatus(); // 第二次保險
         enterMap();
     }
+
 
     // ===== 頁面載入後：先處理稱號，再啟動遊戲 =====
     window.addEventListener('load', () => {
         initTitleSelectBox();
     
-        // 直接顯示稱號選單，等玩家選完才 startGame()
-        const box = document.getElementById("titleSelectBox");
-        if (box) {
-            box.style.display = "flex";
-        }
+        const btnConfirmTitle = document.getElementById("btnConfirmTitle");
+    
+        btnConfirmTitle.addEventListener("click", () => {
+    
+            const selectedA = document.getElementById("sel-A").value;
+            const selectedB = document.getElementById("sel-B").value;
+            const selectedC = document.getElementById("sel-C").value;
+    
+            const selectedTitle = `${selectedA}的${selectedB}${selectedC}`;
+    
+            hero.title = selectedTitle;
+    
+            // ★ 選完就立即更新（這會修正你現在遇到的「一開始不顯示」問題）
+            updateStatus();
+    
+            // 隱藏稱號選單
+            document.getElementById("titleSelectBox").style.display = "none";
+    
+            // 正式開始遊戲
+            startGame();
+        });
     });
+
 
 
 </script>
 
 </body>
 </html>
+
 
 
 

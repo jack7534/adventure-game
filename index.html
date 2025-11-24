@@ -166,6 +166,15 @@
             padding-bottom: 5px;
             margin-top: 15px;
         }
+
+        #turn-box {
+            margin-top: 6px;
+            padding: 4px 8px;
+            border: 3px solid #000;
+            background-color: #fff8e1;  /* 跟 status-box 類似的顏色 */
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -202,7 +211,7 @@
       <select id="titleC"></select>
     </div>
     <div style="text-align:right;">
-      <button onclick="randomTitleOnly()" style="margin-right:8px;">🎲 隨機一組看看</button>
+      <!-- <button onclick="randomTitleOnly()" style="margin-right:8px;">🎲 隨機一組看看</button> -->
       <button onclick="confirmTitle()">✅ 開始冒險</button>
     </div>
   </div>
@@ -229,7 +238,12 @@
             爆擊: <span id="hero-crit-val">5</span>%
         </div>
     </div>
-
+    
+    <!-- 新增：回合顯示框 -->
+    <div id="turn-box">
+      回合：<span id="turn-count">0</span>
+    </div>
+    
     <div id="main-view">
         <p>歡迎來到冒險世界！</p>
     </div>
@@ -449,9 +463,12 @@
 
 <script>
     let gameState = 'MAP';
-    let totalTurnCount = 0;   // 總回合數（每次行動+1，破關排序用）
+    let totalTurnCount = 0;   // 這是你原本用來記錄破關排序的
+    let turnCount = 0;        // 這個用來顯示「目前第幾回合」
 
     // ===== 稱號文字庫 =====
+
+    const turnCountSpan = document.getElementById('turn-count');
     // 你之後想要 30 個就一直加
     const TITLE_A = [
       '偉大的','暴走的','神秘的','無情的','熱血的',
@@ -1083,6 +1100,11 @@
 
     function updateStatus() {
         calculateHeroStats();
+        
+            // 顯示目前回合數
+        if (turnCountSpan) {
+            turnCountSpan.textContent = turnCount;
+        }
 
         heroHpSpan.textContent = Math.max(0, hero.hp);
         heroMaxHpSpan.textContent = hero.maxHp;
@@ -1090,10 +1112,10 @@
         heroExpSpan.textContent = hero.exp;
         heroExpMaxSpan.textContent = hero.expToNextLevel;
 
-        // 更新稱號顯示：「勇者 称號: Lv...」
-        const title = hero.title || '';   // 看你稱號是存 hero.title 還是 heroTitle
+        // 顯示稱號（勇者 後面那一段）
         if (heroTitleSpan) {
-            heroTitleSpan.textContent = title ? ` ${title}` : '';
+            // 如果你想要顯示成：偉大的廢人 → 前後不要引號，就這樣填
+            heroTitleSpan.textContent = hero.title || '';
         }
 
 
@@ -2408,9 +2430,10 @@ ${art.join('\n')}
         
             // 關掉遮罩
             document.getElementById("titleSelectBox").style.display = "none";
-        
+
+            hero.title = finalTitle;         // 把稱號存進 hero 裡
             log(`🧾 你的稱號是「${finalTitle}」。祝你武運昌隆！`);
-        
+            updateStatus();                  // 立刻刷新畫面，勇者後面會出現稱號
             // 開始遊戲
             startGame();
         }
@@ -2835,6 +2858,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

@@ -1259,7 +1259,7 @@
         gameState = 'MAP';
         updateStatus();
         mainView.style.backgroundColor = '#1a2a3a';
-        mapMessage.innerHTML = `📘 勇者 <span class="title-color">${hero.title || ''}</span>（Lv.${hero.level}），今天要去哪裡亂晃？`;
+        mainView.innerHTML = `<p>🗺️ 勇者 ${hero.name} (Lv.${hero.level})，今天要去哪裡亂晃？</p>`;
 
         const maxBossLevel = ENEMIES.BOSS.length;
         let c2Text;
@@ -2882,8 +2882,6 @@ ${art.join('\n')}
 
 </body>
 </html>
-
-
 
 
 

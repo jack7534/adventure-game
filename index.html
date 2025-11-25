@@ -226,6 +226,7 @@
     <div id="status-box">
         勇者 <span id="hero-title"></span>: Lv.<span id="hero-level">1</span>
         (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)<br>
+        巔峰: Lv.<span id="hero-paragon">0</span><br>
         HP: <span id="hero-hp">20</span> / <span id="hero-max-hp">20</span><br>
         <div id="equipment-status">
             ATK: <span id="hero-atk-val">15</span> |
@@ -519,11 +520,13 @@
     let weaponMaterials = 0;
     let shieldMaterials = 0;
 
-    const MAGIC_RING_MAGIC_RATE = [0, 0.25, 0.50, 0.75, 1.00];
-    const CRIT_RING_MAGIC_RATE  = [0, 0.10, 0.20, 0.30, 0.40];
-
-    const BERSERKER_MULTI_HIT_CHANCE = [0, 0.15, 0.25, 0.35, 0.45];
-    const BERSERKER_THIRD_HIT_CHANCE = [0, 0.0, 0.10, 0.20, 0.25];
+    // 魔導：最高等級拉到 +160% 魔攻
+    const MAGIC_RING_MAGIC_RATE = [0, 0.40, 0.80, 1.20, 1.60];
+    const CRIT_RING_MAGIC_RATE  = [0, 0.10, 0.20, 0.30, 0.40]; // 原本就不錯，可留
+    
+    // 狂戰士：多段機率拉高
+    const BERSERKER_MULTI_HIT_CHANCE = [0, 0.20, 0.30, 0.40, 0.50];
+    const BERSERKER_THIRD_HIT_CHANCE = [0, 0.05, 0.15, 0.25, 0.35];
 
     let hero = {
         name: '無名英雄',
@@ -531,6 +534,7 @@
         maxHp: HERO_MAX_HP_START,
         level: 1,
         highestLevel: 1,
+        paragonLevel: 0,        // ★ 巔峰等級
         exp: 0,
         title: "",   // ★★ 初始化稱號 → 不會沿用上次記錄
         expToNextLevel: 10,
@@ -781,7 +785,7 @@
         BOSS: [
             { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.2, '🌠': 0.5, '🛡️': 0.3 } },
             { level: 2, name: "火焰巨龍", hp: 380, atk: 28, def: 24, mDef: 12, dodge: 12, lootChance: 1.0, exp: 160, bias: { '⚔️': 0.5, '🌠': 0.2, '🛡️': 0.3 } },
-            { level: 3, name: "遠古魔神", hp: 650, atk: 45, def: 26, mDef: 26, dodge: 15, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🌠': 0.3, '🛡️': 0.4 } }
+            { level: 3, name: "遠古魔神", hp: 520, atk: 38, def: 24, mDef: 22, dodge: 15, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🌠': 0.3, '🛡️': 0.4 } }
         ]
     };
 
@@ -822,6 +826,26 @@
             "  |_︸_|",
             " _/¯¯¯＼_"
         ],
+        
+        "迷路的牛頭人菁英": [
+        "   /\\__/\\",
+        "  (  o_x)  < 迷路的",
+        "  /  ^^ \\",
+        " /_/   \\_\\"
+        ],
+        "度假中的迷你九頭蛇": [
+        "    ~~~~~~",
+        "  ~( o o o )~",
+        "  ~( o o o )~  < 迷你九頭蛇",
+        "    ~~~~~~"
+        ],
+        "被縮小的遠古小魔神": [
+        "    /\\",
+        "   (ಠ_ಠ)  < 小魔神",
+        "  _/|  |\\_",
+        "    /  \\"
+        ],
+
         "不死巫妖": [
             "",
             "    +--[⚰️]--+       ",
@@ -1360,18 +1384,23 @@
     }
 
     function startEliteBattle() {
+        // 依目前 BOSS 進度決定對應的菁英種類
         const baseIndex = Math.min(Math.max(bossLevel - 1, 0), ENEMIES.BOSS.length - 1);
         const bossData = ENEMIES.BOSS[baseIndex];
 
-        const scaledHp   = Math.floor(bossData.hp   * 0.6);
-        const scaledAtk  = Math.floor(bossData.atk  * 0.7);
-        const scaledDef  = Math.floor((bossData.def  || 0) * 0.7);
-        const scaledMDef = Math.floor((bossData.mDef || bossData.def || 0) * 0.7);
+        // ★ 菁英強度調整：
+        //   - HP：0.85 倍 BOSS（有點肉）
+        //   - ATK / DEF / MDEF：0.9 倍 BOSS（比小怪痛、比正牌 BOSS 稍弱）
+        const scaledHp   = Math.floor(bossData.hp   * 0.85);
+        const scaledAtk  = Math.floor(bossData.atk  * 0.90);
+        const scaledDef  = Math.floor((bossData.def  || 0) * 0.90);
+        const scaledMDef = Math.floor((bossData.mDef || bossData.def || 0) * 0.90);
 
+        // 不同階段對應不同菁英造型名稱
         const eliteNames = [
-            "迷路的牛頭人菁英",
-            "度假中的迷你九頭蛇",
-            "被縮小的遠古小魔神"
+            "迷路的牛頭人菁英",   // 對應 1 王
+            "度假中的迷你九頭蛇", // 對應 2 王
+            "被縮小的遠古小魔神"  // 對應 3 王
         ];
         const eName = eliteNames[baseIndex] || "不太想上班的菁英怪";
 
@@ -1388,9 +1417,11 @@
             exp: Math.floor(bossData.exp * 0.5),
             bias: bossData.bias
         };
+
         log(`😈 你不小心鑽進奇怪的小巷，撞見一隻【菁英怪】：${eName}！`);
         battleTransition(enterBattle);
     }
+
 
     function adventureTreasure() {
         const matType = Math.random() < 0.5 ? 'WEAPON' : 'SHIELD';
@@ -1685,6 +1716,32 @@ ${art.join('\n')}
             const heal = Math.max(1, Math.floor(totalDamage * 0.2));
             hero.hp = Math.min(hero.maxHp, hero.hp + heal);
             log(`🩸「愛吃不辣的(Blood)」生效，回復 ${heal} 點 HP！`);
+        }
+
+        // ===== 狂戰士戒指吸血（新增） =====
+        const ring = hero.equipment.RING;
+        if (
+            isPhysical &&
+            ring &&
+            ring.ability &&
+            ring.ability.id === "BERSERKER" &&
+            totalDamage > 0
+        ) {
+            // tier 等級：1~4
+            const tier = ring.tier || 0;
+        
+            // 各等級吸血比例：3% / 5% / 7% / 10%
+            const berserkLeechRate = [0, 0.03, 0.05, 0.07, 0.10][tier];
+        
+            if (berserkLeechRate > 0) {
+                const heal = Math.max(1, Math.floor(totalDamage * berserkLeechRate));
+                const old = hero.hp;
+                hero.hp = Math.min(hero.maxHp, hero.hp + heal);
+        
+                if (hero.hp > old) {
+                    log(`💢 狂戰士指環憤怒吸血，回復 ${hero.hp - old} 點 HP！`);
+                }
+            }
         }
 
         return totalDamage;
@@ -2219,16 +2276,21 @@ ${art.join('\n')}
     }
 
     function gainExp(amount) {
-        if (hero.level >= MAX_LEVEL) return;
         hero.exp += amount;
         log(`獲得了 ${amount} 點經驗值!`);
-
-        while (hero.exp >= hero.expToNextLevel && hero.level < MAX_LEVEL) {
+    
+        while (hero.exp >= hero.expToNextLevel) {
             hero.exp -= hero.expToNextLevel;
-            levelUp();
+            if (hero.level < MAX_LEVEL) {
+                levelUp();
+            } else {
+                // 已滿等，改成巔峰等級
+                gainParagonLevel();
+            }
         }
         updateStatus();
     }
+
 
     function levelUp() {
         if (hero.level >= MAX_LEVEL) return;
@@ -2261,6 +2323,29 @@ ${art.join('\n')}
             log(`⬆️ 回到曾經到過的等級 Lv.${hero.level}，只恢復最大 HP，不再追加能力成長。`);
         }
     }
+
+    function gainParagonLevel() {
+        hero.paragonLevel = (hero.paragonLevel || 0) + 1;
+    
+        // 每次巔峰都給一點小成長（偏向魔攻＋血量）
+        const hpGain   = 3;
+        const atkGain  = randInt(1, 2);
+        const defGain  = randInt(1, 2);
+        const matkGain = randInt(2, 4);
+    
+        hero.maxHp       += hpGain;
+        hero.baseAttack  += atkGain;
+        hero.baseDefense += defGain;
+        hero.baseMagicAtk+= matkGain;
+        hero.hp           = hero.maxHp;
+    
+        // 巔峰等級的經驗門檻也慢慢變難
+        hero.expToNextLevel = Math.floor(hero.expToNextLevel * 1.10) + 5;
+    
+        log(`🌟 巔峰等級 +1！(現在巔峰 Lv.${hero.paragonLevel})`);
+        log(`   HP +${hpGain}，ATK +${atkGain}，DEF +${defGain}，MATK +${matkGain}`);
+    }
+
 
     function unlockNewRarity() {
         if (bossLevel === 2) {
@@ -2911,6 +2996,7 @@ ${art.join('\n')}
 
 </body>
 </html>
+
 
 
 

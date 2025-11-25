@@ -1,3016 +1,1177 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>🗺️ 勇者模擬器：稀有度分級版</title>
+
     <style>
+
         body {
+
             font-family: 'Courier New', monospace;
+
             display: flex;
+
             flex-direction: column;
+
             align-items: center;
+
             justify-content: center;
+
             min-height: 100vh;
+
             margin: 0;
+
             padding: 20px 0;
+
             background-color: #e8f5e9;
+
         }
+
         #game-container {
+
             width: 90%;
+
             max-width: 650px;
+
             padding: 20px;
+
             background-color: #fff;
+
             border: 5px solid #000;
+
             box-shadow: 6px 6px 0px #4caf50;
+
             text-align: center;
+
             margin-bottom: 20px;
+
         }
+
         #status-box {
+
             background-color: #f0f4c3;
+
             border: 2px solid #000;
+
             padding: 10px;
+
             margin-bottom: 15px;
+
             text-align: left;
+
             font-size: 14px;
+
         }
+
         #equipment-status {
+
             margin-top: 4px;
+
         }
+
         #extra-status {
+
             margin-top: 4px;
+
         }
+
         #main-view {
+
             height: 180px;
+
             border: 3px solid #000;
+
             background-color: #1a2a3a;
+
             color: #fff;
+
             display: flex;
+
             flex-direction: column;
+
             align-items: center;
+
             justify-content: center;
+
             white-space: pre-wrap;
+
             line-height: 1.1;
+
             font-size: 18px;
+
             margin-bottom: 15px;
+
             transition: background-color 0.1s;
+
         }
+
+
 
         .transition-flash-on { background-color: #000000 !important; transition: none; }
+
         .transition-flash-off { background-color: #ffffff !important; transition: none; }
 
+
+
         .hero-hit-flash { background-color: #ffd700 !important; }
+
         .monster-hit-flash { background-color: #ff3333 !important; }
+
         .crit-flash { background-color: #ffaa00 !important; }
+
         .heal-flash { background-color: #33ff33 !important; }
 
+
+
         .loot-Magic { background-color: #003300 !important; color: #00aa00; font-size: 24px;}
+
         .loot-Rare { background-color: #000033 !important; color: #00aaff; font-size: 28px;}
+
         .loot-Epic { background-color: #330033 !important; color: #aa00aa; font-size: 30px;}
+
         .loot-Legendary { background-color: #331a00 !important; color: #FF8C00; font-size: 32px;}
+
         .loot-Mythic { background-color: #330000 !important; color: #FF0000; font-size: 34px;}
+
         .loot-Normal { background-color: #333333 !important; color: #ffffff; font-size: 20px;}
 
+
+
         #command-menu {
+
             display: flex;
+
             flex-wrap: wrap;
+
             gap: 10px;
+
             justify-content: center;
+
             margin-bottom: 15px;
+
         }
+
         .command-btn {
+
             padding: 10px 15px;
+
             font-size: 16px;
+
             cursor: pointer;
+
             border: 2px solid #000;
+
             background-color: #ffcc00;
+
             box-shadow: 2px 2px 0px #000;
+
             flex-grow: 1;
+
             min-width: 100px;
+
             transition: background-color 0.2s;
+
         }
+
         .command-btn:hover:not(:disabled) { background-color: #ffd740; }
+
         .command-btn:disabled { background-color: #ccc; cursor: not-allowed; }
 
+
+
         .defend-btn {
+
             background-color: #2196F3;
+
             color: white;
+
             font-weight: bold;
+
         }
+
+
 
         #decision-menu {
+
             display: none;
+
             justify-content: center;
+
             gap: 10px;
+
             margin-top: 10px;
+
             padding: 10px 0;
+
             border-top: 2px solid #ccc;
+
         }
+
         .decision-btn {
+
             padding: 10px 15px;
+
             font-size: 16px;
+
             cursor: pointer;
+
             border: 2px solid #000;
+
             background-color: #f44336;
+
             color: white;
+
             box-shadow: 2px 2px 0px #000;
+
             flex-grow: 1;
+
             min-width: 150px;
+
         }
+
         .decision-btn-yes { background-color: #4CAF50; }
+
         .decision-btn-no { background-color: #F44336; }
 
+
+
         #message-log {
+
             min-height: 120px;
+
             border: 2px solid #000;
+
             padding: 10px;
+
             text-align: left;
+
             overflow-y: auto;
+
             max-height: 120px;
+
             background-color: #fcfcfc;
+
             font-size: 13px;
+
         }
+
         .log-msg { margin: 2px 0; }
 
+
+
         #equipment-display {
+
             margin-top: 15px;
+
             border: 2px solid #000;
+
             padding: 10px;
+
             text-align: left;
+
             background-color: #fcfcfc;
+
             font-size: 14px;
+
             line-height: 1.6;
+
         }
+
+
 
         .Rarity-Normal { color: #808080; }
+
         .Rarity-Magic { color: #00AA00; font-weight: bold; }
+
         .Rarity-Rare { color: #0000AA; font-weight: bold; }
+
         .Rarity-Epic { color: #AA00AA; font-weight: bold; }
+
         .Rarity-Legendary { color: #FF8C00; font-weight: bold; }
+
         .Rarity-Mythic { color: #FF0000; font-weight: bold; }
 
+
+
         #game-manual {
+
             width: 90%;
+
             max-width: 650px;
+
             padding: 20px;
+
             margin-top: 20px;
+
             background-color: #f9f9f9;
+
             border: 2px dashed #4caf50;
+
             text-align: left;
+
             font-size: 13px;
+
             line-height: 1.8;
-        }
-        #game-manual h3 {
-            color: #2e7d32;
-            border-bottom: 1px solid #4caf50;
-            padding-bottom: 5px;
-            margin-top: 15px;
+
         }
 
-        #turn-box {
-            margin-top: 6px;
-            padding: 4px 8px;
-            border: 3px solid #000;
-            background-color: #fff8e1;  /* 跟 status-box 類似的顏色 */
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+        #game-manual h3 {
+
+            color: #2e7d32;
+
+            border-bottom: 1px solid #4caf50;
+
+            padding-bottom: 5px;
+
+            margin-top: 15px;
+
         }
+
+
+
+        #turn-box {
+
+            margin-top: 6px;
+
+            padding: 4px 8px;
+
+            border: 3px solid #000;
+
+            background-color: #fff8e1;  /* 跟 status-box 類似的顏色 */
+
+            font-family: 'Courier New', monospace;
+
+            font-size: 14px;
+
+        }
+
     </style>
+
 </head>
+
 <body>
+
 <!-- ===== 勇者稱號選單（進遊戲前出現） ===== -->
+
 <div id="titleSelectBox" style="
+
     position: fixed; inset: 0;
+
     background: rgba(0,0,0,0.6);
+
     display: flex; align-items: center; justify-content: center;
+
     z-index: 9999;
+
 ">
+
   <div style="
+
       background:#fffbea;
+
       border:3px solid #333;
+
       padding:16px 20px;
+
       min-width:320px;
+
       box-shadow:4px 4px 0 #333;
+
       font-family:'Courier New',monospace;
+
   ">
+
     <h3 style="margin-top:0;">🧾 請先幫自己選一個稱號</h3>
+
     <p style="font-size:14px;margin-top:0;">
+
       組合方式：<b>A形容詞</b> + 的 + <b>B形容詞</b> + <b>C名詞</b><br>
+
       直接按「開始冒險」沒選的話，會自動幫你抽一組隨機稱號。
+
     </p>
+
     <div style="margin-bottom:8px;">
+
       A：
+
       <select id="titleA"></select>
+
     </div>
+
     <div style="margin-bottom:8px;">
+
       B：
+
       <select id="titleB"></select>
+
     </div>
+
     <div style="margin-bottom:12px;">
+
       C：
+
       <select id="titleC"></select>
+
     </div>
+
     <div style="text-align:right;">
+
       <!-- <button onclick="randomTitleOnly()" style="margin-right:8px;">🎲 隨機一組看看</button> -->
+
       <button onclick="confirmTitle()">✅ 開始冒險</button>
+
     </div>
+
   </div>
+
 </div>
+
 <!-- ===== 稱號選單結束 ===== -->
 
 
+
+
+
     <!-- 遊戲主視窗介面 -->
+
 <div id="game-container"> 
+
     <h1>🗺️ 勇者模擬器：打寶與養成</h1>
 
+
+
     <div id="status-box">
+
         勇者 <span id="hero-title"></span>: Lv.<span id="hero-level">1</span>
+
         (EXP: <span id="hero-exp">0</span>/<span id="hero-exp-max">10</span>)<br>
+
         巔峰: Lv.<span id="hero-paragon">0</span><br>
+
         HP: <span id="hero-hp">20</span> / <span id="hero-max-hp">20</span><br>
+
         <div id="equipment-status">
+
             ATK: <span id="hero-atk-val">15</span> |
+
             DEF: <span id="hero-def-val">10</span> |
+
             MATK: <span id="hero-matk-val">20</span>
+
         </div>
+
         <div id="extra-status">
+
             閃避: <span id="hero-dodge-val">5</span>% |
+
             平手勝率: <span id="hero-tie-win-rate-val">30</span>% |
+
             爆擊: <span id="hero-crit-val">5</span>%
+
         </div>
+
     </div>
+
     
+
     <!-- 新增：回合顯示框 -->
+
     <div id="turn-box">
+
       回合：<span id="turn-count">0</span>
+
     </div>
+
     
+
     <div id="main-view">
+
         <p>歡迎來到冒險世界！</p>
+
     </div>
+
+
 
     <div id="command-menu">
+
         <button id="btn-action-1" class="command-btn" onclick="handleMapAction('Small')">出發冒險</button>
+
         <button id="btn-action-2" class="command-btn" onclick="handleMapAction('Boss')">挑戰 Boss 寶藏</button>
+
         <button id="btn-action-3" class="command-btn" onclick="handleMapAction('Heal')">休息 (恢復 HP)</button>
+
     </div>
+
+
 
     <div id="decision-menu">
+
         <button id="btn-decision-yes" class="decision-btn decision-btn-yes" onclick="handleRingDecision('YES')">💍 換上/升級新戒指</button>
+
         <button id="btn-decision-no" class="decision-btn decision-btn-no" onclick="handleRingDecision('NO')">🚫 保留舊戒指</button>
+
     </div>
+
+
 
     <div id="message-log">
+
         <div class="log-msg">勇者踏上了冒險的旅途...</div>
+
     </div>
+
+
 
     <div id="equipment-display">
+
         **⚙️ 裝備欄**<br>
+
         武: <span id="eq-weapon">徒手</span> |
+
         盾: <span id="eq-shield">無</span> |
+
         戒: <span id="eq-ring">無</span><br>
+
         精練等級：武器精練 +<span id="weapon-refine-level">0</span> (素材 <span id="weapon-materials">0</span>/5)；
+
         盾牌精練 +<span id="shield-refine-level">0</span> (素材 <span id="shield-materials">0</span>/5)
+
         <hr style="border-top: 1px solid #ccc; margin: 5px 0;">
+
         **🛡️ 裝備屬性**<br>
+
         攻: <span id="eq-detail-weapon">攻擊力 +0</span> |
+
         防: <span id="eq-detail-shield">防禦力 +0</span><br>
+
         戒: <span id="eq-detail-ring">特效：無 (Lv.0)</span><br>
+
         武器詞條: <span id="eq-weapon-affix">無</span><br>
+
         盾牌詞條: <span id="eq-shield-affix">無</span>
+
     </div>
+
 </div>
 
+
+
 <div id="game-manual">
+
     <h2>📖 遊戲說明與戰鬥規則</h2>
 
+
+
     <h3>⚔️ 戰鬥系統：三種招式 + 克制關係</h3>
+
     <ul>
+
         <li>招式：
+
             <ul>
+
                 <li>⚔️ <b>砍擊（物理）</b>：吃 ATK，傷害 = ATK − 怪物 DEF，會被怪物閃避影響。</li>
+
                 <li>🌠 <b>魔法攻擊</b>：吃 MATK，傷害 = 魔攻 − 怪物 MDEF，<b>絕對命中，不會被閃避</b>。</li>
+
                 <li>🛡️ <b>盾擊</b>：傷害 = 你目前的 <b>DEF 數值</b>，<b>完全無視怪物所有防禦 (DEF/MDEF)</b>，但會被怪物閃避。</li>
+
             </ul>
+
         </li>
+
         <li><b>克制關係：</b> ⚔️ > 魔法 > 盾擊 > ⚔️。</li>
+
         <li><b>克制：</b> 勝方造成傷害，被克制方該回合完全失效。</li>
+
         <li><b>平手：</b> 出同一招，依「平手勝率」判定是我方打還是怪打。</li>
+
         <li><b>盾擊傷害：</b> 不看任何防禦，直接吃 DEF，防禦堆越高，盾擊越痛。</li>
+
     </ul>
+
+
 
     <h3>😈 怪物與弱點（只會進場講一句幹話）</h3>
+
     <ul>
+
         <li><b>哥布林：</b>「人不是我殺的，我只是負責收屍。」</li>
+
         <li><b>骷髏兵：</b>「我先說，勞健保沒幫我保。」</li>
+
         <li><b>野狼：</b>「我只咬加班的人。」</li>
+
         <li><b>石頭人：</b>「我防禦超高，攻擊超低，跟我薪水一樣。」</li>
+
         <li><b>蝙蝠：</b>「我不是吸血鬼，我只是想喝無糖。」</li>
+
     </ul>
+
+
 
     <h3>📊 能力值說明</h3>
+
     <ul>
+
         <li><b>ATK：</b> 影響 ⚔️ 砍擊的物理傷害。</li>
+
         <li><b>DEF：</b> 減少怪物物理傷害，並決定：
+
             <ul>
+
                 <li>🛡️ 盾擊傷害 = DEF（無視防禦）。</li>
+
             </ul>
+
         </li>
+
         <li><b>MATK：</b> 魔攻，用來計算魔法攻擊傷害與部分回復量、老練老屁股的魔法追傷。</li>
+
         <li><b>閃避：</b> 有機率完全閃掉敵方攻擊，<b>上限 75%</b>。</li>
+
         <li><b>平手勝率：</b> 雙方出同招時，我方被判定為「贏」的機率。</li>
+
         <li><b>爆擊：</b> 砍擊有機會爆擊（2 倍傷害），盾擊不會爆擊。</li>
+
     </ul>
+
+
 
     <h3>💍 戒指能力（重點：敏捷指環 & 狂戰職）</h3>
+
     <ul>
+
         <li><b>敏捷指環 (DODGE)</b>
+
             <ul>
+
                 <li>提高大量閃避率。</li>
+
                 <li>當你的「實際閃避」超過 75% 時，多出來的部分會變成<b>追擊機率</b>（例如：顯示 75%，實際 85%，多出 10% 就是追擊率 10%）。</li>
+
                 <li>成功閃避怪物攻擊時，會<b>立刻普攻反擊一次</b>。</li>
+
             </ul>
+
         </li>
+
         <li><b>狂戰士指環 (BERSERKER)</b>
+
             <ul>
+
                 <li>犧牲 DEF / HP 換大量 ATK。</li>
+
                 <li>物理攻擊有機會多段攻擊，戰鬥訊息會顯示「第1擊、第2擊…」與每一擊傷害（含暴擊與老屁股魔傷），最後加總。</li>
+
             </ul>
+
         </li>
+
         <li>其餘戒指（幸運、生命、魔導、平衡）延續原本效果。</li>
+
     </ul>
+
+
 
     <h3>💎 裝備稀有度與掉落解鎖</h3>
+
     <ul>
+
         <li><span class="Rarity-Normal">灰色 Normal</span></li>
+
         <li><span class="Rarity-Magic">綠色 Magic</span></li>
+
         <li><span class="Rarity-Rare">藍色 Rare</span></li>
+
         <li><span class="Rarity-Epic">紫色 Epic</span></li>
+
         <li><span class="Rarity-Legendary">橘色 Legendary</span></li>
+
         <li><span class="Rarity-Mythic">紅色 Mythic</span></li>
+
     </ul>
+
     <p>掉落階段（武器 / 盾牌）：</p>
+
     <ul>
+
         <li><b>打第一隻 Boss 之前：</b> 只會掉 紫 / 藍 / 綠 / 灰。</li>
+
         <li><b>打死第一隻 Boss 之後：</b> 加入 <span class="Rarity-Legendary">橘武、橘盾</span>。</li>
+
         <li><b>打死第二隻 Boss 之後：</b> 再加入 <span class="Rarity-Mythic">紅武、紅盾</span>。</li>
+
     </ul>
+
+
 
     <h3>🧲 武器 / 盾牌詞條說明（各 12 種）</h3>
+
         <p><b>武器詞條</b>（括號內為實際效果）：</p>
+
         <ul>
+
             <li>
+
                 <b>偷摸一把</b>：物理攻擊時，有 <b>20%</b> 機率多打一擊。
-            </li>
-            <li>
-                <b>知識就是力量</b>：帶上一本書，提高物理攻擊力，隨時可以敲打敵人的頭，最終物理 ATK 約 +12%。
-            </li>
-            <li>
-                <b>燃燒小宇宙🌀</b>：勇者魔法攻擊（MATK）<b>+10%</b>。
-            </li>
-            <li>
-                <b>神速脫衣</b>：砍擊時計算傷害時，無視敵人<b>30%</b>防禦力。
-            </li>
-            <li>
-                <b>愛吃不辣的(Blood)</b>：本次物理攻擊造成的「總傷害」的 <b>20%</b> 會轉成自我回血（至少 1 點）。
-            </li>
-            <li>
-                <b>再加把勁</b>：平手時，勇者額外獲得 +7% 判定獲勝率（可與戒指、盾牌加成疊加，上限 100%）。
 
             </li>
+
             <li>
+
+                <b>知識就是力量</b>：帶上一本書，提高物理攻擊力，隨時可以敲打敵人的頭，最終物理 ATK 約 +12%。
+
+            </li>
+
+            <li>
+
+                <b>燃燒小宇宙🌀</b>：勇者魔法攻擊（MATK）<b>+10%</b>。
+
+            </li>
+
+            <li>
+
+                <b>神速脫衣</b>：砍擊時計算傷害時，無視敵人<b>30%</b>防禦力。
+
+            </li>
+
+            <li>
+
+                <b>愛吃不辣的(Blood)</b>：本次物理攻擊造成的「總傷害」的 <b>20%</b> 會轉成自我回血（至少 1 點）。
+
+            </li>
+
+            <li>
+
+                <b>再加把勁</b>：平手時，勇者額外獲得 +7% 判定獲勝率（可與戒指、盾牌加成疊加，上限 100%）。
+
+
+
+            </li>
+
+            <li>
+
                 <b>塞你巴掌</b>：基本暴擊率 +<b>5%</b>（由 5% → 10%）。
+
             </li>
+
             <li>
+
                 <b>6點了我先下班了</b>：閃避率 +<b>3%</b>。
+
             </li>
+
             <li>
+
                 <b>加班勞碌命</b>：當 HP 低於最大值的 <b>30%</b> 時：
+
                 物攻 +<b>15%</b>，暴擊率額外 +<b>10%</b>。
+
             </li>
+
             <li>
+
                 <b>老練老屁股</b>：每一擊砍擊額外附加相當於勇者魔攻 <b>30%</b> 的魔法傷害。
+
             </li>
+
             <li>
+
                 <b>火大亂砍</b>：物理攻擊時，有 <b>5%</b> 機率直接變成「至少」<b>3 連擊</b>。
+
             </li>
+
             <li>
+
                 <b>打了又打</b>：同一回合內的連擊會越打越痛：
+
                 第 2 擊傷害 +<b>15%</b>，第 3 擊 +<b>30%</b>，第 4 擊以上依序再 +15% 疊上去。
+
             </li>
+
         </ul>
+
         
+
         <p><b>盾牌詞條</b>（有「詞上加詞」鏈）：</p>
+
         <ul>
+
             <li>
+
                 <b>我擋~🛡️</b>：受到攻擊時，有 <b>20%</b> 機率本次傷害減半，
+
                 並可觸發後續「我再頂~💥 / 我再砍~🔪」等效果。
+
             </li>
+
             <li>
+
                 <b>魔法胸罩</b>：施放魔法或盾擊時，有 <b>20%</b> 機率獲得
+
                 <b>3 回合</b>「受到傷害減半」的魔法護盾。
+
             </li>
+
             <li>
+
                 <b>厚臉皮</b>：防禦力（DEF）<b>+10%</b>。
+
             </li>
+
             <li>
+
                 <b>豹子通殺</b>：平手時勇者獲勝的機率 +<b>5%</b>。
+
             </li>
+
             <li>
+
                 <b>怎麼刺刺的</b>：受到傷害時，反彈本次實際傷害的 <b>20%</b>
+
                 給敵人（至少 1 點）。
+
             </li>
+
             <li>
+
                 <b>正在忙別的案子</b>：閃避率 +<b>5%</b>。
+
             </li>
+
             <li>
+
                 <b>癢癢滴</b>：被 Boss 攻擊時，承受的最終傷害 -<b>10%</b>。
+
             </li>
+
             <li>
+
                 <b>不太痛</b>：被一般小怪攻擊時，承受的最終傷害 -<b>10%</b>。
+
             </li>
+
             <li>
+
                 <b>吃個麵包先</b>：每場戰鬥開始時獲得持續回復效果，
+
                 大約 <b>3 回合</b>、每回合回復約最大 HP 的 <b>3%</b>（至少 2 點 HP）。
+
             </li>
+
             <li>
+
                 <b>YA~撿到十塊錢</b>：裝備被分解成素材時，若原本會得到素材，
+
                 有 <b>30%</b> 機率額外多出 <b>1</b> 份素材。
+
             </li>
+
             <li>
+
                 <b>我再頂~💥</b>：需要先有「我擋~🛡️」。
+
                 當「我擋~🛡️」格檔成功時，會再追加一次以「目前防禦力」為基礎的盾擊攻擊。
+
             </li>
+
             <li>
+
                 <b>我再砍~🔪</b>：需要先有「我擋~🛡️」。
+
                 當「我擋~🛡️」格檔成功時，會再補上一刀普通砍擊，
+
                 會吃到所有物理相關效果（暴擊、多段攻擊、打了又打等）。
+
             </li>
+
         </ul>
+
         <p>
+
             「我再頂~💥」、「我再砍~🔪」只會出現在已經擁有「我擋~🛡️」的盾牌上。<br>
+
             發動時機與多段傷害細節會在戰鬥 Log 中逐條顯示。
+
         </p>
 
 
+
+
+
     <h3>🛠 精練系統（+3 解鎖詞條）</h3>
+
     <ul>
+
         <li><b>武器精練綁在角色</b>：換武器時，精練等級與精練詞條都會跟著新武器走。</li>
+
         <li><b>盾牌精練綁盾本身</b>：換盾就換掉。</li>
+
         <li><b>每 +3 精練（+3 / +6 / +9 ...）就增加一條詞條。</b></li>
+
         <li>分解裝備得到素材，每 5 點素材自動精練一次，精練不會失敗。</li>
+
     </ul>
+
 </div>
 
+
+
 <script>
+
     let gameState = 'MAP';
+
     let totalTurnCount = 0;   // 這是你原本用來記錄破關排序的
+
     let turnCount = 0;        // 這個用來顯示「目前第幾回合」
+
+
 
     // ===== 稱號文字庫 =====
 
+
+
     const turnCountSpan = document.getElementById('turn-count');
+
     // 你之後想要 30 個就一直加
+
     const TITLE_A = [
+
       '烈焰', '爆轟', '蒼雷', '深淵', '迅影',
+
       '無畏', '孤高', '狂躁', '沉穩', '冰牙',
+
       '斬鐵', '迅猛', '赤紅', '秘境', '月影',
+
       '碎星', '朦朧', '滑稽', '胖胖', '奇妙',
+
       '背刺型', '超怕痛', '很會睡', '超衰', '超歐',
+
       '深海系', '熔岩系', '夢幻', '隱匿', '笨拙','視覺系',
+
       '偉大','暴走','神秘','無情','熱血',
+
       '悠哉','傳說中','孤獨','勇敢','佛系'
-    ];
-    const TITLE_B = [
-  '暴走', '貪吃', '高能', '省電', '大雞雞',
-  '迷了路的', '三分鐘熱度的', '不讀說明書的', '背包滿滿', '滿身DEBUFF',
-  '怒氣值滿的', '操作鬼才', '臨時抱佛腳的', '邊走邊摸魚的', '太早起的',
-  '人來瘋', '不講武德的', '躺著贏的', '躲草叢的', '手滑',
-  '超會卡牆角的', '死要錢的', '喝藥喝很兇的', '怕痛的', '打王專用',
-  '愛亂衝的', '不乾淨的', '放生隊友的', '網路卡卡', '認真的',
-  '帥氣','陰沉','暴怒','冷靜','邊緣',
-  '早睡','非洲','歐洲','開外掛'
-];
-    const TITLE_C = [
-      '獵人', '研磨師', '大劍客', '連擊者', '炸彈魔',
-      '鍋邊探頭者', '採集狂', '路痴冒險者', '龍車乘客', '團滅製造機',
-      '補刀王', '喝藥專家', '蓋房者', '甩尾職人', '滅龍者',
-      '菜鳥勇者', '資深摸魚員', '怪物觀察員', '爆肝王', '旅人',
-      '路邊撿垃圾者', '大村長', '營火管理員', '討債人', '掉寶觀測員',
-      '卡位者', '兇手', '轉蛋大師', '暴擊器', '躺贏者', '裝死高手',
-      '老闆','勇者','上班族','廢人','魔王','上班族','工程師',
-      '菜鳥','摸魚王','爆肝者','旅人','掛網者'
+
     ];
 
+    const TITLE_B = [
+
+      '暴走', '貪吃', '高能', '省電', '大雞雞',
+
+      '迷了路的', '三分鐘熱度的', '不讀說明書的', '背包滿滿', '滿身DEBUFF',
+
+      '怒氣值滿的', '操作鬼才', '臨時抱佛腳的', '邊走邊摸魚的', '太早起的',
+
+      '人來瘋', '不講武德的', '躺著贏的', '躲草叢的', '手滑',
+
+      '超會卡牆角的', '死要錢的', '喝藥喝很兇的', '怕痛的', '打王專用',
+
+      '愛亂衝的', '不乾淨的', '放生隊友的', '網路卡卡', '認真的',
+
+      '帥氣','陰沉','暴怒','冷靜','邊緣',
+
+      '早睡','非洲','歐洲','開外掛'
+
+    ];
+
+    const TITLE_C = [
+
+      '獵人', '研磨師', '大劍客', '連擊者', '炸彈魔',
+
+      '鍋邊探頭者', '採集狂', '路痴冒險者', '龍車乘客', '團滅製造機',
+
+      '補刀王', '喝藥專家', '蓋房者', '甩尾職人', '滅龍者',
+
+      '菜鳥勇者', '資深摸魚員', '怪物觀察員', '爆肝王', '旅人',
+
+      '路邊撿垃圾者', '大村長', '營火管理員', '討債人', '掉寶觀測員',
+
+      '卡位者', '兇手', '轉蛋大師', '暴擊器', '躺贏者', '裝死高手',
+
+      '老闆','勇者','上班族','廢人','魔王','上班族','工程師',
+
+      '菜鳥','摸魚王','爆肝者','旅人','掛網者'
+
+    ];
+
+
+
     
+
     const HERO_MAX_HP_START = 20;
+
     const MAX_LEVEL = 25;
+
     const HP_PER_LEVEL = 5;
 
+
+
     const RARITY_ORDER = ['Normal', 'Magic', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+
     const RARITY_MATERIAL_VALUE = {
+
         Normal: 0, Magic: 1, Rare: 2, Epic: 3, Legendary: 4, Mythic: 5
+
     };
+
+
 
     const MAGIC_REFINE_BONUS = {
+
         Normal: 1, Magic: 3, Rare: 5, Epic: 8, Legendary: 12, Mythic: 16
+
     };
+
     const WEAPON_MATERIAL_PER_REFINE = 5;
+
     const SHIELD_MATERIAL_PER_REFINE = 5;
+
     let weaponMaterials = 0;
+
     let shieldMaterials = 0;
 
+
+
     // 魔導：最高等級拉到 +160% 魔攻
+
     const MAGIC_RING_MAGIC_RATE = [0, 0.40, 0.80, 1.20, 1.60];
+
     const CRIT_RING_MAGIC_RATE  = [0, 0.10, 0.20, 0.30, 0.40]; // 原本就不錯，可留
+
     
+
     // 狂戰士：多段機率拉高
+
     const BERSERKER_MULTI_HIT_CHANCE = [0, 0.20, 0.30, 0.40, 0.50];
+
     const BERSERKER_THIRD_HIT_CHANCE = [0, 0.05, 0.15, 0.25, 0.35];
 
+
+
     let hero = {
+
         name: '無名英雄',
+
         hp: HERO_MAX_HP_START,
+
         maxHp: HERO_MAX_HP_START,
+
         level: 1,
+
         highestLevel: 1,
+
         paragonLevel: 0,        // ★ 巔峰等級
+
         exp: 0,
+
         title: "",   // ★★ 初始化稱號 → 不會沿用上次記錄
+
         expToNextLevel: 10,
+
         baseAttack: 15,
+
         baseDefense: 10,
+
         baseDodge: 5,       // 起始閃避 5%
+
         baseTieWinRate: 30,
+
         baseMagicAtk: 20,
+
         equipment: {
+
             WEAPON: { name: "徒手", power: 0, rarity: 'Normal', affixes: [] },
+
             SHIELD: { name: "無", power: 0, rarity: 'Normal', refine: 0, affixes: [], refineSlots: 0 },
+
             RING: { name: "無", ability: null, tier: 0, rarity: 'Normal' }
+
         },
+
         berserkerBonus: 0,
+
         berserkerPenalty: 0,
+
         healRingDefBonus: 0,
+
         currentAttack: 0,
+
         currentDefense: 0,
+
         currentDodge: 0,        // 顯示用 (最多 75%)
+
         dodgeOverflow: 0,       // 溢出的追擊機率（%）
+
         currentTieWinRate: 0,
+
         currentMagicAtk: 0,
+
         magicGuardTurns: 0,
+
         burnTurns: 0,
+
         burnDamage: 0,
+
         defDownTurns: 0,
+
         defDownRate: 0,
+
         weaponRefineLevel: 0,
+
         weaponRefineSlots: 0,
+
         weaponRefineAffixes: [],
+
         // 冒險事件 buff
+
         buffDamageUpTurns: 0,
+
         buffDamageUpRate: 0,
+
         regenTurns: 0,
+
         regenAmount: 0
+
     };
+
+
 
         //初始化稱號選單
+
     function initTitleSelectBox() {
+
         const selA = document.getElementById('titleA');
+
         const selB = document.getElementById('titleB');
+
         const selC = document.getElementById('titleC');
+
     
+
         // 先塞一個「不選」選項
+
         function fillSelect(sel, arr) {
+
             sel.innerHTML = '';
+
             const optEmpty = document.createElement('option');
+
             optEmpty.value = '';
+
             optEmpty.textContent = '（隨機）';
+
             sel.appendChild(optEmpty);
-    
-            arr.forEach(txt => {
-                const opt = document.createElement('option');
-                opt.value = txt;
-                opt.textContent = txt;
-                sel.appendChild(opt);
-            });
-        }
-    
-        fillSelect(selA, TITLE_A);
-        fillSelect(selB, TITLE_B);
-        fillSelect(selC, TITLE_C);
-    }
-
 
     
-    function getShieldRefineLevel() {
-        return hero.equipment.SHIELD.refine || 0;
-    }
 
-    let currentEnemy = null;
-    let bossLevel = 1;
-    let newLoot = null;
-
-    let healCooldown = 30000;
-    let lastHealTime = 0;
-    let healCooldownTimer = null;
-
-    const CLASH_RULES = {
-        '⚔️': '🌠',
-        '🌠': '🛡️',
-        '🛡️': '⚔️'
-    };
-
-    const RING_ABILITIES = [
-        {
-            id: 'CRIT',
-            name: '幸運戒指',
-            desc: '提高暴擊機率，略微提升魔法相關傷害',
-            effect: () => {}
-        },
-        {
-            id: 'HEAL',
-            name: '生命戒指',
-            desc: '格擋成功或盾擊造成傷害時回復 HP，回復量依 DEF 而定，並小幅提升 DEF',
-            effect: () => {}
-        },
-        {
-            id: 'DODGE',
-            name: '敏捷指環',
-            desc: '提高閃避，閃避超過 75% 的部分會變成追擊機率，成功閃避時還會普攻反擊一次',
-            effect: (hero) => 0.10 + hero.equipment.RING.tier * 0.08
-        },
-        {
-            id: 'MAGIC',
-            name: '魔導指環',
-            desc: '大幅提高魔法相關傷害',
-            effect: (tier) => MAGIC_RING_MAGIC_RATE[tier] || 0
-        },
-        {
-            id: 'BERSERKER',
-            name: '狂戰士指環',
-            desc: '犧牲最大HP換取大量ATK，物理攻擊有機會多段攻擊並略增爆擊率',
-            effect: (tier) => {
-                const ratios = [0, 0.30, 0.40, 0.50, 0.60];
-                return ratios[tier] || 0;
-            }
-        },
-        {
-            id: 'BALANCE',
-            name: '平衡指環',
-            desc: '提升平手時勇者獲勝的機率',
-            effect: (tier) => 10 + tier * 10
-        },
-        { id: 'NONE', name: '無', desc: '無' }
-    ];
-
-    // === 武器詞條（12 個） ===
-    const WEAPON_AFFIX_POOL = [
-        { id: 'W_EXTRA_HIT', name: '偷摸一把', desc: '物理攻擊時有 20% 機率多打一擊。', prereq: null },
-        { id: 'W_ATK_UP',    name: '知識就是力量', desc: '帶著一本書提高少量物理攻擊力，隨時可以用書本敲打敵人的頭。', prereq: null },
-        { id: 'W_MAGIC_UP',  name: '燃燒小宇宙🌀', desc: '提高少量魔法攻擊力。', prereq: null },
-        { id: 'W_ARMOR_PEN', name: '神速脫衣', desc: '砍擊時無視部分敵人防禦。', prereq: null },
-        { id: 'W_LIFESTEAL', name: '愛吃不辣的(Blood)', desc: '物理傷害的一部分會轉為回血。', prereq: null },
-        { id: 'W_BALANCE',   name: '再加把勁', desc: '平手時稍微提高我方判定勝率。', prereq: null },
-        { id: 'W_CRIT_UP',   name: '塞你巴掌', desc: '提高砍擊爆擊率。', prereq: null },
-        { id: 'W_DODGE_UP',  name: '6點了我先下班了', desc: '提高少量閃避率。', prereq: null },
-        { id: 'W_BRAVE',     name: '加班勞碌命', desc: '當 HP 低於 30% 時，物攻與爆擊率提升。', prereq: null },
-        { id: 'W_VETERAN',   name: '老練老屁股', desc: '砍擊時額外造成依魔攻比例的魔法傷害。', prereq: null },
-        { id: 'W_RAGE',      name: '火大亂砍', desc: '物理攻擊有小機率直接變成三連擊。', prereq: null },
-        { id: 'W_CHAIN',     name: '打了又打', desc: '同一回合連擊時，第二擊起傷害逐擊提高。', prereq: null }
-    ];
-
-    // === 盾牌詞條（12 個，含「詞上加詞」） ===
-    const SHIELD_AFFIX_POOL = [
-        { id: 'S_BLOCK',        name: '我擋~🛡️',       desc: '受到傷害時有 20% 機率減少 50% 傷害，觸發後續擋系效果。', prereq: null },
-        { id: 'S_MAGIC_GUARD',  name: '魔法胸罩',     desc: '施放魔法 / 盾擊時有 20% 機率獲得 3 回合 50% 減傷效果。', prereq: null },
-        { id: 'S_DEF_UP',       name: '厚臉皮',       desc: '提高少量防禦力。', prereq: null },
-        { id: 'S_TIE_UP',       name: '豹子通殺',     desc: '稍微提高平手勝率。', prereq: null },
-        { id: 'S_REFLECT',      name: '怎麼刺刺的',     desc: '受到傷害時反彈部分傷害給敵人。', prereq: null },
-        { id: 'S_DODGE_UP',     name: '正在忙別的案子',     desc: '提高少量閃避率。', prereq: null },
-        { id: 'S_BOSS_GUARD',   name: '癢癢滴',     desc: '對 Boss 受到的傷害略微降低。', prereq: null },
-        { id: 'S_SMALL_GUARD',  name: '不太痛',     desc: '對一般小怪受到的傷害略微降低。', prereq: null },
-        { id: 'S_REGEN',        name: '吃個麵包先',     desc: '每場戰鬥開始時獲得幾回合的小量回血。', prereq: null },
-        { id: 'S_MAT_BOOST',    name: 'YA~撿到十塊錢',     desc: '裝備被分解時，偶爾多掉一點素材。', prereq: null },
-        { id: 'S_BLOCK_STRIKE', name: '我再頂~💥',     desc: '需要「我擋~🛡️」，格檔成功時再追加一次盾擊。', prereq: 'S_BLOCK' },
-        { id: 'S_BLOCK_CRIT',   name: '我再砍~🔪',     desc: '需要「我擋~🛡️」，格檔成功時再補上一刀砍擊。', prereq: 'S_BLOCK' }
-    ];
-
-    function findAffix(pool, id) {
-        return pool.find(a => a.id === id);
-    }
-
-    function getAllWeaponAffixSet() {
-        const weapon = hero.equipment.WEAPON || {};
-        const set = new Set();
-        (weapon.affixes || []).forEach(id => set.add(id));
-        (hero.weaponRefineAffixes || []).forEach(id => set.add(id));
-        return set;
-    }
-
-    function addRandomAffixToWeaponRefine() {
-        const existing = new Set(hero.weaponRefineAffixes);
-        const candidates = WEAPON_AFFIX_POOL.filter(a => {
-            if (existing.has(a.id)) return false;
-            if (a.prereq && !existing.has(a.prereq)) return false;
-            return true;
-        });
-        if (candidates.length === 0) return;
-        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-        hero.weaponRefineAffixes.push(chosen.id);
-    }
-
-    function updateWeaponRefineAffixes() {
-        // 每 +3 精練，多一條
-        const targetSlots = Math.floor(hero.weaponRefineLevel / 3);
-        if (targetSlots > hero.weaponRefineSlots) {
-            for (let i = 0; i < targetSlots - hero.weaponRefineSlots; i++) {
-                addRandomAffixToWeaponRefine();
-            }
-        } else if (targetSlots < hero.weaponRefineSlots) {
-            for (let i = 0; i < hero.weaponRefineSlots - targetSlots; i++) {
-                if (hero.weaponRefineAffixes.length > 0) hero.weaponRefineAffixes.pop();
-            }
-        }
-        hero.weaponRefineSlots = targetSlots;
-    }
-
-    function addRandomAffix(equip, pool) {
-        if (!equip.affixes) equip.affixes = [];
-        const existing = new Set(equip.affixes);
-        const candidates = pool.filter(a => {
-            if (existing.has(a.id)) return false;
-            if (a.prereq && !existing.has(a.prereq)) return false;
-            return true;
-        });
-        if (candidates.length === 0) return;
-        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-        equip.affixes.push(chosen.id);
-    }
-
-    function updateShieldRefineAffixes(equip) {
-        if (!equip) return;
-        if (equip.refine == null) equip.refine = 0;
-        if (equip.refineSlots == null) equip.refineSlots = 0;
-        // 每 +3 精練，多一條
-        const targetSlots = Math.floor(equip.refine / 3);
-        if (targetSlots > equip.refineSlots) {
-            for (let i = 0; i < targetSlots - equip.refineSlots; i++) {
-                addRandomAffix(equip, SHIELD_AFFIX_POOL);
-            }
-        } else if (targetSlots < equip.refineSlots) {
-            for (let i = 0; i < equip.refineSlots - targetSlots; i++) {
-                if (equip.affixes && equip.affixes.length > 0) equip.affixes.pop();
-            }
-        }
-        equip.refineSlots = targetSlots;
-    }
-
-    const RARITY_COLORS = {
-        'Normal': 'Rarity-Normal',
-        'Magic': 'Rarity-Magic',
-        'Rare': 'Rarity-Rare',
-        'Epic': 'Rarity-Epic',
-        'Legendary': 'Rarity-Legendary',
-        'Mythic': 'Rarity-Mythic'
-    };
-
-    // 小怪 / 王
-    const ENEMIES = {
-        SMALL: [
-            { name: "哥布林", hp: 32, atk: 9, def: 8,  mDef: 12,  dodge: 35, lootChance: 0.80, exp: 8,  bias: { '⚔️': 0.3, '🌠': 0.4, '🛡️': 0.3 } },
-            { name: "骷髏兵", hp: 45, atk: 8, def: 16, mDef: 6,  dodge: 5,  lootChance: 0.75, exp: 10, bias: { '⚔️': 0.3, '🌠': 0.3, '🛡️': 0.4 } },
-            { name: "野狼",  hp: 42, atk: 9, def: 6,  mDef: 24, dodge: 20, lootChance: 0.80, exp: 11, bias: { '⚔️': 0.6, '🌠': 0.2, '🛡️': 0.2 } },
-            { name: "石頭人", hp: 60, atk: 8,  def: 30, mDef: 4,  dodge: 5,  lootChance: 0.75, exp: 14, bias: { '⚔️': 0.6, '🌠': 0.1, '🛡️': 0.3 } },
-            { name: "蝙蝠", hp: 22, atk: 10, def: 4,  mDef: 8, dodge: 60, lootChance: 0.85, exp: 7,  bias: { '⚔️': 0.2, '🌠': 0.5, '🛡️': 0.3 } }
-        ],
-        BOSS: [
-            { level: 1, name: "不死巫妖", hp: 200, atk: 20, def: 10, mDef: 22, dodge: 10, lootChance: 1.0, exp: 70,  bias: { '⚔️': 0.2, '🌠': 0.5, '🛡️': 0.3 } },
-            { level: 2, name: "火焰巨龍", hp: 380, atk: 28, def: 24, mDef: 12, dodge: 12, lootChance: 1.0, exp: 160, bias: { '⚔️': 0.5, '🌠': 0.2, '🛡️': 0.3 } },
-            { level: 3, name: "遠古魔神", hp: 520, atk: 38, def: 24, mDef: 22, dodge: 15, lootChance: 1.0, exp: 380, bias: { '⚔️': 0.3, '🌠': 0.3, '🛡️': 0.4 } }
-        ]
-    };
-
-    const ENEMY_ART = {
-        "哥布林": [
-            "",
-            "/＼__/＼",
-            "( o.o >",
-            "( ^ )",
-            "＼--/"
-        ],
-        "骷髏兵": [
-            "",
-            " .-.",
-            "( o )",
-            " ＼＼_/",
-            " /＼＼"
-        ],
-        "野狼": [
-            "",
-            "/＼/＼",
-            "( o.o )",
-            "( ^ )",
-            "\\-_/"
-        ],
-        "石頭人": [
-            "",
-            "| O O |",
-            "| \\_/ |",
-            "|_____|",
-            "| | |"
-        ],
-        "蝙蝠": [
-            "",
-            "＿      ＿ ",
-            "）＼^ ^/ (",
-            " )＿。。)(",
-            "  |_︸_|",
-            " _/¯¯¯＼_"
-        ],
-        
-        "迷路的牛頭人菁英": [
-        "   /\\__/\\",
-        "  (  o_x)  < 迷路的",
-        "  /  ^^ \\",
-        " /_/   \\_\\"
-        ],
-        "度假中的迷你九頭蛇": [
-        "    ~~~~~~",
-        "  ~( o o o )~",
-        "  ~( o o o )~  < 迷你九頭蛇",
-        "    ~~~~~~"
-        ],
-        "被縮小的遠古小魔神": [
-        "    /\\",
-        "   (ಠ_ಠ)  < 小魔神",
-        "  _/|  |\\_",
-        "    /  \\"
-        ],
-
-        "不死巫妖": [
-            "",
-            "    +--[⚰️]--+       ",
-            "   | ( 💀 💀 ) |    ",
-            "   |  /|v|\\  |    ",
-            "   /  `-----'  \\   ",
-            "  `-------------'   "
-        ],
-        "火焰巨龍": [
-            "",
-            "    <~🔥~>  <~🔥~>  ",
-            "   /  ( 🐉 🐉 )  \\ ",
-            "  |    |  v  |    | ",
-            "   \\  /\\_/\\_/\\  /   ",
-            "    `----------'    "
-        ],
-        "遠古魔神": [
-            "",
-            "    /\\/\\/\\/\\/\\   ",
-            "   ( 👁️ [X] 👁️ )  ",
-            "  |  /  |w|  \\  |  ",
-            "   \\ |  |V|  | /    ",
-            "    `-----------'   "
-        ]
-    };
-
-    const ENEMY_INTRO_LINES = {
-        "哥布林": "哥布林：『對面有個叫Jack的叫我來這，說這有好康?』",
-        "骷髏兵": "骷髏兵：『唉~房貸還沒繳完就死了，只好回來加班。』",
-        "野狼":   "野狼：『我剛剛UBER點的午餐就是你嗎?』",
-        "石頭人": "石頭人：『我的皮很硬，我的肝更硬。』",
-        "蝙蝠":   "蝙蝠：『什麼動物不用休息？』..................答：『蝙蝠，因為不休蝙蝠』",
-        "不死巫妖": "不死巫妖：『你問我永生的秘訣？每天睡滿八小時，然後多運動，就這麼簡單。』",
-        "火焰巨龍": "火焰巨龍：『我會噴火是因為我有嚴重的胃食道逆流，晚餐吃太辣了。』",
-        "遠古魔神": "遠古魔神：『我就是資本主義的具象化，你每天都得幫我打工。』"
-    };
-
-    const mainView = document.getElementById('main-view');
-    const messageLog = document.getElementById('message-log');
-    const heroAtkVal = document.getElementById('hero-atk-val');
-    const heroDefVal = document.getElementById('hero-def-val');
-    const heroMatkVal = document.getElementById('hero-matk-val');
-    const heroDodgeVal = document.getElementById('hero-dodge-val');
-    const heroTieWinRateVal = document.getElementById('hero-tie-win-rate-val');
-    const heroCritVal = document.getElementById('hero-crit-val');
-
-    const commandMenu = document.getElementById('command-menu');
-    const decisionMenu = document.getElementById('decision-menu');
-    const btnDecYes = document.getElementById('btn-decision-yes');
-    const btnDecNo = document.getElementById('btn-decision-no');
-
-    const btn1 = document.getElementById('btn-action-1');
-    const btn2 = document.getElementById('btn-action-2');
-    const btn3 = document.getElementById('btn-action-3');
-
-    const eqWeapon = document.getElementById('eq-weapon');
-    const eqShield = document.getElementById('eq-shield');
-    const eqRing = document.getElementById('eq-ring');
-    const eqDetailWeapon = document.getElementById('eq-detail-weapon');
-    const eqDetailShield = document.getElementById('eq-detail-shield');
-    const eqDetailRing = document.getElementById('eq-detail-ring');
-    const eqWeaponAffix = document.getElementById('eq-weapon-affix');
-    const eqShieldAffix = document.getElementById('eq-shield-affix');
-
-    const heroHpSpan = document.getElementById('hero-hp');
-    const heroMaxHpSpan = document.getElementById('hero-max-hp');
-    const heroLevelSpan = document.getElementById('hero-level');
-    const heroExpSpan = document.getElementById('hero-exp');
-    const heroExpMaxSpan = document.getElementById('hero-exp-max');
-    // 把稱號塞進 hero-title在這裡加 ↓
-    const heroTitleSpan = document.getElementById('hero-title');
-    const weaponRefineLevelSpan = document.getElementById('weapon-refine-level');
-    const shieldRefineLevelSpan = document.getElementById('shield-refine-level');
-    const weaponMaterialsSpan = document.getElementById('weapon-materials');
-    const shieldMaterialsSpan = document.getElementById('shield-materials');
-
-    function randInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function getEffectivePower(eq, slotType) {
-        if (!eq) return 0;
-        let base = eq.power || 0;
-        if (slotType === 'SHIELD' && eq.refine && eq.refine > 0) {
-            const per = 0.08;
-            base = Math.floor(base * (1 + eq.refine * per));
-        }
-        return base;
-    }
-
-    function getMagicAttackValue() {
-        let magic = hero.currentMagicAtk;
-        const ring = hero.equipment.RING;
-        if (ring && ring.ability) {
-            if (ring.ability.id === 'MAGIC') {
-                const rate = MAGIC_RING_MAGIC_RATE[ring.tier] || 0;
-                magic = Math.floor(magic * (1 + rate));
-            } else if (ring.ability.id === 'CRIT') {
-                const rate = CRIT_RING_MAGIC_RATE[ring.tier] || 0;
-                magic = Math.floor(magic * (1 + rate));
-            }
-        }
-        if (magic < 0) magic = 0;
-        return magic;
-    }
-
-    function getHeroBaseCritChance() {
-        let base = 0.05;
-        const affSet = getAllWeaponAffixSet();
-        if (affSet.has('W_CRIT_UP')) base += 0.05;
-        return base;
-    }
-
-    function getHeroCritChance() {
-        let chance = getHeroBaseCritChance();
-        const wAff = getAllWeaponAffixSet();
-        const ring = hero.equipment.RING;
-
-        if (wAff.has('W_BRAVE') && hero.hp > 0 && hero.hp <= hero.maxHp * 0.3) {
-            chance += 0.10;
-        }
-
-        if (ring && ring.ability) {
-            if (ring.ability.id === 'CRIT') {
-                chance = 0.10 + ring.tier * 0.10;
-            } else if (ring.ability.id === 'BERSERKER') {
-                const extra = [0, 0.05, 0.06, 0.08, 0.10];
-                chance += extra[ring.tier] || 0.05;
-            }
-        }
-        if (chance < 0) chance = 0;
-        if (chance > 0.9) chance = 0.9;
-        return chance;
-    }
-
-    function getHeroCritRate() {
-        return getHeroCritChance() * 100;
-    }
-
-    function attemptWeaponRefine() {
-        const w = hero.equipment.WEAPON;
-        if (!w || w.name === "徒手") {
-            log("❗ 目前沒有可精練的武器（徒手不精練）。");
-            return;
-        }
-        hero.weaponRefineLevel += 1;
-        log(`🛠 武器精練成功！全武器精練等級提升為 +${hero.weaponRefineLevel}（換新武器也會沿用）。`);
-        updateWeaponRefineAffixes();
-    }
-
-    function attemptShieldRefine() {
-        const s = hero.equipment.SHIELD;
-        if (!s || s.name === "無") {
-            log("❗ 目前沒有可精練的盾牌。");
-            return;
-        }
-        if (!s.refine) s.refine = 0;
-        s.refine += 1;
-        log(`🛡 盾牌精練成功！${s.name} 精練 +${s.refine}。`);
-        updateShieldRefineAffixes(s);
-    }
-
-    function log(message) {
-        const div = document.createElement('div');
-        div.className = 'log-msg';
-        div.innerHTML = `> ${message}`;
-        messageLog.prepend(div);
-        if (messageLog.children.length > 80) {
-            messageLog.removeChild(messageLog.lastChild);
-        }
-    }
-
-    function calculateHeroStats() {
-        const weaponPower = getEffectivePower(hero.equipment.WEAPON, 'WEAPON');
-        const shieldPower = getEffectivePower(hero.equipment.SHIELD, 'SHIELD');
-
-        hero.currentAttack = hero.baseAttack + weaponPower;
-        hero.currentDefense = hero.baseDefense + shieldPower;
-        hero.healRingDefBonus = 0;
-
-        const ring = hero.equipment.RING;
-
-        if (ring.ability && ring.ability.id === 'HEAL') {
-            const tier = ring.tier;
-            const ratio = Math.min(0.12, 0.03 * tier);
-            const extraDef = Math.floor(hero.currentDefense * ratio);
-            hero.currentDefense += extraDef;
-            hero.healRingDefBonus = extraDef;
-        }
-
-        let ringDodgeBonus = 0;
-        if (ring.ability && ring.ability.id === 'DODGE') {
-            ringDodgeBonus = ring.ability.effect(hero) * 100;
-        }
-
-        hero.currentTieWinRate = hero.baseTieWinRate;
-        if (ring.ability && ring.ability.id === 'BALANCE') {
-            hero.currentTieWinRate += ring.ability.effect(ring.tier);
-        }
-
-        const shield = hero.equipment.SHIELD;
-        if (shield && shield.affixes) {
-            if (shield.affixes.includes('S_DEF_UP')) {
-                hero.currentDefense = Math.floor(hero.currentDefense * 1.10);
-            }
-            if (shield.affixes.includes('S_TIE_UP')) {
-                hero.currentTieWinRate += 5;
-            }
-            if (shield.affixes.includes('S_DODGE_UP')) {
-                ringDodgeBonus += 5;
-            }
-        }
-
-        hero.currentTieWinRate = Math.min(100, hero.currentTieWinRate);
-
-        hero.berserkerBonus = 0;
-        hero.berserkerPenalty = 0;
-
-        if (ring.ability && ring.ability.id === 'BERSERKER') {
-            const tier = ring.tier;
-            const ratio = ring.ability.effect(tier);
-            const hpToAtk = Math.floor(hero.maxHp * ratio);
-            const defReduction = Math.floor(hero.currentDefense * 0.15);
-            hero.currentAttack += hpToAtk;
-            hero.currentDefense -= defReduction;
-            hero.berserkerBonus = hpToAtk;
-            hero.berserkerPenalty = defReduction;
-        }
-
-        if (hero.defDownTurns > 0 && hero.defDownRate > 0) {
-            const reduce = Math.floor(hero.currentDefense * hero.defDownRate);
-            hero.currentDefense = Math.max(0, hero.currentDefense - reduce);
-        }
-
-        hero.currentDefense = Math.max(0, hero.currentDefense);
-
-        // 閃避計算：先算 raw，再拆成顯示 + 溢出追擊
-        const wAff = getAllWeaponAffixSet();
-
-        // 武器詞條：知識就是力量（W_ATK_UP）→ 物理攻擊 +12%
-        if (wAff.has('W_ATK_UP')) {
-            hero.currentAttack = Math.floor(hero.currentAttack * 1.12);
-        }
-
-        // 武器詞條：再加把勁（W_BALANCE）→ 平手勝率 +7%
-        if (wAff.has('W_BALANCE')) {
-            hero.currentTieWinRate += 7;
-        }
-
-        // 再次壓上限，避免超過 100%
-        hero.currentTieWinRate = Math.min(100, hero.currentTieWinRate);
-
-        // 閃避計算：先算 raw，再拆成顯示 + 溢出追擊
-        let rawDodge = hero.baseDodge + ringDodgeBonus;
-        if (wAff.has('W_DODGE_UP')) rawDodge += 3;
-
-        hero.dodgeOverflow = 0;
-        if (ring.ability && ring.ability.id === 'DODGE' && rawDodge > 75) {
-            hero.dodgeOverflow = rawDodge - 75;
-        }
-        hero.currentDodge = Math.min(75, rawDodge);
-
-        const rarity = hero.equipment.WEAPON.rarity || 'Normal';
-        const per = MAGIC_REFINE_BONUS[rarity] || 0;
-        hero.currentMagicAtk = hero.baseMagicAtk + hero.weaponRefineLevel * per;
-        if (wAff.has('W_MAGIC_UP')) {
-            hero.currentMagicAtk = Math.floor(hero.currentMagicAtk * 1.10);
-        }
-        if (wAff.has('W_BRAVE') && hero.hp > 0 && hero.hp <= hero.maxHp * 0.3) {
-            hero.currentAttack = Math.floor(hero.currentAttack * 1.15);
-        }
-        if (hero.currentMagicAtk < 0) hero.currentMagicAtk = 0;
-    }
-
-    function getAllWeaponAffixNames() {
-        const ids = new Set();
-        (hero.equipment.WEAPON.affixes || []).forEach(id => ids.add(id));
-        (hero.weaponRefineAffixes || []).forEach(id => ids.add(id));
-        if (ids.size === 0) return '無';
-        return Array.from(ids).map(id => {
-            const a = findAffix(WEAPON_AFFIX_POOL, id);
-            return a ? a.name : id;
-        }).join('、');
-    }
-
-    function getShieldAffixNames() {
-        const s = hero.equipment.SHIELD;
-        if (!s || !s.affixes || s.affixes.length === 0) return '無';
-        return s.affixes.map(id => {
-            const a = findAffix(SHIELD_AFFIX_POOL, id);
-            return a ? a.name : id;
-        }).join('、');
-    }
-
-    function updateStatus() {
-        calculateHeroStats();
-        
-            // 顯示目前回合數
-        if (turnCountSpan) {
-            turnCountSpan.textContent = turnCount;
-        }
-
-        heroHpSpan.textContent = Math.max(0, hero.hp);
-        heroMaxHpSpan.textContent = hero.maxHp;
-        heroLevelSpan.textContent = hero.level;
-        heroExpSpan.textContent = hero.exp;
-        heroExpMaxSpan.textContent = hero.expToNextLevel;
-
-        // 顯示稱號（勇者 後面那一段）
-        if (heroTitleSpan) {
-            // 如果你想要顯示成：偉大的廢人 → 前後不要引號，就這樣填
-            heroTitleSpan.textContent = hero.title || '';
-        }
-
-
-        heroAtkVal.textContent = hero.currentAttack;
-        heroDefVal.textContent = hero.currentDefense;
-        heroMatkVal.textContent = getMagicAttackValue();
-        heroDodgeVal.textContent = hero.currentDodge.toFixed(1);
-        heroTieWinRateVal.textContent = hero.currentTieWinRate.toFixed(1);
-        heroCritVal.textContent = getHeroCritRate().toFixed(1);
-
-        const wEq = hero.equipment.WEAPON;
-        const sEq = hero.equipment.SHIELD;
-        const rEq = hero.equipment.RING;
-
-        const effW = getEffectivePower(wEq, 'WEAPON');
-        const effS = getEffectivePower(sEq, 'SHIELD');
-
-        eqWeapon.innerHTML = `<span class="${RARITY_COLORS[wEq.rarity]}">${wEq.name}</span>`;
-        eqShield.innerHTML = `<span class="${RARITY_COLORS[sEq.rarity]}">${sEq.name}${sEq.refine ? ' +' + sEq.refine : ''}</span>`;
-        eqRing.innerHTML = `<span class="${RARITY_COLORS[rEq.rarity]}">${rEq.name}</span>`;
-
-        eqDetailWeapon.innerHTML =
-            `<span class="${RARITY_COLORS[wEq.rarity]}">攻擊力 +${effW}，魔攻 +${getMagicAttackValue()}</span>`;
-        eqDetailShield.innerHTML =
-            `<span class="${RARITY_COLORS[sEq.rarity]}">防禦力 +${effS}${sEq.refine ? ` (精練+${sEq.refine})` : ''}</span>`;
-
-        let ringDetailText = `特效：${rEq.ability.desc} (Lv.${rEq.tier})`;
-        const ringId = rEq.ability.id;
-        const tier = rEq.tier;
-
-        if (ringId === 'BERSERKER') {
-            ringDetailText += `<span style="color:red;"> (ATK+${hero.berserkerBonus}, DEF-${hero.berserkerPenalty}，物攻多段&小幅爆擊加成)</span>`;
-        } else if (ringId === 'HEAL' && hero.healRingDefBonus > 0) {
-            const extraRatio = Math.min(0.12, 0.03 * tier) * 100;
-            ringDetailText += `<span style="color:#2196F3;"> (防禦+${hero.healRingDefBonus}，防禦加成約 +${extraRatio.toFixed(0)}%)</span>`;
-        } else if (ringId === 'MAGIC') {
-            const rate = (MAGIC_RING_MAGIC_RATE[tier] || 0) * 100;
-            ringDetailText += `<span style="color:#9c27b0;"> (魔法傷害 +${rate.toFixed(0)}%)</span>`;
-        } else if (ringId === 'CRIT') {
-            const critRate = getHeroCritRate();
-            const mRate = (CRIT_RING_MAGIC_RATE[tier] || 0) * 100;
-            ringDetailText += `<span style="color:#ff9800;"> (砍擊爆擊率約 ${critRate.toFixed(0)}%，魔法傷害 +${mRate.toFixed(0)}%)</span>`;
-        } else if (ringId === 'DODGE') {
-            ringDetailText += `<span style="color:#4caf50;"> (目前顯示閃避約 ${hero.currentDodge.toFixed(1)}%，追擊機率約 ${hero.dodgeOverflow.toFixed(1)}%)</span>`;
-        } else if (ringId === 'BALANCE') {
-            ringDetailText += `<span style="color:#03a9f4;"> (平手勝率目前約 ${hero.currentTieWinRate.toFixed(1)}%)</span>`;
-        } else if (ringId === 'NONE') {
-            ringDetailText = `特效：無 (Lv.0)`;
-        }
-        eqDetailRing.innerHTML = `<span class="${RARITY_COLORS[rEq.rarity]}">${ringDetailText}</span>`;
-
-        eqWeaponAffix.innerHTML = getAllWeaponAffixNames();
-        eqShieldAffix.innerHTML = getShieldAffixNames();
-
-        weaponRefineLevelSpan.textContent = hero.weaponRefineLevel;
-        shieldRefineLevelSpan.textContent = getShieldRefineLevel();
-        weaponMaterialsSpan.textContent = weaponMaterials;
-        shieldMaterialsSpan.textContent = shieldMaterials;
-    }
-
-    function setCommands(c1, c2, c3, actionHandler, state) {
-        btn1.textContent = c1.text;
-        btn2.textContent = c2.text;
-        btn3.textContent = c3.text;
-
-        btn1.onclick = () => actionHandler(c1.value);
-        btn2.onclick = () => actionHandler(c2.value);
-        btn3.onclick = () => actionHandler(c3.value);
-
-        btn1.classList.remove('defend-btn');
-        btn2.classList.remove('defend-btn');
-        btn3.classList.remove('defend-btn');
-
-        commandMenu.style.display = 'flex';
-        decisionMenu.style.display = 'none';
-
-        if (state === 'BATTLE') {
-            if (c3.value === '🚫') btn3.classList.add('defend-btn');
-            commandMenu.querySelectorAll('.command-btn').forEach(btn => btn.disabled = false);
-        } else if (state === 'MAP') {
-            commandMenu.querySelectorAll('.command-btn').forEach(btn => btn.disabled = false);
-            checkHealCooldown();
-        }
-    }
-
-    function flashBattleView(type) {
-        let className = 'hero-hit-flash';
-        if (type === 'crit') className = 'crit-flash';
-        else if (type === 'heal') className = 'heal-flash';
-        else if (type === 'monster-hit') className = 'monster-hit-flash';
-
-        mainView.classList.add(className);
-        setTimeout(() => mainView.classList.remove(className), 300);
-    }
-
-    function battleTransition(callback) {
-        mainView.innerHTML = `<h1>進入戰鬥...</h1>`;
-        disableCommands(true);
-        let count = 0;
-        const interval = setInterval(() => {
-            if (count % 2 === 0) {
-                mainView.classList.remove('transition-flash-off');
-                mainView.classList.add('transition-flash-on');
-            } else {
-                mainView.classList.remove('transition-flash-on');
-                mainView.classList.add('transition-flash-off');
-            }
-            count++;
-            if (count > 5) {
-                clearInterval(interval);
-                mainView.classList.remove('transition-flash-on', 'transition-flash-off');
-                mainView.style.backgroundColor = '#1a2a3a';
-                callback();
-            }
-        }, 200);
-    }
-
-    function showLootAnimation(loot) {
-        return new Promise(resolve => {
-            const rarityClass = `loot-${loot.rarity}`;
-            mainView.classList.add(rarityClass);
-            mainView.innerHTML = `
-                <p style="text-shadow: 0 0 10px currentColor;">✨ 獲得新寶物! ✨</p>
-                <p>${loot.name}</p>
-            `;
-            setTimeout(() => {
-                mainView.classList.remove(rarityClass);
-                mainView.style.backgroundColor = '#1a2a3a';
-                resolve();
-            }, 1500);
-        });
-    }
-
-    function enterMap() {
-        if (gameState === 'CREDITS') {
-            mainView.style.whiteSpace = 'pre-wrap';
-        }
-        gameState = 'MAP';
-        updateStatus();
-        mainView.style.backgroundColor = '#1a2a3a';
-        mainView.innerHTML = `<p>🗺️ 勇者 ${hero.name} (Lv.${hero.level})，今天要去哪裡亂晃？</p>`;
-
-        const maxBossLevel = ENEMIES.BOSS.length;
-        let c2Text;
-        if (bossLevel > maxBossLevel) {
-            c2Text = "🎉 已擊敗所有 Boss";
-            btn2.disabled = true;
-        } else {
-            c2Text = `挑戰 Boss ${bossLevel} 寶藏`;
-            btn2.disabled = false;
-        }
-
-        setCommands(
-            { text: "出發冒險", value: 'Small' },
-            { text: c2Text, value: 'Boss' },
-            { text: "休息 (恢復 HP)", value: 'Heal' },
-            handleMapAction,
-            'MAP'
-        );
-    }
-
-    function checkHealCooldown() {
-        const healBtn = btn3;
-        const now = Date.now();
-        const remaining = (lastHealTime + healCooldown) - now;
-        if (remaining > 0) {
-            setHealCooldown(remaining);
-        } else {
-            healBtn.textContent = '休息 (恢復 HP)';
-            healBtn.disabled = false;
-            clearInterval(healCooldownTimer);
-        }
-    }
-
-    function setHealCooldown(initialRemaining) {
-        const healBtn = btn3;
-        if (gameState === 'MAP') healBtn.disabled = true;
-        clearInterval(healCooldownTimer);
-
-        let remainingSeconds = Math.ceil(initialRemaining / 1000);
-        healCooldownTimer = setInterval(() => {
-            if (remainingSeconds <= 0) {
-                clearInterval(healCooldownTimer);
-                if (gameState === 'MAP') {
-                    healBtn.textContent = '休息 (恢復 HP)';
-                    healBtn.disabled = false;
-                }
-            } else {
-                if (gameState === 'MAP') {
-                    healBtn.textContent = `休息 (${remainingSeconds}s)`;
-                }
-                remainingSeconds--;
-            }
-        }, 1000);
-
-        if (remainingSeconds > 0 && gameState === 'MAP') {
-            healBtn.textContent = `休息 (${remainingSeconds}s)`;
-        }
-    }
-
-    // ===== 冒險事件區 =====
-
-    function startSmallBattle() {
-        const index = Math.floor(Math.random() * ENEMIES.SMALL.length);
-        const enemyData = ENEMIES.SMALL[index];
-
-        const levelFactor = 1 + (hero.level - 1) * 0.52; // ← 小怪整體成長倍率
-        const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
-        const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
-        const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (hero.level - 1) * 0.22)); // ← 小怪def成長
-        const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (hero.level - 1) * 0.22));// ← 小怪Mdef成長
-
-       currentEnemy = {
-            // 先把原始怪物資料展開（名字、exp、lootChance 等）
-            ...enemyData,
-            // 再覆蓋成長後的數值
-            originalHp: scaledHp,
-            hp: scaledHp,
-            atk: scaledAtk,
-            def: scaledDef,
-            mDef: scaledMDef
-        };
-        battleTransition(enterBattle);
-    }
-
-    function startEliteBattle() {
-        // 依目前 BOSS 進度決定對應的菁英種類
-        const baseIndex = Math.min(Math.max(bossLevel - 1, 0), ENEMIES.BOSS.length - 1);
-        const bossData = ENEMIES.BOSS[baseIndex];
-
-        // ★ 菁英強度調整：
-        //   - HP：0.85 倍 BOSS（有點肉）
-        //   - ATK / DEF / MDEF：0.9 倍 BOSS（比小怪痛、比正牌 BOSS 稍弱）
-        const scaledHp   = Math.floor(bossData.hp   * 0.85);
-        const scaledAtk  = Math.floor(bossData.atk  * 0.90);
-        const scaledDef  = Math.floor((bossData.def  || 0) * 0.90);
-        const scaledMDef = Math.floor((bossData.mDef || bossData.def || 0) * 0.90);
-
-        // 不同階段對應不同菁英造型名稱
-        const eliteNames = [
-            "迷路的牛頭人菁英",   // 對應 1 王
-            "度假中的迷你九頭蛇", // 對應 2 王
-            "被縮小的遠古小魔神"  // 對應 3 王
-        ];
-        const eName = eliteNames[baseIndex] || "不太想上班的菁英怪";
-
-        currentEnemy = {
-            level: bossData.level,
-            name: eName,
-            originalHp: scaledHp,
-            hp: scaledHp,
-            atk: scaledAtk,
-            def: scaledDef,
-            mDef: scaledMDef,
-            dodge: bossData.dodge,
-            lootChance: 0.9,
-            exp: Math.floor(bossData.exp * 0.5),
-            bias: bossData.bias
-        };
-
-        log(`😈 你不小心鑽進奇怪的小巷，撞見一隻【菁英怪】：${eName}！`);
-        battleTransition(enterBattle);
-    }
-
-
-    function adventureTreasure() {
-        const matType = Math.random() < 0.5 ? 'WEAPON' : 'SHIELD';
-        const gain = randInt(2, 4);
-        if (matType === 'WEAPON') {
-            weaponMaterials += gain;
-            log(`💰 你踢到一個可疑木箱，裡面全是鐵屑！武器素材 +${gain} (目前 ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
-            while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
-                weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
-                attemptWeaponRefine();
-            }
-        } else {
-            shieldMaterials += gain;
-            log(`📦 你撿到一面壞掉的盾牌堆，拆一拆得到盾牌素材 +${gain} (目前 ${shieldMaterials}/${SHIELD_MATERIAL_PER_REFINE})`);
-            while (shieldMaterials >= SHIELD_MATERIAL_PER_REFINE) {
-                shieldMaterials -= SHIELD_MATERIAL_PER_REFINE;
-                attemptShieldRefine();
-            }
-        }
-        const bonusExp = randInt(5, 15);
-        gainExp(bonusExp);
-        log(`🎁 你順手翻找，還獲得了一點雜七雜八的經驗值 +${bonusExp}。`);
-        updateStatus();
-        setTimeout(enterMap, 800);
-    }
-
-    function adventureSpring() {
-        hero.hp = hero.maxHp;
-        hero.burnTurns = 0;
-        hero.burnDamage = 0;
-        hero.defDownTurns = 0;
-        hero.defDownRate = 0;
-        hero.magicGuardTurns = 0;
-        log("💧 你發現一個發光的治療泉水，泡完整個人像剛上 SPA，HP 全滿，各種 debuff 被洗掉。");
-        flashBattleView('heal');
-        updateStatus();
-        setTimeout(enterMap, 800);
-    }
-
-    function adventureNiceGuy() {
-        const roll = Math.random();
-        if (roll < 0.4) {
-            hero.buffDamageUpTurns = 5;
-            hero.buffDamageUpRate = 0.3;
-            log("🧙 一位路過的奶油法師拍拍你肩膀：『等一下 5 回合內你會變超痛。』(傷害提升 buff)");
-        } else if (roll < 0.8) {
-            hero.regenTurns = 5;
-            hero.regenAmount = Math.max(2, Math.floor(hero.maxHp * 0.05));
-            log(`🍲 一個好心大嬸塞給你暖呼呼雞湯，未來 5 回合開始時都會回復約 ${hero.regenAmount} HP。`);
-        } else {
-            const matGain = randInt(1, 3);
-            weaponMaterials += matGain;
-            log(`🚶 你遇到一個看起來很有錢的冒險者，他說不想打怪了，把身上 ${matGain} 份武器素材塞給你就走了。`);
-            while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
-                weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
-                attemptWeaponRefine();
-            }
-        }
-        updateStatus();
-        setTimeout(enterMap, 800);
-    }
-
-    function adventureLoveScam() {
-        const r = Math.random();
-        if (r < 0.5) {
-            const lost = Math.max(1, Math.floor(hero.maxHp * 0.2));
-            hero.hp = Math.max(1, hero.hp - lost);
-            log(`💔 你遇到一位自稱「會永遠愛你的」的愛情騙子，被騙走了 ${lost} 點 HP（氣到內傷）。`);
-        } else {
-            const maxLoss = Math.floor(hero.expToNextLevel * 0.3);
-            const realLoss = Math.min(hero.exp, maxLoss);
-            hero.exp -= realLoss;
-            log(`📉 對方說「幫你作股票投資」，結果投資失利，你少了 ${realLoss} 點經驗值，但還好沒有掉級。`);
-        }
-        updateStatus();
-        setTimeout(enterMap, 800);
-    }
-
-    function handleMapAction(action) {
-        if (gameState !== 'MAP') return;
-
-        totalTurnCount++;   // 地圖上的每個動作都算 1 回合
-        
-        if (action === 'Small') {
-            const roll = Math.random();
-            if (roll < 0.58) {               // 普通小怪
-                startSmallBattle();
-            } else if (roll < 0.73) {        // 菁英怪
-                startEliteBattle();
-            } else if (roll < 0.85) {        // 寶箱
-                adventureTreasure();
-            } else if (roll < 0.92) {        // 治療泉水
-                adventureSpring();
-            } else if (roll < 0.97) {        // 好心人
-                adventureNiceGuy();
-            } else {                         // 愛情騙子
-                adventureLoveScam();
-            }
-        } else if (action === 'Boss') {
-            if (bossLevel > ENEMIES.BOSS.length) return;
-            const enemyData = ENEMIES.BOSS[bossLevel - 1];
-
-            const effectiveLevel = Math.max(hero.level, enemyData.level * 7); //這個決定「即使你等級很低，Boss 至少會被當作幾等在算」
-            const levelFactor = 1 + (effectiveLevel - 1) * 0.25;  // ← Boss 成長倍率（Boss HP / ATK 成長速度）
-
-            const scaledHp   = Math.floor(enemyData.hp   * levelFactor);
-            const scaledAtk  = Math.floor(enemyData.atk  * levelFactor);
-            const scaledDef  = Math.floor((enemyData.def  || 0) * (1 + (effectiveLevel - 1) * 0.14)); //（Boss DEF 成長速度）
-            const scaledMDef = Math.floor((enemyData.mDef || enemyData.def || 0) * (1 + (effectiveLevel - 1) * 0.14)); //（Boss MDEF 成長速度）
-
-            currentEnemy = {
-                // 先展開原始 Boss 資料（名字、exp、lootChance、弱點等）
-                ...enemyData,
-                // 再覆蓋成長後的數值
-                originalHp: scaledHp,
-                hp: scaledHp,
-                atk: scaledAtk,
-                def: scaledDef,
-                mDef: scaledMDef
-            };
-            battleTransition(enterBattle);
-        } else if (action === 'Heal') {
-            const now = Date.now();
-            if (now - lastHealTime < healCooldown) {
-                const remainingSec = Math.ceil((healCooldown - (now - lastHealTime)) / 1000);
-                log(`⏱️ 休息冷卻中! 尚餘 ${remainingSec} 秒。`);
-                return;
-            }
-            const baseHeal = 5 + Math.floor(Math.random() * 5);
-            const magicBonus = Math.floor(getMagicAttackValue() / 10);
-            const healAmount = baseHeal + magicBonus;
-            hero.hp = Math.min(hero.maxHp, hero.hp + healAmount);
-            log(`🙏 你找了塊安全的石頭坐下，恢復了 ${healAmount} 點 HP。(魔攻加成 +${magicBonus})`);
-            flashBattleView('heal');
-            updateStatus();
-
-            lastHealTime = now;
-            setHealCooldown(healCooldown);
-        }
-    }
-
-    function enterBattle() {
-        gameState = 'BATTLE';
-
-        // 怪物開場只講一次幹話
-        if (ENEMY_INTRO_LINES[currentEnemy.name]) {
-            log(`💬 ${ENEMY_INTRO_LINES[currentEnemy.name]}`);
-        }
-
-        log(`遭遇了 ${currentEnemy.name}! 請選擇你的招式!`);
-
-        // 盾牌 S_REGEN：進戰鬥時給一點暫時回血
-        const s = hero.equipment.SHIELD;
-        if (s && s.affixes && s.affixes.includes('S_REGEN')) {
-            hero.regenTurns = Math.max(hero.regenTurns, 3);
-            hero.regenAmount = Math.max(hero.regenAmount, Math.max(2, Math.floor(hero.maxHp * 0.03)));
-            log(`🛡️【吃個麵包先】生效：未來幾回合開始時會小幅回復 HP。`);
-        }
-
-        updateBattleView();
-        setCommands(
-            { text: "⚔️ 砍擊 (物理)", value: '⚔️' },
-            { text: "🌠 魔法攻擊 (必中)", value: '🌠' },
-            { text: "🛡️ 盾擊 (DEF 無視防禦)", value: '🛡️' },
-            handleBattleAction,
-            'BATTLE'
-        );
-        disableCommands(false);
-    }
-
-    function updateBattleView() {
-        const art = ENEMY_ART[currentEnemy.name] || ENEMY_ART["骷髏兵"];
-        mainView.innerHTML = `
-${currentEnemy.name}
-HP: ${Math.max(0, currentEnemy.hp)}/${currentEnemy.originalHp}
-
-${art.join('\n')}
-        `;
-        updateStatus();
-    }
-
-    // 生命戒指：共用回血函數
-    function healFromLifeRing(triggerSource) {
-        const ring = hero.equipment.RING;
-        if (!ring || !ring.ability || ring.ability.id !== 'HEAL' || ring.tier <= 0) return 0;
-        if (hero.hp >= hero.maxHp) return 0;
-
-        const baseRatio = 0.10 + ring.tier * 0.03;
-        const raw = Math.floor(hero.currentDefense * baseRatio);
-        const heal = Math.max(3, raw);
-        const missing = hero.maxHp - hero.hp;
-        const actual = Math.min(heal, missing);
-        if (actual <= 0) return 0;
-
-        hero.hp += actual;
-        const srcText = triggerSource === 'BLOCK' ? '成功格擋' : '盾擊命中';
-        log(`💖 生命戒指：${srcText}，依 DEF 回復 ${actual} HP！`);
-        flashBattleView('heal');
-        updateStatus();
-        return actual;
-    }
-
-    // 多段攻擊 & 老練老屁股魔傷 + 詳細 Log
-    function applyHeroAttackEffects(baseDamage, isPhysical, attackKind, label) {
-        let hits = 1;
-        const ring = hero.equipment.RING;
-        const tier = ring.tier;
-        const critChance = getHeroCritChance();
-        const wAff = getAllWeaponAffixSet();
-        let totalDamage = 0;
-        let hitDetails = [];
-        const magicAtk = getMagicAttackValue();
-
-        if (isPhysical && ring.ability && ring.ability.id === 'BERSERKER') {
-            const multiChance = BERSERKER_MULTI_HIT_CHANCE[tier] || 0;
-            const thirdChance = BERSERKER_THIRD_HIT_CHANCE[tier] || 0;
-            if (Math.random() < multiChance) {
-                hits++;
-                if (Math.random() < thirdChance) hits++;
-            }
-        }
-
-        if (isPhysical && wAff.has('W_EXTRA_HIT')) {
-            if (Math.random() < 0.2) {
-                hits++;
-                log(`⚔️「偷摸一把」發動，多打一擊！`);
-            }
-        }
-
-        if (isPhysical && wAff.has('W_RAGE')) {
-            if (Math.random() < 0.05) {
-                hits = Math.max(hits, 3);
-                log(`🤬「火大亂砍」發動，本次至少 3 連擊！`);
-            }
-        }
-
-        let hasVeteran = isPhysical && attackKind === 'SWORD' && wAff.has('W_VETERAN');
-        let hasChain = isPhysical && wAff.has('W_CHAIN');
-
-        for (let i = 0; i < hits; i++) {
-            let dmg = baseDamage;
-            let thisHitCrit = false;
-            let thisMagicBonus = 0;
-
-            // 打了又打：第二擊起每次 +15%
-            if (hasChain && i > 0) {
-                const factor = 1 + 0.15 * i;
-                dmg = Math.floor(dmg * factor);
-            }
-
-            // 暴擊（只對砍擊 / 一般物理）
-            if (isPhysical && attackKind === 'SWORD') {
-                if (Math.random() < critChance) {
-                    dmg = Math.floor(dmg * 2);
-                    thisHitCrit = true;
-                }
-            }
-
-            // 老練老屁股：砍擊附加魔攻比例魔傷
-            if (hasVeteran && magicAtk > 0) {
-                thisMagicBonus = Math.max(1, Math.floor(magicAtk * 0.30));
-            }
-
-            const singleTotal = dmg + thisMagicBonus;
-            totalDamage += singleTotal;
-
-            hitDetails.push({
-                index: i + 1,
-                dmg,
-                isCrit: thisHitCrit,
-                magicBonus: thisMagicBonus
-            });
-        }
-
-        if (hitDetails.length > 1 || hitDetails.some(h => h.magicBonus > 0)) {
-            const tag = label || '攻擊';
-            log(`📊 ${tag}詳解：`);
-            hitDetails.forEach(h => {
-                let txt = `第${h.index}擊：${h.dmg}`;
-                if (isPhysical) txt += ` 物理傷害`;
-                if (h.isCrit) txt += `（暴擊）`;
-                if (h.magicBonus > 0) txt += ` + ${h.magicBonus} 魔法傷害（老練老屁股）`;
-                log(txt + '。');
-            });
-            log(`🔢 合計：${totalDamage} 點傷害。`);
-        } else {
-            // 單擊普通情況，保留原本簡單風格
-        }
-
-        // 吸血
-        if (isPhysical && wAff.has('W_LIFESTEAL') && totalDamage > 0) {
-            const heal = Math.max(1, Math.floor(totalDamage * 0.2));
-            hero.hp = Math.min(hero.maxHp, hero.hp + heal);
-            log(`🩸「愛吃不辣的(Blood)」生效，回復 ${heal} 點 HP！`);
-        }
-
-        // ===== 狂戰士戒指吸血（新增） =====
-        const ring = hero.equipment.RING;
-        if (
-            isPhysical &&
-            ring &&
-            ring.ability &&
-            ring.ability.id === "BERSERKER" &&
-            totalDamage > 0
-        ) {
-            // tier 等級：1~4
-            const tier = ring.tier || 0;
-        
-            // 各等級吸血比例：3% / 5% / 7% / 10%
-            const berserkLeechRate = [0, 0.03, 0.05, 0.07, 0.10][tier];
-        
-            if (berserkLeechRate > 0) {
-                const heal = Math.max(1, Math.floor(totalDamage * berserkLeechRate));
-                const old = hero.hp;
-                hero.hp = Math.min(hero.maxHp, hero.hp + heal);
-        
-                if (hero.hp > old) {
-                    log(`💢 狂戰士指環憤怒吸血，回復 ${hero.hp - old} 點 HP！`);
-                }
-            }
-        }
-
-        return totalDamage;
-    }
-
-    function tryTriggerMagicGuard() {
-        const shield = hero.equipment.SHIELD;
-        if (shield && shield.affixes && shield.affixes.includes('S_MAGIC_GUARD')) {
-            if (Math.random() < 0.2) {
-                hero.magicGuardTurns = 3;
-                log('✨「魔法胸罩」啟動！接下來 3 回合受到的傷害減半。');
-            }
-        }
-    }
-
-    function doShieldStrikeFollowUp(label) {
-        if (!currentEnemy || currentEnemy.hp <= 0) return 0;
-        const SHIELD_DMG = Math.max(1, hero.currentDefense);
-        if (enemyDodged('🛡️')) {
-            log(`😈 ${currentEnemy.name} 閃過了你的追加盾擊！`);
-            return 0;
-        }
-        let dmg = applyHeroAttackEffects(SHIELD_DMG, true, 'SHIELD', label || '盾擊追打');
-        currentEnemy.hp -= dmg;
-        maybeExtraOverflowAttack('盾擊追擊');
-        updateBattleView();
-        return dmg;
-    }
-
-    function doSwordStrikeFollowUp(label) {
-        if (!currentEnemy || currentEnemy.hp <= 0) return 0;
-        const wAff = getAllWeaponAffixSet();
-        let enemyDefForSword = currentEnemy.def || 0;
-        if (wAff.has('W_ARMOR_PEN')) {
-            enemyDefForSword = Math.floor(enemyDefForSword * 0.7);
-        }
-        let atkForCalc = hero.currentAttack;
-        if (hero.buffDamageUpTurns > 0 && hero.buffDamageUpRate > 0) {
-            atkForCalc = Math.floor(atkForCalc * (1 + hero.buffDamageUpRate));
-        }
-        let baseSwordDmg = Math.max(1, atkForCalc - enemyDefForSword);
-        if (enemyDodged('⚔️')) {
-            log(`😈 ${currentEnemy.name} 閃過了你的追加砍擊！`);
-            return 0;
-        }
-        let dmg = applyHeroAttackEffects(baseSwordDmg, true, 'SWORD', label || '額外砍擊');
-        currentEnemy.hp -= dmg;
-        maybeExtraOverflowAttack('額外砍擊追擊');
-        updateBattleView();
-        return dmg;
-    }
-
-    function triggerBlockFollowUps() {
-        const shield = hero.equipment.SHIELD;
-        if (!shield || !shield.affixes) return;
-
-        if (shield.affixes.includes('S_BLOCK_STRIKE')) {
-            const dmg = doShieldStrikeFollowUp('我再頂~💥');
-            if (dmg > 0) {
-                log(`🛡️「我再頂~💥」追加盾擊造成 ${dmg} 點傷害！`);
-            }
-        }
-        if (shield.affixes.includes('S_BLOCK_CRIT')) {
-            const dmg2 = doSwordStrikeFollowUp('我再砍~🔪');
-            if (dmg2 > 0) {
-                log(`⚔️「我再砍~🔪」補上一刀造成 ${dmg2} 點傷害！`);
-            }
-        }
-    }
-
-    function applyDamageToHero(rawDamage, isBoss = false) {
-        let dmg = rawDamage;
-        const shield = hero.equipment.SHIELD;
-        let blocked = false;
-
-        if (hero.magicGuardTurns && hero.magicGuardTurns > 0) {
-            dmg = Math.floor(dmg * 0.5);
-            hero.magicGuardTurns--;
-            if (hero.magicGuardTurns === 0) {
-                log('🔚 魔力胸罩效果結束。');
-            }
-        }
-
-        if (shield && shield.affixes && shield.affixes.includes('S_BLOCK')) {
-            if (Math.random() < 0.2) {
-                dmg = Math.floor(dmg * 0.5);
-                blocked = true;
-                log('🛡️「我擋~🛡️」格擋成功，本次傷害減半。');
-            }
-        }
-
-        if (shield && shield.affixes) {
-            if (isBoss && shield.affixes.includes('S_BOSS_GUARD')) {
-                dmg = Math.floor(dmg * 0.9);
-                log('👑「癢癢滴」生效：對 Boss 傷害略為降低。');
-            }
-            if (!isBoss && shield.affixes.includes('S_SMALL_GUARD')) {
-                dmg = Math.floor(dmg * 0.95);
-                log('🐀「不太痛」生效：一般小怪打你有點不痛。');
-            }
-            if (shield.affixes.includes('S_REFLECT') && dmg > 0) {
-                const reflect = Math.max(1, Math.floor(dmg * 0.2));
-                currentEnemy.hp -= reflect;
-                log(`🔁「怎麼刺刺的」反彈 ${reflect} 點傷害給 ${currentEnemy.name}！`);
-            }
-        }
-
-        const final = Math.max(1, Math.floor(dmg));
-        hero.hp -= final;
-
-        if (blocked) {
-            healFromLifeRing('BLOCK');
-            triggerBlockFollowUps();
-        }
-
-        return final;
-    }
-
-    function enemyDodged(playerMove) {
-        if (playerMove === '🛡️') return false;
-        const dodge = currentEnemy.dodge || 0;
-        return Math.random() * 100 < dodge;
-    }
-
-    function applyHeroOngoingStatusAtTurnStart() {
-        let heroDied = false;
-
-        if (hero.burnTurns > 0 && hero.burnDamage > 0) {
-            const dmg = hero.burnDamage;
-            hero.hp -= dmg;
-            hero.burnTurns--;
-            log(`🔥 灼燒持續發作，你受到 ${dmg} 點傷害！（剩餘 ${hero.burnTurns} 回合）`);
-            flashBattleView('monster-hit');
-            if (hero.burnTurns === 0) {
-                hero.burnDamage = 0;
-                log('💧 灼燒效果解除。');
-            }
-            if (hero.hp <= 0) {
-                hero.hp = 0;
-                heroDied = true;
-            }
-        }
-
-        if (hero.regenTurns > 0 && hero.regenAmount > 0 && hero.hp > 0) {
-            const missing = hero.maxHp - hero.hp;
-            if (missing > 0) {
-                const heal = Math.min(hero.regenAmount, missing);
-                hero.hp += heal;
-                hero.regenTurns--;
-                log(`🍀 持續回復效果：恢復 ${heal} HP（剩餘 ${hero.regenTurns} 回合）。`);
-                flashBattleView('heal');
-            } else {
-                hero.regenTurns--;
-            }
-            if (hero.regenTurns === 0) {
-                hero.regenAmount = 0;
-                log('🧾 持續回復效果結束。');
-            }
-        }
-
-        if (hero.defDownTurns > 0) {
-            hero.defDownTurns--;
-            if (hero.defDownTurns === 0) {
-                hero.defDownRate = 0;
-                log('🛡️ 防禦力的詛咒解除，你的防禦恢復正常。');
-            }
-        }
-
-        if (hero.buffDamageUpTurns > 0) {
-            hero.buffDamageUpTurns--;
-            if (hero.buffDamageUpTurns === 0) {
-                hero.buffDamageUpRate = 0;
-                log('💥 奶油法師加持的「傷害 buff」時間到了，輸出回歸正常。');
-            }
-        }
-
-        updateStatus();
-        return heroDied;
-    }
-
-    function calcBossAttackDamage(baseDamage) {
-        if (!currentEnemy) {
-            return { damage: baseDamage, skip: false };
-        }
-
-        if (currentEnemy.name === '遠古魔神') {
-            if (currentEnemy.ancientChargeState === 'CHARGING') {
-                currentEnemy.ancientChargeState = null;
-                const dmg = Math.max(1, baseDamage * 2);
-                log('⚡ 遠古魔神釋放【蓄力重擊】，造成 2 倍傷害！');
-                return { damage: dmg, skip: false };
-            }
-
-            if (!currentEnemy.ancientChargeState && Math.random() < 0.25) {
-                currentEnemy.ancientChargeState = 'CHARGING';
-                log('💥 遠古魔神開始蓄力，準備在下一回合使出【蓄力重擊】！本回合不攻擊。');
-                return { damage: 0, skip: true };
-            }
-        }
-
-        return { damage: baseDamage, skip: false };
-    }
-
-    function applyBossPostHitEffects(finalDamage) {
-        if (!currentEnemy || finalDamage <= 0) return;
-
-        if (currentEnemy.name === '哥布林') {
-            if (Math.random() < 0.20) {
-                const extra = Math.max(1, Math.floor(finalDamage * 0.3));
-                hero.hp = Math.max(0, hero.hp - extra);
-                log(`🗡️ 哥布林趁亂偷襲，再造成 ${extra} 點額外傷害！`);
-            }
-        } else if (currentEnemy.name === '骷髏兵') {
-            if (Math.random() < 0.20) {
-                hero.defDownTurns = 2;
-                hero.defDownRate = 0.15;
-                log('🦴 骷髏兵敲碎你的護甲，未來 2 回合防禦力降低 15%。');
-            }
-        } else if (currentEnemy.name === '野狼') {
-            if (Math.random() < 0.25) {
-                const extra = Math.max(1, Math.floor(finalDamage * 0.5));
-                hero.hp = Math.max(0, hero.hp - extra);
-                log(`🐺 野狼趁勢再咬一口，額外造成 ${extra} 點傷害！`);
-            }
-        } else if (currentEnemy.name === '石頭人') {
-            if (Math.random() < 0.20) {
-                const oldDef = currentEnemy.def || 0;
-                const addDef = Math.max(1, Math.floor(oldDef * 0.1));
-                currentEnemy.def = oldDef + addDef;
-                log(`🪨 石頭人啟動【硬化】，防禦力永久提升 ${addDef} 點（本場戰鬥）。`);
-            }
-        } else if (currentEnemy.name === '蝙蝠') {
-            if (Math.random() < 0.20) {
-                const heal = Math.max(1, Math.floor(finalDamage * 0.3));
-                currentEnemy.hp = Math.min(currentEnemy.originalHp, currentEnemy.hp + heal);
-                log(`🦇 蝙蝠吸食你的鮮血，回復 ${heal} 點 HP。`);
-            }
-        } else if (currentEnemy.name === '不死巫妖') {
-            if (Math.random() < 0.25) {
-                const heal = Math.max(1, Math.floor(finalDamage * 0.15));
-                currentEnemy.hp = Math.min(currentEnemy.originalHp, currentEnemy.hp + heal);
-                log(`🩸 不死巫妖從你的生命中汲取力量，回復 ${heal} HP。`);
-            }
-            if (Math.random() < 0.20) {
-                hero.defDownTurns = 3;
-                hero.defDownRate = 0.20;
-                log('🕯️ 不死巫妖的詛咒削弱了你的護甲，未來 3 回合防禦力降低 20%。');
-            }
-        } else if (currentEnemy.name === '火焰巨龍') {
-            if (Math.random() < 0.25) {
-                const burnDmg = Math.max(1, Math.floor(hero.maxHp * 0.03));
-                hero.burnTurns = 3;
-                hero.burnDamage = burnDmg;
-                log(`🔥 火焰巨龍的龍炎附著在你身上，未來 3 回合開始時會各損失 ${burnDmg} HP！`);
-            }
-            if (Math.random() < 0.25) {
-                hero.defDownTurns = 2;
-                hero.defDownRate = 0.25;
-                log('💢 火焰巨龍的重擊砸裂了你的護甲，未來 2 回合防禦力降低 25%。');
-            }
-        } else if (currentEnemy.name === '遠古魔神' || currentEnemy.name.includes('小魔神')) {
-            if (Math.random() < 0.30) {
-                hero.defDownTurns = 2;
-                hero.defDownRate = 0.30;
-                log('🕳️ 遠古魔神施放【虛空侵蝕】，未來 2 回合你的防禦力降低 30%。');
-            }
-            if (Math.random() < 0.25) {
-                const heal = Math.max(1, Math.floor(finalDamage * 0.25));
-                currentEnemy.hp = Math.min(currentEnemy.originalHp, currentEnemy.hp + heal);
-                log(`🩸 遠古魔神從你的痛苦中汲取力量，回復 ${heal} HP。`);
-            }
-        }
-    }
-
-    function maybeExtraOverflowAttack(label) {
-        const ring = hero.equipment.RING;
-        if (!ring || !ring.ability || ring.ability.id !== 'DODGE') return;
-        if (!currentEnemy || currentEnemy.hp <= 0) return;
-        if (hero.dodgeOverflow <= 0) return;
-
-        const chance = hero.dodgeOverflow / 100;
-        if (Math.random() >= chance) return;
-
-        log(`💨 閃避溢出追擊發動！（機率約 ${hero.dodgeOverflow.toFixed(1)}%）`);
-        doSwordStrikeFollowUp(label || '追擊砍擊');
-    }
-
-    function heroDodgeCounterAttack() {
-        if (!currentEnemy || currentEnemy.hp <= 0) return;
-        log('💥 敏捷反擊：你趁著閃避的空檔補上一刀！');
-        const dmg = doSwordStrikeFollowUp('閃避反擊');
-        if (currentEnemy.hp <= 0 && dmg > 0) {
-            setTimeout(() => endBattle('win'), 800);
-        }
-    }
-
-    function monsterAttack(monsterMove) {
-        const ring = hero.equipment.RING;
-        if (ring && ring.ability && ring.ability.id === 'DODGE' &&
-            Math.random() * 100 < hero.currentDodge) {
-
-            log(`💨 敏捷指環：成功閃避了 ${currentEnemy.name} 的攻擊！`);
-            flashBattleView('heal');
-            heroDodgeCounterAttack();
-            return;
-        }
-
-        let monsterDamage = Math.max(1, currentEnemy.atk - hero.currentDefense);
-
-        const bossNames = ENEMIES.BOSS.map(b => b.name);
-        const isBoss = bossNames.includes(currentEnemy.name);
-
-        const bossAttack = calcBossAttackDamage(monsterDamage);
-        if (bossAttack.skip) {
-            return;
-        }
-        monsterDamage = bossAttack.damage;
-
-        const finalDamage = applyDamageToHero(monsterDamage, isBoss);
-        log(`💥 ${currentEnemy.name} ${monsterMove} 攻擊，造成 ${finalDamage} 點傷害!`);
-        flashBattleView('monster-hit');
-
-        applyBossPostHitEffects(finalDamage);
-    }
-
-    async function handleBattleAction(playerMove) {
-        if (gameState !== 'BATTLE') return;
-        totalTurnCount++;   // 每一回合戰鬥也算 1 回合
-        disableCommands(true);
-        let battleEnded = false;
-
-        try {
-            if (applyHeroOngoingStatusAtTurnStart()) {
-                updateStatus();
-                setTimeout(() => endBattle('lose'), 1000);
-                return;
-            }
-
-            const bias = currentEnemy.bias;
-            let monsterMove = '';
-            const r = Math.random();
-            let cumulative = 0;
-            if (r < (cumulative += bias['⚔️'])) monsterMove = '⚔️';
-            else if (r < (cumulative += bias['🌠'])) monsterMove = '🌠';
-            else monsterMove = '🛡️';
-
-            log(`--- 雙方同時出招 ---`);
-            log(`勇者出招: ${playerMove} | 怪物出招: ${monsterMove}`);
-
-            const isHeroWin    = CLASH_RULES[playerMove] === monsterMove;
-            const isMonsterWin = CLASH_RULES[monsterMove] === playerMove;
-
-            const wAff = getAllWeaponAffixSet();
-            let enemyDefForSword = currentEnemy.def || 0;
-            if (wAff.has('W_ARMOR_PEN')) {
-                enemyDefForSword = Math.floor(enemyDefForSword * 0.7);
-            }
-
-            let atkForCalc = hero.currentAttack;
-            let magicForCalc = getMagicAttackValue();
-            if (hero.buffDamageUpTurns > 0 && hero.buffDamageUpRate > 0) {
-                atkForCalc = Math.floor(atkForCalc * (1 + hero.buffDamageUpRate));
-                magicForCalc = Math.floor(magicForCalc * (1 + hero.buffDamageUpRate));
-            }
-
-            let baseSwordDmg  = Math.max(1, atkForCalc - enemyDefForSword);
-            let baseMagicDmg  = Math.max(1, magicForCalc - (currentEnemy.mDef || currentEnemy.def || 0));
-            const SHIELD_DMG  = Math.max(1, hero.currentDefense);
-
-            if (isHeroWin) {
-                let damage = 0;
-                let isPhysical = false;
-                let attackKind = null;
-
-                if (playerMove === '⚔️') {
-                    damage = baseSwordDmg;
-                    isPhysical = true;
-                    attackKind = 'SWORD';
-                } else if (playerMove === '🌠') {
-                    damage = baseMagicDmg;
-                    isPhysical = false;
-                    attackKind = 'MAGIC';
-                } else if (playerMove === '🛡️') {
-                    damage = SHIELD_DMG;
-                    isPhysical = true;
-                    attackKind = 'SHIELD';
-                    if (currentEnemy.name === '石頭人') {
-                        damage *= 2;
-                        log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
-                    }
-                }
-
-                if (enemyDodged(playerMove)) {
-                    log(`😈 ${currentEnemy.name} 成功閃避了你的攻擊！`);
-                    damage = 0;
-                } else {
-                    if (isPhysical && damage > 0) {
-                        damage = applyHeroAttackEffects(damage, true, attackKind, '主動攻擊');
-                    } else if (!isPhysical && damage > 0) {
-                        // 遠古魔神被魔攻時會反噬自己（當成增傷）
-                        if (currentEnemy.name === '遠古魔神') {
-                            const extra = Math.max(1, Math.floor(getMagicAttackValue() * 0.1));
-                            damage += extra;
-                            log(`🧿 遠古魔神遭受你的魔法反噬，額外多承受 ${extra} 點傷害！`);
-                        }
-                    }
-                    if (playerMove === '🌠' || playerMove === '🛡️') {
-                        tryTriggerMagicGuard();
-                    }
-                    currentEnemy.hp -= damage;
-                    log(`✅ 勇者造成 ${damage} 點傷害!`);
-                    flashBattleView('hero-hit');
-
-                    if (playerMove === '🛡️' && damage > 0) {
-                        healFromLifeRing('SHIELD');
-                    }
-                    if (damage > 0) {
-                        maybeExtraOverflowAttack('主動追擊');
-                    }
-                }
-            } else if (playerMove === monsterMove) {
-                log(`🤝 雙方出招相同 (${playerMove})，進入平手機率判定!`);
-                const tieWinChance = hero.currentTieWinRate / 100;
-                if (Math.random() < tieWinChance) {
-                    log(`✨ 判定成功! 勇者獲得優勢!`);
-
-                    let damage = 0;
-                    let isPhysical = false;
-                    let attackKind = null;
-
-                    if (playerMove === '⚔️') {
-                        damage = baseSwordDmg;
-                        isPhysical = true;
-                        attackKind = 'SWORD';
-                    } else if (playerMove === '🌠') {
-                        damage = baseMagicDmg;
-                        isPhysical = false;
-                        attackKind = 'MAGIC';
-                    } else if (playerMove === '🛡️') {
-                        damage = SHIELD_DMG;
-                        isPhysical = true;
-                        attackKind = 'SHIELD';
-                        if (currentEnemy.name === '石頭人') {
-                            damage *= 2;
-                            log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
-                        }
-                    }
-
-                    if (enemyDodged(playerMove)) {
-                        log(`😈 ${currentEnemy.name} 在平手判定中成功閃避你的攻擊！`);
-                        damage = 0;
-                    } else {
-                        if (isPhysical && damage > 0) {
-                            damage = applyHeroAttackEffects(damage, true, attackKind, '平手優勢攻擊');
-                        } else if (!isPhysical && damage > 0) {
-                            if (currentEnemy.name === '遠古魔神') {
-                                const extra = Math.max(1, Math.floor(getMagicAttackValue() * 0.1));
-                                damage += extra;
-                                log(`🧿 遠古魔神遭受你的魔法反噬，額外多承受 ${extra} 點傷害！`);
-                            }
-                        }
-                        if (playerMove === '🌠' || playerMove === '🛡️') {
-                            tryTriggerMagicGuard();
-                        }
-                        currentEnemy.hp -= damage;
-                        log(`✅ 勇者造成 ${damage} 點傷害!`);
-                        flashBattleView('hero-hit');
-
-                        if (playerMove === '🛡️' && damage > 0) {
-                            healFromLifeRing('SHIELD');
-                        }
-                        if (damage > 0) {
-                            maybeExtraOverflowAttack('平手追擊');
-                        }
-                    }
-                } else {
-                    log(`💀 判定失敗... 怪物獲得優勢!`);
-                    monsterAttack(monsterMove);
-                }
-            } else if (isMonsterWin) {
-                log(`🦸‍♂️ 勇者 ${playerMove} 被 ${monsterMove} 克制，招式被擋開。`);
-                if (playerMove === '🛡️' && monsterMove === '⚔️') {
-                    let damage = SHIELD_DMG;
-                    let attackKind = 'SHIELD';
-                    if (currentEnemy.name === '石頭人') {
-                        damage *= 2;
-                        log('💥 石頭人特別怕盾擊，盾擊傷害加倍！');
-                    }
-                    if (enemyDodged('🛡️')) {
-                        log(`😈 ${currentEnemy.name} 閃過了你的盾擊反擊！`);
-                        damage = 0;
-                    } else {
-                        damage = applyHeroAttackEffects(damage, true, attackKind, '盾擊反擊');
-                        tryTriggerMagicGuard();
-                        currentEnemy.hp -= damage;
-                        log(`💥 盾擊反擊! 造成 ${damage} 點傷害。`);
-                        flashBattleView('hero-hit');
-                        if (damage > 0) {
-                            healFromLifeRing('SHIELD');
-                            maybeExtraOverflowAttack('盾擊反擊追擊');
-                        }
-                    }
-                } else {
-                    monsterAttack(monsterMove);
-                }
-            }
-
-            updateBattleView();
-            if (currentEnemy.hp <= 0) {
-                setTimeout(() => endBattle('win'), 1500);
-                battleEnded = true;
-                return;
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            if (!isHeroWin && !(playerMove === monsterMove && Math.random() < hero.currentTieWinRate / 100) && !isMonsterWin) {
-                // 已由上面的分支處理，這裡不再重複攻擊
-            }
-
-            updateStatus();
-            if (hero.hp <= 0) {
-                setTimeout(() => endBattle('lose'), 1500);
-                battleEnded = true;
-                return;
-            }
-        } finally {
-            if (!battleEnded && gameState === 'BATTLE') {
-                disableCommands(false);
-            }
-        }
-    }
-
-    function gainExp(amount) {
-        hero.exp += amount;
-        log(`獲得了 ${amount} 點經驗值!`);
-    
-        while (hero.exp >= hero.expToNextLevel) {
-            hero.exp -= hero.expToNextLevel;
-            if (hero.level < MAX_LEVEL) {
-                levelUp();
-            } else {
-                // 已滿等，改成巔峰等級
-                gainParagonLevel();
-            }
-        }
-        updateStatus();
-    }
-
-
-    function levelUp() {
-        if (hero.level >= MAX_LEVEL) return;
-        const oldLevel = hero.level;
-        hero.level++;
-        hero.expToNextLevel = Math.floor(hero.expToNextLevel * 1.15) + 3;
-
-        if (hero.level > hero.highestLevel) {
-            hero.highestLevel = hero.level;
-
-            hero.maxHp += HP_PER_LEVEL;
-            const atkGain   = randInt(1, 3);
-            const defGain   = randInt(1, 3);
-            const dodgeGain = randInt(0, 2);   // 閃避成長縮小，避免太誇張
-            const tieGain   = randInt(1, 3);
-            const matkGain  = randInt(3, 5);
-
-            hero.baseAttack     += atkGain;
-            hero.baseDefense    += defGain;
-            hero.baseDodge      += dodgeGain;
-            hero.baseTieWinRate += tieGain;
-            hero.baseMagicAtk   += matkGain;
-
-            hero.hp = hero.maxHp;
-            log(`🎉 升級! Lv.${oldLevel} → Lv.${hero.level} (首次達到該等級)`);
-            log(`   HP +${HP_PER_LEVEL}，ATK +${atkGain}，DEF +${defGain}，閃避 +${dodgeGain}% ，平手勝率 +${tieGain}% ，MATK +${matkGain}`);
-        } else {
-            hero.maxHp += HP_PER_LEVEL;
-            hero.hp = hero.maxHp;
-            log(`⬆️ 回到曾經到過的等級 Lv.${hero.level}，只恢復最大 HP，不再追加能力成長。`);
-        }
-    }
-
-    function gainParagonLevel() {
-        hero.paragonLevel = (hero.paragonLevel || 0) + 1;
-    
-        // 每次巔峰都給一點小成長（偏向魔攻＋血量）
-        const hpGain   = 3;
-        const atkGain  = randInt(1, 2);
-        const defGain  = randInt(1, 2);
-        const matkGain = randInt(2, 4);
-    
-        hero.maxHp       += hpGain;
-        hero.baseAttack  += atkGain;
-        hero.baseDefense += defGain;
-        hero.baseMagicAtk+= matkGain;
-        hero.hp           = hero.maxHp;
-    
-        // 巔峰等級的經驗門檻也慢慢變難
-        hero.expToNextLevel = Math.floor(hero.expToNextLevel * 1.10) + 5;
-    
-        log(`🌟 巔峰等級 +1！(現在巔峰 Lv.${hero.paragonLevel})`);
-        log(`   HP +${hpGain}，ATK +${atkGain}，DEF +${defGain}，MATK +${matkGain}`);
-    }
-
-
-    function unlockNewRarity() {
-        if (bossLevel === 2) {
-            log(`🎉 已擊敗 Boss 1：開始有機會掉落 <span class="${RARITY_COLORS['Legendary']}">橘武、橘盾</span>！`);
-        } else if (bossLevel === 3) {
-            log(`🎉 已擊敗 Boss 2：開始有機會掉落 <span class="${RARITY_COLORS['Mythic']}">紅武、紅盾</span>！`);
-        }
-    }
-
-//通關時把角色快照存到 localStorage
-            function recordClearRun() {
-            const snapshot = {
-                title: hero.name,
-                level: hero.level,
-                maxHp: hero.maxHp,
-                baseAttack: hero.baseAttack,
-                baseDefense: hero.baseDefense,
-                baseMagicAtk: hero.baseMagicAtk,
-                currentAttack: hero.currentAttack,
-                currentDefense: hero.currentDefense,
-                currentMagicAtk: getMagicAttackValue(),
-                ring: hero.equipment.RING,
-                weapon: hero.equipment.WEAPON,
-                shield: hero.equipment.SHIELD,
-                totalTurn: totalTurnCount,
-                time: Date.now()
-            };
-        
-            let list = [];
-            try {
-                list = JSON.parse(localStorage.getItem('clearRecords') || '[]');
-            } catch (e) {
-                list = [];
-            }
-        
-            list.push(snapshot);
-            // 越少回合越前面
-            list.sort((a, b) => a.totalTurn - b.totalTurn);
-            // 只留前 10 名
-            list = list.slice(0, 10);
-        
-            localStorage.setItem('clearRecords', JSON.stringify(list));
-        
-            log(`📒 已將你的通關紀錄存入前 10 名候補（目前回合：${snapshot.totalTurn}）。`);
-        }
-
-
-    function showCredits() {
-        gameState = 'CREDITS';
-        disableCommands(true);
-        mainView.style.backgroundColor = '#000';
-        mainView.style.whiteSpace = 'pre-wrap';
-        mainView.innerHTML = `
-🎉 史詩級勝利！世界恢復了和平 🎉
-
-【世界和平計畫 - 最終製作名單】
-
-遊戲概念 / 原創作者：Jack
-總監 (Director)：Jack
-程式碼撰寫 (Code)：Jack
-美術設計 (ASCII Art)：Jack
-遊戲平衡 / 數值 (Balance)：Jack
-
-特別感謝：正在玩這個網頁的你
-
-（25 秒後自動回到地圖畫面，繼續打寶）`;
-
-        setTimeout(() => {
-            enterMap();
-        }, 25000);
-    }
-
-    async function endBattle(result) {
-        disableCommands(true);
-        currentEnemy.hp = Math.max(0, currentEnemy.hp);
-
-        if (result === "win") {
-            const expGained = currentEnemy.exp;
-            gainExp(expGained);
-            log(`🏆 擊敗了 ${currentEnemy.name}!`);
-
-            const isBoss = ENEMIES.BOSS.some(b => b.name === currentEnemy.name);
-            if (isBoss) {
-                if (bossLevel <= ENEMIES.BOSS.length) {
-                    unlockNewRarity();
-                    bossLevel++;
-                    if (bossLevel <= ENEMIES.BOSS.length) {
-                        log(`🎉 新的挑戰解鎖! Boss ${bossLevel} 寶藏已開啟!`);
-                    }
-                }
-                if (bossLevel > ENEMIES.BOSS.length) {
-                    log("👑 恭喜! 你擊敗了所有 Boss，世界恢復了和平!");
-                    showCredits();
-                    return;
-                }
-            }
-
-            await handleLootDrop(currentEnemy, isBoss);
-        } else if (result === "lose") {
-            log("💀 勇者倒下了... 你的冒險暫時告一段落。");
-            applyDeathPenalty();
-        }
-
-        const isFinalBoss = result === 'win' &&
-            ENEMIES.BOSS.length > 0 &&
-            currentEnemy.name === ENEMIES.BOSS[ENEMIES.BOSS.length - 1].name;
-        
-        if (isFinalBoss) {
-            // 通關時記錄一次角色資料
-            recordClearRun();
-        }
-        
-        if (!isFinalBoss && gameState !== 'LOOT_RING_DECISION' && gameState !== 'CREDITS') {
-            setTimeout(enterMap, 2000);
-        }
-
-    }
-
-    function applyDeathPenalty() {
-        if (hero.level === 1) {
-            log("幸運的是，新手階段不會受到死亡懲罰。");
-            hero.hp = hero.maxHp;
-            updateStatus();
-            setTimeout(enterMap, 2000);
-            return;
-        }
-        const expLoss = Math.floor(hero.expToNextLevel * 0.5);
-        hero.exp -= expLoss;
-        log(`⚡ 因戰敗，你損失了 ${expLoss} 點經驗值。`);
-
-        if (hero.exp < 0) {
-            log(`🔥 經驗值不足! 勇者降級了!`);
-            const oldLevel = hero.level;
-            hero.level = Math.max(1, hero.level - 1);
-
-            let currentExpToNext = 10;
-            let tempLevel = 2;
-            while (tempLevel <= hero.level) {
-                currentExpToNext = Math.floor(currentExpToNext * 1.15) + 3;
-                tempLevel++;
-            }
-            hero.expToNextLevel = currentExpToNext;
-            hero.exp = Math.max(0, hero.expToNextLevel + hero.exp);
-
-            hero.maxHp = Math.max(HERO_MAX_HP_START + (hero.level - 1) * HP_PER_LEVEL, HERO_MAX_HP_START);
-            hero.hp = hero.maxHp;
-            log(`⬇️ 等級從 Lv.${oldLevel} 降到 Lv.${hero.level}，最大 HP 跟著降低，其餘能力保留。`);
-        } else {
-            hero.hp = hero.maxHp;
-        }
-        updateStatus();
-        setTimeout(enterMap, 2000);
-    }
-
-            //稱號確認 & 隨機按鈕
-        function buildRandomTitle() {
-            let aPart = TITLE_A[Math.floor(Math.random() * TITLE_A.length)];
-            let bPart = ... TITLE_B[Math.floor(Math.random() * TITLE_B.length)];
-            let cPart = TITLE_C[Math.floor(Math.random() * TITLE_C.length)];
-            return `${aPart}的${bPart}${cPart}`;
-        }
-        
-        // 只單純抽一組給玩家看，不開始遊戲
-        function randomTitleOnly() {
-            const title = buildRandomTitle();
-            alert(`抽到的稱號是：\n「${title}」\n如果喜歡，可以自己從下拉選單挑一樣的組合；\n不改直接按「開始冒險」會再重抽一次。`);
-        }
-        
-        function confirmTitle() {
-            const A = document.getElementById("titleA").value;
-            const B = document.getElementById("titleB").value;
-            const C = document.getElementById("titleC").value;
-        
-            let finalTitle;
-        
-            if (!A && !B && !C) {
-                // 三個都沒選 → 完全隨機
-                finalTitle = buildRandomTitle();
-            } else {
-                // 有選就用玩家的選項，沒選的部位用隨機補
-                let aPart = A || TITLE_A[Math.floor(Math.random() * TITLE_A.length)];
-                let bPart = B || TITLE_B[Math.floor(Math.random() * TITLE_B.length)];
-                let cPart = C || TITLE_C[Math.floor(Math.random() * TITLE_C.length)];
-                finalTitle = `${aPart}的${bPart}${cPart}`;
-            }
-        
-            hero.name = finalTitle;                     // 設定勇者名稱
-            localStorage.setItem("playerTitle", finalTitle);  // 存檔給之後用
-        
-            // 關掉遮罩
-            document.getElementById("titleSelectBox").style.display = "none";
-
-            hero.title = finalTitle;         // 把稱號存進 hero 裡
-            log(`🧾 你的稱號是「${finalTitle}」。祝你武運昌隆！`);
-            updateStatus();                  // 立刻刷新畫面，勇者後面會出現稱號
-            // 開始遊戲
-            startGame();
-        }
-
-
-        // ===== 依等級切換成長階段 =====
-        function getRandomRarity(lootType, isBoss = false) {
-            
-            let phase = 0;
-            if (hero.level >= 8)  phase = 1;  // 成長階段 1
-            if (hero.level >= 15) phase = 2;  // 成長階段 2
-            if (hero.level >= 22) phase = 3;  // 成長階段 3
-        
-            // ===============================
-            // 一般裝備（武器 / 盾牌）掉落表
-            // 等級越高 → 灰綠下降、藍紫橘紅上升
-            // ===============================
-            const equipTable0 = [ // Lv 1–7：灰綠為主
-                { rarity: 'Normal',    weight: 45 },
-                { rarity: 'Magic',     weight: 35 },
-                { rarity: 'Rare',      weight: 15 },
-                { rarity: 'Epic',      weight: 5  },
-                { rarity: 'Legendary', weight: 0  },
-                { rarity: 'Mythic',    weight: 0  }
-            ];
-            const equipTable1 = [ // Lv 8–14：開始看到紫
-                { rarity: 'Normal',    weight: 30 },
-                { rarity: 'Magic',     weight: 30 },
-                { rarity: 'Rare',      weight: 25 },
-                { rarity: 'Epic',      weight: 12 },
-                { rarity: 'Legendary', weight: 3  },
-                { rarity: 'Mythic',    weight: 0  }
-            ];
-            const equipTable2 = [ // Lv 15–21：紫為主，橘開始出現
-                { rarity: 'Normal',    weight: 15 },
-                { rarity: 'Magic',     weight: 20 },
-                { rarity: 'Rare',      weight: 30 },
-                { rarity: 'Epic',      weight: 25 },
-                { rarity: 'Legendary', weight: 8  },
-                { rarity: 'Mythic',    weight: 2  }
-            ];
-            const equipTable3 = [ // Lv 22+：紫橘很多，紅開始掉
-                { rarity: 'Normal',    weight: 8  },
-                { rarity: 'Magic',     weight: 12 },
-                { rarity: 'Rare',      weight: 25 },
-                { rarity: 'Epic',      weight: 30 },
-                { rarity: 'Legendary', weight: 18 },
-                { rarity: 'Mythic',    weight: 7  }
-            ];
-        
-            // ===============================
-            // 戒指掉落表（本來就比一般裝備更高稀有）
-            // 一樣分 4 個階段，但整體偏向 Rare 以上
-            // ===============================
-            const ringTable0 = [ // Lv 1–7
-                { rarity: 'Normal',    weight: 25 },
-                { rarity: 'Magic',     weight: 30 },
-                { rarity: 'Rare',      weight: 25 },
-                { rarity: 'Epic',      weight: 15 },
-                { rarity: 'Legendary', weight: 5  },
-                { rarity: 'Mythic',    weight: 0  }
-            ];
-            const ringTable1 = [ // Lv 8–14
-                { rarity: 'Normal',    weight: 15 },
-                { rarity: 'Magic',     weight: 25 },
-                { rarity: 'Rare',      weight: 30 },
-                { rarity: 'Epic',      weight: 20 },
-                { rarity: 'Legendary', weight: 8  },
-                { rarity: 'Mythic',    weight: 2  }
-            ];
-            const ringTable2 = [ // Lv 15–21
-                { rarity: 'Normal',    weight: 10 },
-                { rarity: 'Magic',     weight: 18 },
-                { rarity: 'Rare',      weight: 28 },
-                { rarity: 'Epic',      weight: 25 },
-                { rarity: 'Legendary', weight: 14 },
-                { rarity: 'Mythic',    weight: 5  }
-            ];
-            const ringTable3 = [ // Lv 22+
-                { rarity: 'Normal',    weight: 6  },
-                { rarity: 'Magic',     weight: 12 },
-                { rarity: 'Rare',      weight: 24 },
-                { rarity: 'Epic',      weight: 28 },
-                { rarity: 'Legendary', weight: 20 },
-                { rarity: 'Mythic',    weight: 10 }
-            ];
-        
-            // ===== 先依裝備類型選 table =====
-            let table;
-        
-            if (lootType === 'RING') {
-                // 戒指用戒指專用表
-                if      (phase === 0) table = ringTable0;
-                else if (phase === 1) table = ringTable1;
-                else if (phase === 2) table = ringTable2;
-                else                  table = ringTable3;
-            } else {
-                // 武器 / 盾牌用一般裝備表
-                if      (phase === 0) table = equipTable0;
-                else if (phase === 1) table = equipTable1;
-                else if (phase === 2) table = equipTable2;
-                else                  table = equipTable3;
-            }
-        
-            // ===== Boss 掉落額外偏向高稀有 =====
-            if (isBoss) {
-                table = table.map(entry => {
-                    let factor = 1;
-                    switch (entry.rarity) {
-                        case 'Normal':    factor = 0.5; break;  // 灰↓
-                        case 'Magic':     factor = 0.7; break;  // 綠↓
-                        case 'Rare':      factor = 1.0; break;
-                        case 'Epic':      factor = 1.4; break;  // 紫↑
-                        case 'Legendary': factor = 1.8; break;  // 橘↑↑
-                        case 'Mythic':    factor = 2.2; break;  // 紅↑↑↑
-                    }
-                    return { ...entry, weight: entry.weight * factor };
-                });
-            }
-        
-            // ===== 實際抽選 =====
-            const total = table.reduce((sum, e) => sum + e.weight, 0) || 1;
-            let r = Math.random() * total;
-            for (const e of table) {
-                if (r < e.weight) return e.rarity;
-                r -= e.weight;
-            }
-            return 'Normal';
-        }
-
-
-    function getPowerRange(rarity, isWeapon, isBoss) {
-        const base = isWeapon ? 10 : 5;
-        const multiplier = isWeapon ? 1.5 : 1;
-        const bossBonus = isBoss ? hero.level * 0.5 : 0;
-        switch (rarity) {
-            case 'Mythic':   return { min: (base * 5.0 * multiplier) + bossBonus * 15, max: (base * 6.5 * multiplier) + bossBonus * 15 };
-            case 'Legendary':return { min: (base * 4.0 * multiplier) + bossBonus * 10, max: (base * 5.0 * multiplier) + bossBonus * 10 };
-            case 'Epic':     return { min: (base * 3.0 * multiplier) + bossBonus * 5,  max: (base * 4.0 * multiplier) + bossBonus * 5 };
-            case 'Rare':     return { min: (base * 2.0 * multiplier) + bossBonus * 2,  max: (base * 3.0 * multiplier) + bossBonus * 2 };
-            case 'Magic':    return { min: (base * 1.0 * multiplier) + bossBonus * 1,  max: (base * 2.0 * multiplier) + bossBonus * 1 };
-            default:         return { min: base * 0.5 * multiplier, max: base * 1.0 * multiplier };
-        }
-    }
-
-    function generateLoot(type, isBoss) {
-        let rarity = getRandomRarity(type, isBoss);
-
-        if (type === 'RING') {
-            const abilityIndex = Math.floor(Math.random() * (RING_ABILITIES.length - 1));
-            const ability = RING_ABILITIES[abilityIndex];
-            let tier = 1;
-            if (isBoss) tier = Math.min(4, bossLevel + 1);
-            else tier = Math.min(2, Math.ceil(Math.random() * 2));
-            return { type: 'RING', name: ability.name, ability: ability, tier: tier, rarity: rarity };
-        }
-
-        const isWeapon = type === 'WEAPON';
-        const range = getPowerRange(rarity, isWeapon, isBoss);
-        const power = Math.floor(Math.random() * (range.max - range.min) + range.min) + 1;
-        const name = isWeapon ? `${rarity}之劍` : `${rarity}之盾`;
-        const equip = {
-            type, name, power, rarity,
-            refine: 0,
-            refineSlots: 0,
-            affixes: [],
-        };
-
-        const baseSlotsByRarity = {
-            Normal: 0, Magic: 0, Rare: 1, Epic: 1, Legendary: 2, Mythic: 3
-        };
-        const baseSlots = baseSlotsByRarity[rarity] || 0;
-        const pool = isWeapon ? WEAPON_AFFIX_POOL : SHIELD_AFFIX_POOL;
-        for (let i = 0; i < baseSlots; i++) {
-            addRandomAffix(equip, pool);
-        }
-        return equip;
-    }
-
-    async function handleLootDrop(enemy, isBoss) {
-        if (Math.random() > enemy.lootChance) {
-            log("🧱 這次怪物很窮，啥都沒掉。");
-            return;
-        }
-        const lootType = ['WEAPON', 'SHIELD', 'RING'][Math.floor(Math.random() * 3)];
-        const loot = generateLoot(lootType, isBoss);
-        await showLootAnimation(loot);
-
-        log(`✨ ${enemy.name} 掉落了 <span class="${RARITY_COLORS[loot.rarity] || 'Rarity-Rare'}">${loot.name}</span>!`);
-
-        if (lootType === 'RING') {
-            // 不在這裡自動升級，全部丟去戒指選擇畫面處理
-            newLoot = loot;
-            enterRingDecision();
-            return;
-        }
-
-
-            if (lootType === 'WEAPON') {
-                const currentW = hero.equipment.WEAPON;
-        
-                // 1. 沒武器 / 徒手 → 直接裝上
-                if (!currentW || currentW.name === "徒手") {
-                    hero.equipment.WEAPON = loot;
-                    log(`👍 裝備了新的 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
-                    updateStatus();
-                    return;
-                }
-        
-                // 2. 判斷新武器有沒有比較好
-                const lootRIndex = RARITY_ORDER.indexOf(loot.rarity);
-                const curRIndex  = RARITY_ORDER.indexOf(currentW.rarity);
-        
-                let isBetter = false;
-                if (lootRIndex > curRIndex) isBetter = true;
-                else if (lootRIndex === curRIndex && loot.power > currentW.power) isBetter = true;
-        
-                if (isBetter) {
-                    // 2-1. 先把舊武器的資料全部存起來（要沿用的東西）
-                    const oldAffix         = currentW.affixes ? [...currentW.affixes] : [];
-                    const oldRefineLevel   = hero.weaponRefineLevel || 0;
-                    const oldRefineAffixes = hero.weaponRefineAffixes ? [...hero.weaponRefineAffixes] : [];
-        
-                    // 2-2. 舊武器拆成素材
-                    const matOld = (RARITY_MATERIAL_VALUE[currentW.rarity] || 0);
-                    if (matOld > 0 && currentW.name !== "徒手") {
-                        weaponMaterials += matOld;
-                        log(`🔧 原本的 <span class="${RARITY_COLORS[currentW.rarity]}">${currentW.name}</span> 被分解為武器素材 x${matOld}。 (武器素材: ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
-                        while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
-                            weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
-                            attemptWeaponRefine();
-                        }
-                    }
-        
-                    // 2-3. 換上新武器本體
-                    hero.equipment.WEAPON = loot;
-        
-                    // 2-4. 新武器自帶詞條 + 舊武器詞條 → 合併
-                    const newOwnAffix = loot.affixes || [];
-                    hero.equipment.WEAPON.affixes = [...new Set([...newOwnAffix, ...oldAffix])];
-        
-                    // 2-5. 精練等級與精練詞條完整沿用
-                    hero.weaponRefineLevel   = oldRefineLevel;
-                    hero.weaponRefineAffixes = [...oldRefineAffixes];
-        
-                    log(`⭐ 新武器更強！已更換為 <span class="${RARITY_COLORS[loot.rity]}">${loot.name}</span>（保留舊武器詞條與精練效果）！`);
-                    updateStatus();
-                } else {
-                    // 3. 新武器比較爛 → 直接拆成素材（不動原本武器）
-                    let mat = RARITY_MATERIAL_VALUE[loot.rarity] || 0;
-                    const sMatMod = hero.equipment.SHIELD.affixes && hero.equipment.SHIELD.affixes.includes('S_MAT_BOOST') ? 1 : 0;
-                    if (sMatMod && mat > 0 && Math.random() < 0.3) {
-                        mat += 1;
-                        log("🛠「YA~撿到十塊錢」發動，多出一點素材。");
-                    }
-                    if (mat > 0) {
-                        weaponMaterials += mat;
-                        log(`🔧 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span> 被分解為武器素材 x${mat}。 (武器素材: ${weaponMaterials}/${WEAPON_MATERIAL_PER_REFINE})`);
-                        while (weaponMaterials >= WEAPON_MATERIAL_PER_REFINE) {
-                            weaponMaterials -= WEAPON_MATERIAL_PER_REFINE;
-                            attemptWeaponRefine();
-                        }
-                    } else {
-                        log(`👎 灰色武器品質太差，被丟棄。`);
-                    }
-                    updateStatus();
-                }
-                return;
-            }
-
-
-        const currentS = hero.equipment.SHIELD;
-        if (!currentS || currentS.name === "無") {
-            hero.equipment.SHIELD = loot;
-            log(`👍 裝備了新的 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
-            updateStatus();
-            return;
-        }
-
-        const lootRIndex = RARITY_ORDER.indexOf(loot.rarity);
-        const curRIndex  = RARITY_ORDER.indexOf(currentS.rarity);
-        let betterShield = false;
-        if (lootRIndex > curRIndex) betterShield = true;
-        else if (lootRIndex === curRIndex && loot.power > currentS.power) betterShield = true;
-
-        if (betterShield) {
-            hero.equipment.SHIELD = loot;
-            log(`⭐ 新盾牌更強！已更換為 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span>！`);
-            updateStatus();
-        } else {
-            let mat = RARITY_MATERIAL_VALUE[loot.rarity] || 0;
-            const sMatMod = currentS.affixes && currentS.affixes.includes('S_MAT_BOOST') ? 1 : 0;
-            if (sMatMod && mat > 0 && Math.random() < 0.3) {
-                mat += 1;
-                log("🛠「YA~撿到十塊錢」發動，多出一點盾牌素材。");
-            }
-            if (mat > 0) {
-                shieldMaterials += mat;
-                log(`🔩 <span class="${RARITY_COLORS[loot.rarity]}">${loot.name}</span> 被分解為盾牌素材 x${mat}。 (盾牌素材: ${shieldMaterials}/${SHIELD_MATERIAL_PER_REFINE})`);
-                while (shieldMaterials >= SHIELD_MATERIAL_PER_REFINE) {
-                    shieldMaterials -= SHIELD_MATERIAL_PER_REFINE;
-                    attemptShieldRefine();
-                }
-            } else {
-                log(`👎 灰色盾牌品質太差，被丟棄。`);
-            }
-            updateStatus();
-        }
-    }
-
-    function enterRingDecision() {
-        gameState = 'LOOT_RING_DECISION';
-        commandMenu.style.display = 'none';
-        decisionMenu.style.display = 'flex';
-    
-        const currentRing = hero.equipment.RING;
-        const newRing = newLoot;
-    
-        const currentRingColor = RARITY_COLORS[currentRing.rarity];
-        const newRingColor = RARITY_COLORS[newRing.rarity];
-    
-        const currentRingNameHtml = `<span class="${currentRingColor}">${currentRing.name}</span>`;
-        const newRingNameHtml = `<span class="${newRingColor}">${newRing.name}</span>`;
-    
-        // ── 判斷是否為「同一種戒指」且還可以升級 ──
-        const isSameAbility =
-            currentRing.ability &&
-            newRing.ability &&
-            currentRing.ability.id === newRing.ability.id &&
-            currentRing.ability.id !== 'NONE';
-    
-        const canLevelUp = isSameAbility && currentRing.tier < 4;
-    
-        let decisionText;
-    
-        if (canLevelUp) {
-            const nextTier = Math.min(4, currentRing.tier + 1);
-            decisionText = `💍 升級 ${currentRing.name}：Lv.${currentRing.tier} → Lv.${nextTier}（消耗新戒指）`;
-            btnDecYes.textContent = decisionText;
-            btnDecNo.textContent = `⭕ 不升級，保留 Lv.${currentRing.tier} 的 ${currentRing.name}（丟棄新）`;
-        } else {
-            decisionText = `💍 換上 Lv.${newRing.tier} 的 ${newRing.name}`;
-            btnDecYes.textContent = decisionText;
-            btnDecNo.textContent = `⭕ 保留 Lv.${currentRing.tier} 的 ${currentRing.name} (丟棄新)`;
-        }
-    
-        mainView.style.backgroundColor = '#2c3e50';
-        mainView.innerHTML = `
-    <p style="color:#ffcc00;">🔔 發現新戒指! 請手動選擇是否替換或升級</p>
-    <p style="text-align: left; padding: 0 20px;">
-    【現有戒指】：${currentRingNameHtml} (${currentRing.ability.desc}, Lv.${currentRing.tier})<br>
-    【新戒指】：${newRingNameHtml} (${newRing.ability.desc}, Lv.${newRing.tier})
-    </p>
-        `;
-    }
-
-
-    function handleRingDecision(choice) {
-        if (gameState !== 'LOOT_RING_DECISION') return;
-        const currentRing = hero.equipment.RING;
-        const newRing = newLoot;
-    
-        const isSameAbility =
-            currentRing.ability &&
-            newRing.ability &&
-            currentRing.ability.id === newRing.ability.id &&
-            currentRing.ability.id !== 'NONE';
-    
-        const canLevelUp = isSameAbility && currentRing.tier < 4;
-    
-        if (choice === 'YES') {
-            if (canLevelUp) {
-                // ── 升級舊戒指，吃掉新戒指 ──
-                const oldTier = currentRing.tier;
-                currentRing.tier = Math.min(4, currentRing.tier + 1);
-    
-                // 如果新戒指稀有度比較高，順便提升稀有度
-                if (RARITY_ORDER.indexOf(newRing.rarity) > RARITY_ORDER.indexOf(currentRing.rarity)) {
-                    currentRing.rarity = newRing.rarity;
-                }
-    
-                log(`💍 ${currentRing.name} 升級：Lv.${oldTier} → Lv.${currentRing.tier}！（新戒指被吸收）`);
-            } else {
-                // ── 不升級就是單純換戒指 ──
-                hero.equipment.RING = newRing;
-                log(`💍 手動確認: 成功換上了 Lv.${newRing.tier} 的 <span class="${RARITY_COLORS[newRing.rarity]}">${newRing.name}</span>!`);
-            }
-        } else {
-            log(`🗑️ 手動確認: 放棄了 <span class="${RARITY_COLORS[newRing.rarity]}">${newRing.name}</span>。`);
-        }
-    
-        newLoot = null;
-        updateStatus();
-        decisionMenu.style.display = 'none';
-        setTimeout(enterMap, 500);
-    }
-
-
-    function disableCommands(disabled) {
-        commandMenu.querySelectorAll('.command-btn').forEach(btn => btn.disabled = disabled);
-        if (disabled) decisionMenu.style.display = 'none';
-    }
-
-    // 初始化戒指為 NONE
-    hero.equipment.RING = {
-        name: "無",
-        ability: RING_ABILITIES.find(a => a.id === 'NONE'),
-        tier: 0,
-        rarity: 'Normal'
-    };
-    
-    function startGame() {
-    
-        // ★ 如果 hero.title 已經設定，這裡立即更新畫面（最重要）
-        updateStatus();
-    
-        calculateHeroStats();
-        updateStatus(); // 第二次保險
-        enterMap();
-    }
-
-
-    // ===== 頁面載入後：先處理稱號，再啟動遊戲 =====
-    window.addEventListener('load', () => {
-        initTitleSelectBox();
-    
-        const btnConfirmTitle = document.getElementById("btnConfirmTitle");
-    
-        btnConfirmTitle.addEventListener("click", () => {
-    
-            const selectedA = document.getElementById("sel-A").value;
-            const selectedB = document.getElementById("sel-B").value;
-            const selectedC = document.getElementById("sel-C").value;
-    
-            const selectedTitle = `${selectedA}的${selectedB}${selectedC}`;
-    
-            hero.title = selectedTitle;
-    
-            // ★ 選完就立即更新（這會修正你現在遇到的「一開始不顯示」問題）
-            updateStatus();
-    
-            // 隱藏稱號選單
-            document.getElementById("titleSelectBox").style.display = "none";
-    
-            // 正式開始遊戲
-            startGame();
-        });
-    });
-
-
-
-</script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            arr.forE

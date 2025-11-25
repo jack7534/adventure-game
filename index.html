@@ -1718,31 +1718,28 @@ ${art.join('\n')}
             log(`🩸「愛吃不辣的(Blood)」生效，回復 ${heal} 點 HP！`);
         }
 
-        // ===== 狂戰士戒指吸血（新增） =====
-        const ring = hero.equipment.RING;
-        if (
-            isPhysical &&
-            ring &&
-            ring.ability &&
-            ring.ability.id === "BERSERKER" &&
-            totalDamage > 0
-        ) {
-            // tier 等級：1~4
-            const tier = ring.tier || 0;
-        
-            // 各等級吸血比例：3% / 5% / 7% / 10%
-            const berserkLeechRate = [0, 0.03, 0.05, 0.07, 0.10][tier];
-        
-            if (berserkLeechRate > 0) {
-                const heal = Math.max(1, Math.floor(totalDamage * berserkLeechRate));
-                const old = hero.hp;
-                hero.hp = Math.min(hero.maxHp, hero.hp + heal);
-        
-                if (hero.hp > old) {
-                    log(`💢 狂戰士指環憤怒吸血，回復 ${hero.hp - old} 點 HP！`);
-                }
-            }
+   // ===== 狂戰士戒指吸血（新增） =====
+if (
+    isPhysical &&
+    ring &&                // ← 用上面已經宣告過的 ring
+    ring.ability &&
+    ring.ability.id === "BERSERKER" &&
+    totalDamage > 0
+) {
+    const berserkTier = ring.tier || 0;
+    const berserkLeechRate = [0, 0.03, 0.05, 0.07, 0.10][berserkTier];
+
+    if (berserkLeechRate > 0) {
+        const heal = Math.max(1, Math.floor(totalDamage * berserkLeechRate));
+        const old = hero.hp;
+        hero.hp = Math.min(hero.maxHp, hero.hp + heal);
+
+        if (hero.hp > old) {
+            log(`💢 狂戰士指環憤怒吸血，回復 ${hero.hp - old} 點 HP！`);
         }
+    }
+}
+
 
         return totalDamage;
     }

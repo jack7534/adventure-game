@@ -79,6 +79,7 @@
         baseDefense: 10,
         baseDodge: 5,       // 起始閃避 5%
         baseTieWinRate: 30,
+        titleCritBonus: 0,
         baseMagicAtk: 20,
         equipment: {
             WEAPON: { name: "徒手", power: 0, rarity: 'Normal', affixes: [] },
@@ -493,7 +494,7 @@
     }
 
     function getHeroBaseCritChance() {
-        let base = 0.05;
+        let base = 0.05 + (hero.titleCritBonus || 0) / 100;
         const affSet = getAllWeaponAffixSet();
         if (affSet.has('W_CRIT_UP')) base += 0.05;
         return base;

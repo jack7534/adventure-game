@@ -42,8 +42,8 @@ function renderLootDecision(){
  btnDecYes.classList.toggle('risky-equip',comparison.risky);btnDecNo.classList.toggle('recommended-keep',comparison.risky);
  btnDecYes.innerHTML=`<strong>${comparison.risky?'⚠ 仍要換上（需再確認）':'✓ '+escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small>`;btnDecNo.innerHTML=`<strong>保留目前裝備</strong><small>${loot.type==='RING'?'新戒指換成金幣':`分解新裝備 · 素材 ${RARITY_MATERIAL_VALUE[loot.rarity]||0}`}</small>`;
  btnDecYes.disabled=btnDecNo.disabled=false;
- const uid=loot.uid;btnDecYes.onclick=()=>handleLootDecision('YES',uid);btnDecNo.onclick=()=>handleLootDecision('NO',uid);
- $('action-tip').textContent='尚未做決定的戰利品也會存檔。重整後可以接著選。';
+ const uid=loot.uid;btnDecYes.onclick=e=>{if(e.detail>1)return;handleLootDecision('YES',uid);revealCurrentContent();};btnDecNo.onclick=e=>{if(e.detail>1)return;handleLootDecision('NO',uid);revealCurrentContent();};
+ $('action-tip').textContent='尚未做決定的戰利品也會存檔。重整後可以接著選。';syncActionDock();
 }
 function handleRingDecision(choice){handleLootDecision(choice);}
 function handleLootDecision(choice,uid=newLoot?.uid){

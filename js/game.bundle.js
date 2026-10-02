@@ -82,6 +82,7 @@
         baseDefense: 10,
         baseDodge: 5,       // 起始閃避 5%
         baseTieWinRate: 30,
+        titleCritBonus: 0,
         baseMagicAtk: 20,
         equipment: {
             WEAPON: { name: "徒手", power: 0, rarity: 'Normal', affixes: [] },
@@ -496,7 +497,7 @@
     }
 
     function getHeroBaseCritChance() {
-        let base = 0.05;
+        let base = 0.05 + (hero.titleCritBonus || 0) / 100;
         const affSet = getAllWeaponAffixSet();
         if (affSet.has('W_CRIT_UP')) base += 0.05;
         return base;
@@ -1236,9 +1237,13 @@ function setScene(mode='map', object=89) {
   const zone=Math.min(2,Math.max(0,bossLevel-1)); $('stage').dataset.zone=zone;drawLandscape(zone);
   $('region-label').textContent=`✦ ${SCENES[zone].name}`;
   $('enemy-actor').hidden=mode!=='battle';$('enemy-hud').hidden=mode!=='battle';$('scene-object').hidden=mode==='battle';
-  spriteAt($('hero-actor').querySelector('.actor-sprite'),96,80);
-  if(object===123)creatureAt($('scene-object'),23,64);else spriteAt($('scene-object'),object,64);
-  $('companion-actor').hidden=!adventure.flags.fox;creatureAt($('companion-actor'),23,40);
+  drawPortrait($('hero-actor').querySelector('.actor-sprite'),currentIdentity().appearance,80);
+  let portrait=mode==='event'?(gameState==='EVENT'?eventPortraitKey(adventure.eventId):adventure.result?.portraitKey):null;
+  if(!portrait&&object===122)portrait='postman';if(!portrait&&object===123)portrait='fox';
+  if(mode==='map'&&object===88)portrait=['ranger','auburn','veteran'][zone];
+  if(portrait)drawPortrait($('scene-object'),portrait,64);else {spriteAt($('scene-object'),object,64);delete $('scene-object').dataset.portrait;delete $('scene-object').dataset.portraitKind;}
+  $('scene-npc-name').hidden=mode==='battle'||!portrait;$('scene-npc-name').textContent=portrait?SCENE_PORTRAITS[portrait].name:'';
+  $('companion-actor').hidden=!adventure.flags.fox;drawPortrait($('companion-actor'),'fox',40);
   $('scene-caption').firstElementChild.textContent=mode==='battle'?'看穿對手的習慣，比一味亂砍更有用。':adventure.flags.fox?'小狐狸跟在你後面。牠堅持自己只是順路。':'森林很大。沒關係，今天走一小段也算。';
   if(mode==='battle'&&currentEnemy){creatureAt($('enemy-actor').querySelector('.actor-sprite'),ENEMY_SPRITES[currentEnemy.name]??123,80);$('enemy-name').textContent=currentEnemy.name;$('enemy-actor').classList.toggle('boss',!!adventure.battle?.isBoss);}
 }
@@ -1297,7 +1302,7 @@ function chooseEvent(index){
  gameState='EVENT_RESOLVING';adventure.eventResolved=true;adventure.stats.events++;disableCommands(true);
  c.act();updateStatus();saveAuto();
 }
-function resultEvent(title,text,object=89){adventure.result={title,text,object,tag:'旅途的回聲'};adventure.eventId=null;gameState='RESULT';renderResult();saveAuto();}
+function resultEvent(title,text,object=89){adventure.result={title,text,object,tag:'旅途的回聲',portraitKey:eventPortraitKey(adventure.eventId)};adventure.eventId=null;gameState='RESULT';renderResult();saveAuto();}
 function giveEventLoot(type,source){log(`✦ ${source}：你發現了一件裝備。`);offerLoot(generateLoot(type,false));}
 
 ;
@@ -1320,9 +1325,10 @@ function story(tag,title,text,hint=''){mainView.innerHTML=`<span class="story-ta
 function countTurn(){totalTurnCount++;turnCount=totalTurnCount;}
 function setCommands(c1,c2,c3,handler,state){
  commandMenu.hidden=false;commandMenu.style.display='flex';decisionMenu.hidden=true;decisionMenu.style.display='none';
- [c1,c2,c3].forEach((c,i)=>{const b=[btn1,btn2,btn3][i];b.hidden=!c;if(!c)return;b.innerHTML=`<em>${i+1}</em><strong>${escapeHtml(c.text)}</strong><small>${escapeHtml(c.hint||'')}</small>`;b.disabled=!!c.disabled;b.onclick=()=>{if(gameState===state)handler(c.value);};});
+ [c1,c2,c3].forEach((c,i)=>{const b=[btn1,btn2,btn3][i];b.hidden=!c;if(!c)return;b.innerHTML=`<em>${i+1}</em><strong>${escapeHtml(c.text)}</strong><small>${escapeHtml(c.hint||'')}</small>`;b.disabled=!!c.disabled;b.onclick=event=>{if(event.detail>1||gameState!==state)return;const before=gameState;handler(c.value);if(before!=='BATTLE'||!['BATTLE','BATTLE_ACTION'].includes(gameState))revealCurrentContent();};});
+ syncActionDock();
 }
-function disableCommands(disabled){[btn1,btn2,btn3,btnDecYes,btnDecNo].forEach(b=>b.disabled=disabled);}
+function disableCommands(disabled){[btn1,btn2,btn3,btnDecYes,btnDecNo].forEach(b=>b.disabled=disabled);syncActionDock();}
 function getHeroCritChance(){let chance=getHeroBaseCritChance(),r=hero.equipment.RING;if(getAllWeaponAffixSet().has('W_BRAVE')&&hero.hp>0&&hero.hp<=hero.maxHp*.3)chance+=.1;if(r.ability.id==='CRIT')chance+=.05+r.tier*.1;if(r.ability.id==='BERSERKER')chance+=[0,.05,.06,.08,.1][r.tier]||0;return Math.max(0,Math.min(.9,chance));}
 function updateStatus(){
  calculateHeroStats();turnCount=totalTurnCount;turnCountSpan.textContent=turnCount;
@@ -1340,6 +1346,7 @@ function updateStatus(){
  updateCompanionPanel();
  $('journey-track').innerHTML=SCENES.map((s,i)=>`<div class="journey-node ${bossLevel>i+1?'done':bossLevel===i+1?'active':''}" ${bossLevel===i+1?'aria-current="step"':''}><span class="node-number">${bossLevel>i+1?'✓':['I','II','III'][i]}</span><div><strong>${s.name}</strong><small>${bossLevel>i+1?'已完成':s.boss}</small></div></div>`).join('');
  $('time-label').textContent=['晨光','午後','暮色','星夜'][Math.floor(adventure.steps/8)%4];
+ updateIdentityDisplay();syncActionDock();
 }
 function healFraction(rate){const n=Math.min(hero.maxHp-hero.hp,Math.max(1,Math.floor(hero.maxHp*rate)));hero.hp+=n;flashBattleView('heal');return n;}
 function healFully(){hero.hp=hero.maxHp;hero.burnTurns=hero.burnDamage=hero.defDownTurns=hero.defDownRate=0;flashBattleView('heal');}
@@ -1365,7 +1372,7 @@ function handleMapAction(action){
 }
 function confirmTitle(){
  sessionEpoch++;clearTimeout(healCooldownTimer);hero=JSON.parse(JSON.stringify(INITIAL_HERO));restoreRingAbility(hero.equipment.RING);adventure=freshAdventure();bossLevel=1;currentEnemy=newLoot=null;weaponMaterials=shieldMaterials=totalTurnCount=turnCount=lastHealTime=0;overflowActive=false;
- const a=$('titleA').value||TITLE_A[randInt(0,TITLE_A.length-1)],b=$('titleB').value||TITLE_B[randInt(0,TITLE_B.length-1)],c=$('titleC').value||TITLE_C[randInt(0,TITLE_C.length-1)];hero.name=hero.title=`${a}的${b}${c}`;
+ const parts=resolveTitleParts();hero.name=hero.title=`${parts[0]}的${parts[1]}${parts[2]}`;applyStartingIdentity(parts,$('hero-look-select')?.value||'auto');
  $('titleSelectBox').hidden=true;$('app-shell').inert=false;redrawLog();log(`🧾 ${hero.title}，歡迎踏上旅程。這次，進度會替你記住。`);enterMap();saveCheckpoint();
 }
 function renderResult(){updateStatus();const r=adventure.result;setScene('event',r?.object??89);story(r?.tag||'休息一下',r?.title||'這一段路，走完了。',r?.text||'先整理一下行囊，再繼續走吧。');setCommands({text:'繼續旅程 →',hint:'回到小徑，決定下一步',value:'continue'},null,null,()=>{if(adventure.pendingEnding)showCredits();else enterMap();},gameState);$('action-tip').textContent='這一頁不會自動消失。看完了，再往前走。';}
@@ -1518,8 +1525,8 @@ function renderLootDecision(){
  btnDecYes.classList.toggle('risky-equip',comparison.risky);btnDecNo.classList.toggle('recommended-keep',comparison.risky);
  btnDecYes.innerHTML=`<strong>${comparison.risky?'⚠ 仍要換上（需再確認）':'✓ '+escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small>`;btnDecNo.innerHTML=`<strong>保留目前裝備</strong><small>${loot.type==='RING'?'新戒指換成金幣':`分解新裝備 · 素材 ${RARITY_MATERIAL_VALUE[loot.rarity]||0}`}</small>`;
  btnDecYes.disabled=btnDecNo.disabled=false;
- const uid=loot.uid;btnDecYes.onclick=()=>handleLootDecision('YES',uid);btnDecNo.onclick=()=>handleLootDecision('NO',uid);
- $('action-tip').textContent='尚未做決定的戰利品也會存檔。重整後可以接著選。';
+ const uid=loot.uid;btnDecYes.onclick=e=>{if(e.detail>1)return;handleLootDecision('YES',uid);revealCurrentContent();};btnDecNo.onclick=e=>{if(e.detail>1)return;handleLootDecision('NO',uid);revealCurrentContent();};
+ $('action-tip').textContent='尚未做決定的戰利品也會存檔。重整後可以接著選。';syncActionDock();
 }
 function handleRingDecision(choice){handleLootDecision(choice);}
 function handleLootDecision(choice,uid=newLoot?.uid){
@@ -1572,8 +1579,9 @@ function cleanEquipment(value,type){
 function cleanHero(input){
  const value=validObject(input),out={};
  for(const [key,def]of Object.entries(INITIAL_HERO)){
-  if(typeof def==='number')out[key]=validNumber(value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
+  if(typeof def==='number')out[key]=validNumber(key==='titleCritBonus'?(value[key]??0):value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
  }
+ validNumber(out.titleCritBonus,0,5);
  out.name=validText(value.name,160);out.title=validText(value.title,160);
  validNumber(out.level,1,25);validNumber(out.highestLevel,out.level,25);validNumber(out.maxHp,1,1e7);validNumber(out.hp,1,out.maxHp);validNumber(out.expToNextLevel,1,1e12);if(out.exp>=out.expToNextLevel)throw new Error('經驗值門檻無效');
  for(const k of ['magicGuardTurns','burnTurns','defDownTurns','buffDamageUpTurns','regenTurns'])validNumber(out[k],0,100);
@@ -1589,8 +1597,15 @@ function cleanEnemy(value){
  if(e.level!=null)out.level=validNumber(e.level,1,3);if(e.elite!=null)out.elite=validBool(e.elite);if(e.ancientChargeState!=null){if(e.ancientChargeState!=='CHARGING')throw new Error('首領蓄力狀態無效');out.ancientChargeState=e.ancientChargeState;}
  return out;
 }
+function cleanIdentity(value){
+ if(value==null)return null;const id=validObject(value);
+ if(id.version!==1||!['new','legacy'].includes(id.source)||!HERO_LOOKS.some(p=>p.id===id.appearance))throw new Error('稱號或造型資料無效');
+ if(id.source==='legacy'){if(id.parts!=null)throw new Error('舊旅程稱號資料無效');return {version:1,source:'legacy',parts:null,appearance:id.appearance};}
+ if(!Array.isArray(id.parts)||id.parts.length!==3||id.parts.some((part,i)=>![TITLE_A,TITLE_B,TITLE_C][i].includes(part)))throw new Error('起始稱號內容無效');
+ return {version:1,source:'new',parts:[...id.parts],appearance:id.appearance};
+}
 function cleanAdventure(value){
- const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{}};
+ const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity)};
  for(const k of ['seq','steps','gold','scoutTurns','nextEventAt'])out[k]=validNumber(a[k]);validNumber(out.scoutTurns,0,100);
  for(const k of ['eventResolved','pendingEnding','clearRecorded'])out[k]=validBool(a[k]);
  for(const k of ['eventId','lastEvent']){if(a[k]!=null&&!Object.hasOwn(EVENTS,a[k]))throw new Error('未知的冒險事件');out[k]=a[k];}
@@ -1601,7 +1616,7 @@ function cleanAdventure(value){
  if((out.flags.fox&&out.flags.foxAt==null)||(out.flags.parcel&&out.flags.parcelAt==null))throw new Error('委託進度不完整');
  for(const key of ['wins','deaths','events','loot','bosses','rests'])out.stats[key]=validNumber(a.stats?.[key]);
  if(!Array.isArray(a.logs)||a.logs.length>80)throw new Error('冒險手札過長');out.logs=a.logs.map(s=>validText(s,1600));
- if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};}else out.result=null;
+ if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};if(r.portraitKey!=null){if(!Object.hasOwn(SCENE_PORTRAITS,r.portraitKey))throw new Error('事件人物造型無效');out.result.portraitKey=r.portraitKey;}}else out.result=null;
  if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round)};}else out.battle=null;
  return out;
 }
@@ -1901,17 +1916,156 @@ function initMusic(){
 
 ;
 
+/* === identity.js === */
+/* Named, visually audited portraits. Never use an arbitrary tile as a person. */
+const HERO_LOOKS=[
+ {id:'iron',name:'鐵甲騎士',atlas:'dungeon',tile:96},
+ {id:'sentinel',name:'城門衛士',atlas:'dungeon',tile:97},
+ {id:'swordsman',name:'劍術旅人',atlas:'dungeon',tile:98},
+ {id:'sun',name:'金髮冒險家',atlas:'dungeon',tile:99},
+ {id:'silver',name:'銀髮劍士',atlas:'dungeon',tile:100},
+ {id:'violet',name:'紫袍法師',atlas:'dungeon',tile:84},
+ {id:'merchant',name:'行腳商旅',atlas:'dungeon',tile:85},
+ {id:'veteran',name:'鬍鬚老手',atlas:'dungeon',tile:86},
+ {id:'smith',name:'矮人工匠',atlas:'dungeon',tile:87},
+ {id:'auburn',name:'赤髮旅人',atlas:'dungeon',tile:88},
+ {id:'sage',name:'白鬚術士',atlas:'dungeon',tile:111},
+ {id:'ranger',name:'綠衣遊俠',atlas:'dungeon',tile:112},
+ {id:'jade',name:'翠玉守衛',atlas:'creatures',tile:16},
+ {id:'azure',name:'蒼藍守衛',atlas:'creatures',tile:17},
+ {id:'ruby',name:'赤鐵守衛',atlas:'creatures',tile:18},
+ {id:'shadow',name:'夜行斥候',atlas:'creatures',tile:19}
+];
+const SCENE_PORTRAITS=Object.fromEntries(HERO_LOOKS.map(p=>[p.id,{...p,kind:'person'}]));
+Object.assign(SCENE_PORTRAITS,{
+ postman:{id:'postman',name:'骷髏郵差',atlas:'creatures',tile:1,kind:'undead'},
+ fox:{id:'fox',name:'嘴硬的小狐狸',atlas:'creatures',tile:157,kind:'animal'},
+ challenger:{id:'challenger',name:'練習中的菁英',atlas:'creatures',tile:20,kind:'monster'}
+});
+const EVENT_CAST={fox:['fox'],foxGift:['fox'],forge:['smith','silver'],bridge:['sentinel','azure'],soup:['sun','auburn'],courier:['postman'],delivery:['veteran'],shrine:['sage','violet'],bard:['violet','sage'],elite:['challenger'],merchant:['merchant','swordsman'],campfire:['auburn','ranger','shadow','jade']};
+const TITLE_STAT_LABELS={maxHp:'HP',baseAttack:'攻擊',baseDefense:'防禦',baseMagicAtk:'魔攻',baseDodge:'閃避',baseTieWinRate:'平手勝率',titleCritBonus:'爆擊'};
+const A_BONUSES={power:{baseAttack:2},guard:{baseDefense:2},magic:{baseMagicAtk:3},vigor:{maxHp:4},swift:{baseDodge:2},poise:{baseTieWinRate:3},lucky:{titleCritBonus:2}};
+const A_GROUPS={power:['爆轟','狂躁','斬鐵','赤紅','暴走','無情','熱血'],guard:['無畏','沉穩','超怕痛','笨拙','勇敢'],magic:['烈焰','蒼雷','深淵','冰牙','秘境','碎星','奇妙','深海系','熔岩系','夢幻','神秘'],vigor:['胖胖','很會睡','悠哉','佛系'],swift:['迅影','迅猛','月影','背刺型','隱匿'],poise:['孤高','朦朧','滑稽','視覺系','偉大','傳說中','孤獨'],lucky:['超衰','超歐']};
+const B_BONUSES={power:{baseAttack:1},guard:{baseDefense:1},magic:{baseMagicAtk:2},vigor:{maxHp:2},swift:{baseDodge:1},poise:{baseTieWinRate:2},lucky:{titleCritBonus:1}};
+const B_GROUPS={power:['暴走','怒氣值滿的','不講武德的','打王專用','愛亂衝的','暴怒','大雞雞'],guard:['背包滿滿','超會卡牆角的','怕痛的','認真的'],magic:['高能','臨時抱佛腳的','陰沉','開外掛'],vigor:['貪吃','省電','太早起的','喝藥喝很兇的','早睡','滿身DEBUFF'],swift:['迷了路的','邊走邊摸魚的','躲草叢的','手滑','放生隊友的','邊緣'],poise:['三分鐘熱度的','不讀說明書的','操作鬼才','人來瘋','網路卡卡','帥氣','冷靜'],lucky:['躺著贏的','死要錢的','不乾淨的','非洲','歐洲']};
+const VOCATIONS={
+ blade:{name:'劍術底子',bonus:{baseAttack:2},looks:['iron','swordsman','ruby']},
+ guard:{name:'守衛訓練',bonus:{baseDefense:2},looks:['sentinel','jade','azure']},
+ mage:{name:'法術學識',bonus:{baseMagicAtk:3},looks:['violet','sage','silver']},
+ scout:{name:'斥候步法',bonus:{baseDodge:2},looks:['ranger','shadow','auburn']},
+ hearty:{name:'充足體力',bonus:{maxHp:4},looks:['veteran','sun','auburn']},
+ diplomat:{name:'臨場應變',bonus:{baseTieWinRate:3},looks:['merchant','sage','veteran']},
+ artisan:{name:'工匠基本功',bonus:{baseAttack:1,baseDefense:1},looks:['smith','silver','merchant']},
+ lucky:{name:'捕捉破綻',bonus:{titleCritBonus:2},looks:['shadow','sun','ranger']},
+ wanderer:{name:'旅人經驗',bonus:{maxHp:2,baseAttack:1},looks:['swordsman','auburn','sun']}
+};
+const C_GROUPS={blade:['大劍客','連擊者','團滅製造機','補刀王','滅龍者','討債人','兇手'],guard:['龍車乘客','蓋房者','卡位者'],mage:['炸彈魔','怪物觀察員','魔王'],scout:['獵人','採集狂','甩尾職人','資深摸魚員','裝死高手','摸魚王'],hearty:['鍋邊探頭者','喝藥專家','營火管理員','躺贏者','廢人','爆肝者'],diplomat:['大村長','老闆','上班族','掛網者'],artisan:['研磨師','路邊撿垃圾者','工程師'],lucky:['掉寶觀測員','轉蛋大師','暴擊器'],wanderer:['路痴冒險者','菜鳥勇者','爆肝王','旅人','勇者','菜鳥']};
+function stableIdentityHash(text){let n=2166136261;for(const c of String(text))n=Math.imul(n^c.charCodeAt(0),16777619);return n>>>0;}
+function groupFor(groups,part){return Object.keys(groups).find(k=>groups[k].includes(part))||Object.keys(groups)[stableIdentityHash(part)%Object.keys(groups).length];}
+function titleProfile(parts){
+ const [a,b,c]=parts,role=VOCATIONS[groupFor(C_GROUPS,c)],bonus={};
+ const sources=[{label:`風格 · ${a}`,bonus:A_BONUSES[groupFor(A_GROUPS,a)]},{label:`個性 · ${b}`,bonus:B_BONUSES[groupFor(B_GROUPS,b)]},{label:`身分 · ${c}`,bonus:role.bonus}];
+ for(const source of sources)for(const [key,value] of Object.entries(source.bonus))bonus[key]=(bonus[key]||0)+value;
+ return {role:role.name,bonus,sources,look:role.looks[stableIdentityHash(parts.join('|'))%role.looks.length]};
+}
+function bonusText(bonus){return Object.entries(bonus).map(([key,n])=>`${TITLE_STAT_LABELS[key]} +${n}${['baseDodge','baseTieWinRate','titleCritBonus'].includes(key)?'%':''}`).join('、');}
+function drawPortrait(el,key,size){if(!el)return;const p=SCENE_PORTRAITS[key]||SCENE_PORTRAITS.iron;(p.atlas==='creatures'?creatureAt:spriteAt)(el,p.tile,size);el.dataset.portrait=p.id;el.dataset.portraitKind=p.kind;}
+function eventPortraitKey(id){const cast=EVENT_CAST[id];return cast?cast[stableIdentityHash(`${adventure.runId}|${id}|${adventure.eventVisits[id]||0}`)%cast.length]:null;}
+function currentIdentity(){return adventure.identity||{version:1,source:'legacy',parts:null,appearance:HERO_LOOKS[stableIdentityHash(hero.title||hero.name)%HERO_LOOKS.length].id};}
+function applyStartingIdentity(parts,appearance='auto'){
+ if(adventure.identity?.source==='new')return false;
+ const profile=titleProfile(parts);adventure.identity={version:1,source:'new',parts:[...parts],appearance:appearance==='auto'?profile.look:appearance};
+ for(const [key,value]of Object.entries(profile.bonus))hero[key]=(hero[key]||0)+value;
+ hero.hp=hero.maxHp;return true;
+}
+function updateIdentityDisplay(){
+ const id=currentIdentity(),portrait=HERO_LOOKS.find(p=>p.id===id.appearance)||HERO_LOOKS[0];
+ drawPortrait(document.querySelector('.hero-portrait'),portrait.id,64);drawPortrait($('hero-actor').querySelector('.actor-sprite'),portrait.id,80);
+ if($('hero-origin'))$('hero-origin').textContent=id.source==='new'?`${portrait.name} · ${bonusText(titleProfile(id.parts).bonus)}`:`${portrait.name} · 舊旅程數值保留`;
+}
+let titleDraft={parts:null,appearance:'auto'};
+function flavorIndex(length){if(globalThis.crypto?.getRandomValues){const n=new Uint32Array(1);crypto.getRandomValues(n);return n[0]%length;}return stableIdentityHash(`${Date.now()}|${performance.now()}`)%length;}
+function resolveTitleParts(){
+ const arrays=[TITLE_A,TITLE_B,TITLE_C];
+ const parts=['titleA','titleB','titleC'].map((key,i)=>{const value=$(key).value;if(arrays[i].includes(value))return value;const chosen=arrays[i][flavorIndex(arrays[i].length)];$(key).value=chosen;return chosen;});
+ titleDraft.parts=parts;return parts;
+}
+function refreshTitlePreview(){
+ const parts=resolveTitleParts(),profile=titleProfile(parts),appearance=$('hero-look-select')?.value||'auto';titleDraft.appearance=appearance;
+ const look=appearance==='auto'?profile.look:appearance;drawPortrait(document.querySelector('.welcome-hero'),look,112);drawPortrait($('creation-portrait'),look,64);
+ $('creation-title').textContent=`${parts[0]}的${parts[1]}${parts[2]}`;$('creation-look-name').textContent=HERO_LOOKS.find(p=>p.id===look).name;
+ $('creation-bonuses').innerHTML=profile.sources.map(s=>`<p><b>${escapeHtml(s.label)}</b><span>${escapeHtml(bonusText(s.bonus))}</span></p>`).join('');
+ const final={...INITIAL_HERO};for(const [k,n]of Object.entries(profile.bonus))final[k]=(final[k]||0)+n;
+ $('creation-totals').textContent=`起始 HP ${final.maxHp} · 攻擊 ${final.baseAttack} · 防禦 ${final.baseDefense} · 魔攻 ${final.baseMagicAtk} · 閃避 ${final.baseDodge}% · 爆擊 ${5+final.titleCritBonus}% · 平手 ${final.baseTieWinRate}%`;
+}
+function initIdentityUI(){
+ const select=$('hero-look-select');select.innerHTML='<option value="auto">依稱號配對外觀</option>'+HERO_LOOKS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+ ['titleA','titleB','titleC','hero-look-select'].forEach(id=>$(id).addEventListener('change',refreshTitlePreview));
+ $('btn-random-title').onclick=()=>{for(const [i,id] of ['titleA','titleB','titleC'].entries())$(id).value=[TITLE_A,TITLE_B,TITLE_C][i][flavorIndex([TITLE_A,TITLE_B,TITLE_C][i].length)];refreshTitlePreview();};
+ $('btn-random-look').onclick=()=>{select.value=HERO_LOOKS[flavorIndex(HERO_LOOKS.length)].id;refreshTitlePreview();};
+ $('btn-identity').onclick=()=>{renderWardrobe();$('identity-dialog').showModal();};
+ const body=document.querySelector('.welcome-body'),scroll=document.createElement('div'),actions=document.createElement('div');scroll.className='welcome-scroll';actions.className='welcome-actions';
+ actions.append($('btn-continue'),$('btn-new-game'));while(body.firstChild)scroll.append(body.firstChild);body.append(scroll,actions);
+ $('new-title-details').addEventListener('toggle',()=>{$('btn-new-game').hidden=!$('new-title-details').open;});
+ refreshTitlePreview();updateIdentityDisplay();
+}
+function renderWardrobe(){
+ const id=currentIdentity();$('identity-description').textContent=id.source==='new'?`這次旅程的稱號底子：${bonusText(titleProfile(id.parts).bonus)}。開局時已加入基礎數值，換造型、讀檔不會重複加成。`:'這是更新前的旅程：等級、HP、裝備與基礎數值全部保持原樣。新稱號加成只在開始新旅程時套用，現在可以免費換造型。';
+ $('wardrobe-grid').replaceChildren();for(const look of HERO_LOOKS){const button=document.createElement('button');button.className='look-choice';button.setAttribute('aria-pressed',String(look.id===id.appearance));button.dataset.look=look.id;const art=document.createElement('span');art.className='sprite';art.setAttribute('aria-hidden','true');drawPortrait(art,look.id,48);const label=document.createElement('span');label.textContent=look.name;button.append(art,label);button.onclick=()=>{if(!STABLE_PHASES.includes(gameState)||!$('identity-dialog').open)return;adventure.identity={...currentIdentity(),appearance:look.id};updateIdentityDisplay();saveAuto();renderWardrobe();};$('wardrobe-grid').append(button);}
+}
+
+;
+
+/* === action-dock.js === */
+/* One real set of action buttons, fixed to the viewport. No cloned actions. */
+let dockObserver=null,lastDockHeight=0,dockFrame=0;
+function syncDockGeometry(){
+ const dock=$('action-dock');if(!dock||dock.hidden)return;
+ const rect=document.querySelector('.play-column').getBoundingClientRect(),width=document.documentElement.clientWidth;
+ const left=width<=760?10:Math.max(10,rect.left),w=width<=760?width-20:Math.min(rect.width,width-left-10);
+ dock.style.setProperty('--dock-left',`${left}px`);dock.style.setProperty('--dock-width',`${w}px`);
+ const h=Math.ceil(dock.getBoundingClientRect().height);if(h!==lastDockHeight){lastDockHeight=h;document.documentElement.style.setProperty('--dock-space',`${h+28}px`);}
+}
+function syncActionDock(){
+ const dock=$('action-dock');if(!dock)return;dock.hidden=gameState==='TITLE';if(dock.hidden)return;
+ const phase=gameState==='BATTLE_ACTION'?'BATTLE':gameState;
+ dock.dataset.phase=phase;$('dock-title').textContent=mainView.querySelector('h2')?.textContent||'下一步，由你決定';
+ let summary='按鈕固定在這裡，不必再滑到頁面底部。';
+ if(phase==='LOOT_DECISION'&&newLoot){const c=equipmentComparison(newLoot);summary=c.risky?c.reasons.slice(0,2).join(' ／ '):'沒有偵測到能力下降；仍可查看詞條再決定。';dock.classList.toggle('dock-risk',c.risky);}
+ else{dock.classList.remove('dock-risk');if(phase==='BATTLE'&&currentEnemy)summary=`你 HP ${Math.max(0,hero.hp)}/${hero.maxHp} · ${currentEnemy.name} ${Math.max(0,currentEnemy.hp)}/${currentEnemy.originalHp}`;else if(phase==='EVENT')summary='選項下方寫有代價；選好後才會繼續。';}
+ $('dock-summary').textContent=summary;syncDockGeometry();
+}
+function revealCurrentContent(){
+ const target=['LOOT_DECISION','RESULT','DEFEAT','CREDITS'].includes(gameState)?mainView:$('stage');
+ if(!target)return;const r=target.getBoundingClientRect();if(r.top<8||r.top>innerHeight*.45)target.scrollIntoView({block:'start',behavior:'instant'});
+}
+function scheduleDock(){if(dockFrame)return;dockFrame=requestAnimationFrame(()=>{dockFrame=0;syncDockGeometry();});}
+function initActionDock(){
+ const dock=document.createElement('section');dock.id='action-dock';dock.setAttribute('aria-label','固定操作選單');dock.hidden=true;
+ dock.innerHTML='<div class="dock-heading"><div><strong id="dock-title"></strong><span id="dock-summary"></span></div><button id="btn-dock-detail" class="text-button" type="button">看詳情 ↑</button></div>';
+ const utility=document.querySelector('.utility-bar'),note=document.querySelector('.action-footnote');
+ dock.append(commandMenu,decisionMenu,utility,note);$('app-shell').append(dock);
+ const tools=document.createElement('div');tools.className='dock-tools';
+ for(const [id,label,fn]of [['save','存檔',openSaveDialog],['guide','指南',()=>$('guide-dialog').showModal()],['look','造型',()=>{renderWardrobe();$('identity-dialog').showModal();}],['audio','♫',()=>{$('btn-sound').click();}]]){const b=document.createElement('button');b.id=`btn-dock-${id}`;b.type='button';b.className='text-button';b.textContent=label;b.setAttribute('aria-label',id==='audio'?'音樂與音效':label);b.onclick=fn;tools.append(b);}
+ utility.insertBefore(tools,$('music-status'));$('btn-camp').textContent='◉ 營地商店';$('btn-dock-detail').onclick=()=>{const target=gameState==='LOOT_DECISION'?mainView:$('stage');target.scrollIntoView({block:'start',behavior:'instant'});};
+ dockObserver=new ResizeObserver(scheduleDock);dockObserver.observe(dock);dockObserver.observe(document.querySelector('.play-column'));
+ window.addEventListener('resize',scheduleDock);window.visualViewport?.addEventListener('resize',scheduleDock);
+ syncActionDock();
+}
+
+;
+
 /* === ui.js === */
 /* Initialize the visible game controls after the page is ready. */
 function initGameUI(){
- initTitleSelectBox();updateStatus();setScene('map',88);
+ initTitleSelectBox();initIdentityUI();updateStatus();setScene('map',88);
  story('YOUR STORY BEGINS','在出發之前，先想個好記的名字。','不選也沒關係，旅途會替你想一個。');
  $('app-shell').inert=true;
  $('btn-new-game').onclick=()=>{if(getBestSave()&&!confirm('開始新冒險會取代自動存檔；手動存檔與通關紀錄仍保留。確定開始？'))return;confirmTitle();};
  $('btn-guide').onclick=()=>$('guide-dialog').showModal();
  $('btn-records').onclick=openRecords;
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
- initSaveUI();initEnhancementUI();initMusic();
+ initSaveUI();initEnhancementUI();initActionDock();initMusic();
 }
 window.addEventListener('DOMContentLoaded',initGameUI);
 

@@ -15,9 +15,10 @@ function story(tag,title,text,hint=''){mainView.innerHTML=`<span class="story-ta
 function countTurn(){totalTurnCount++;turnCount=totalTurnCount;}
 function setCommands(c1,c2,c3,handler,state){
  commandMenu.hidden=false;commandMenu.style.display='flex';decisionMenu.hidden=true;decisionMenu.style.display='none';
- [c1,c2,c3].forEach((c,i)=>{const b=[btn1,btn2,btn3][i];b.hidden=!c;if(!c)return;b.innerHTML=`<em>${i+1}</em><strong>${escapeHtml(c.text)}</strong><small>${escapeHtml(c.hint||'')}</small>`;b.disabled=!!c.disabled;b.onclick=()=>{if(gameState===state)handler(c.value);};});
+ [c1,c2,c3].forEach((c,i)=>{const b=[btn1,btn2,btn3][i];b.hidden=!c;if(!c)return;b.innerHTML=`<em>${i+1}</em><strong>${escapeHtml(c.text)}</strong><small>${escapeHtml(c.hint||'')}</small>`;b.disabled=!!c.disabled;b.onclick=event=>{if(event.detail>1||gameState!==state)return;const before=gameState;handler(c.value);if(before!=='BATTLE'||!['BATTLE','BATTLE_ACTION'].includes(gameState))revealCurrentContent();};});
+ syncActionDock();
 }
-function disableCommands(disabled){[btn1,btn2,btn3,btnDecYes,btnDecNo].forEach(b=>b.disabled=disabled);}
+function disableCommands(disabled){[btn1,btn2,btn3,btnDecYes,btnDecNo].forEach(b=>b.disabled=disabled);syncActionDock();}
 function getHeroCritChance(){let chance=getHeroBaseCritChance(),r=hero.equipment.RING;if(getAllWeaponAffixSet().has('W_BRAVE')&&hero.hp>0&&hero.hp<=hero.maxHp*.3)chance+=.1;if(r.ability.id==='CRIT')chance+=.05+r.tier*.1;if(r.ability.id==='BERSERKER')chance+=[0,.05,.06,.08,.1][r.tier]||0;return Math.max(0,Math.min(.9,chance));}
 function updateStatus(){
  calculateHeroStats();turnCount=totalTurnCount;turnCountSpan.textContent=turnCount;
@@ -35,6 +36,7 @@ function updateStatus(){
  updateCompanionPanel();
  $('journey-track').innerHTML=SCENES.map((s,i)=>`<div class="journey-node ${bossLevel>i+1?'done':bossLevel===i+1?'active':''}" ${bossLevel===i+1?'aria-current="step"':''}><span class="node-number">${bossLevel>i+1?'✓':['I','II','III'][i]}</span><div><strong>${s.name}</strong><small>${bossLevel>i+1?'已完成':s.boss}</small></div></div>`).join('');
  $('time-label').textContent=['晨光','午後','暮色','星夜'][Math.floor(adventure.steps/8)%4];
+ updateIdentityDisplay();syncActionDock();
 }
 function healFraction(rate){const n=Math.min(hero.maxHp-hero.hp,Math.max(1,Math.floor(hero.maxHp*rate)));hero.hp+=n;flashBattleView('heal');return n;}
 function healFully(){hero.hp=hero.maxHp;hero.burnTurns=hero.burnDamage=hero.defDownTurns=hero.defDownRate=0;flashBattleView('heal');}
@@ -60,7 +62,7 @@ function handleMapAction(action){
 }
 function confirmTitle(){
  sessionEpoch++;clearTimeout(healCooldownTimer);hero=JSON.parse(JSON.stringify(INITIAL_HERO));restoreRingAbility(hero.equipment.RING);adventure=freshAdventure();bossLevel=1;currentEnemy=newLoot=null;weaponMaterials=shieldMaterials=totalTurnCount=turnCount=lastHealTime=0;overflowActive=false;
- const a=$('titleA').value||TITLE_A[randInt(0,TITLE_A.length-1)],b=$('titleB').value||TITLE_B[randInt(0,TITLE_B.length-1)],c=$('titleC').value||TITLE_C[randInt(0,TITLE_C.length-1)];hero.name=hero.title=`${a}的${b}${c}`;
+ const parts=resolveTitleParts();hero.name=hero.title=`${parts[0]}的${parts[1]}${parts[2]}`;applyStartingIdentity(parts,$('hero-look-select')?.value||'auto');
  $('titleSelectBox').hidden=true;$('app-shell').inert=false;redrawLog();log(`🧾 ${hero.title}，歡迎踏上旅程。這次，進度會替你記住。`);enterMap();saveCheckpoint();
 }
 function renderResult(){updateStatus();const r=adventure.result;setScene('event',r?.object??89);story(r?.tag||'休息一下',r?.title||'這一段路，走完了。',r?.text||'先整理一下行囊，再繼續走吧。');setCommands({text:'繼續旅程 →',hint:'回到小徑，決定下一步',value:'continue'},null,null,()=>{if(adventure.pendingEnding)showCredits();else enterMap();},gameState);$('action-tip').textContent='這一頁不會自動消失。看完了，再往前走。';}

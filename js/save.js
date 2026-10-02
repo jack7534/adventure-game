@@ -18,8 +18,9 @@ function cleanEquipment(value,type){
 function cleanHero(input){
  const value=validObject(input),out={};
  for(const [key,def]of Object.entries(INITIAL_HERO)){
-  if(typeof def==='number')out[key]=validNumber(value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
+  if(typeof def==='number')out[key]=validNumber(key==='titleCritBonus'?(value[key]??0):value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
  }
+ validNumber(out.titleCritBonus,0,5);
  out.name=validText(value.name,160);out.title=validText(value.title,160);
  validNumber(out.level,1,25);validNumber(out.highestLevel,out.level,25);validNumber(out.maxHp,1,1e7);validNumber(out.hp,1,out.maxHp);validNumber(out.expToNextLevel,1,1e12);if(out.exp>=out.expToNextLevel)throw new Error('經驗值門檻無效');
  for(const k of ['magicGuardTurns','burnTurns','defDownTurns','buffDamageUpTurns','regenTurns'])validNumber(out[k],0,100);
@@ -35,8 +36,15 @@ function cleanEnemy(value){
  if(e.level!=null)out.level=validNumber(e.level,1,3);if(e.elite!=null)out.elite=validBool(e.elite);if(e.ancientChargeState!=null){if(e.ancientChargeState!=='CHARGING')throw new Error('首領蓄力狀態無效');out.ancientChargeState=e.ancientChargeState;}
  return out;
 }
+function cleanIdentity(value){
+ if(value==null)return null;const id=validObject(value);
+ if(id.version!==1||!['new','legacy'].includes(id.source)||!HERO_LOOKS.some(p=>p.id===id.appearance))throw new Error('稱號或造型資料無效');
+ if(id.source==='legacy'){if(id.parts!=null)throw new Error('舊旅程稱號資料無效');return {version:1,source:'legacy',parts:null,appearance:id.appearance};}
+ if(!Array.isArray(id.parts)||id.parts.length!==3||id.parts.some((part,i)=>![TITLE_A,TITLE_B,TITLE_C][i].includes(part)))throw new Error('起始稱號內容無效');
+ return {version:1,source:'new',parts:[...id.parts],appearance:id.appearance};
+}
 function cleanAdventure(value){
- const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{}};
+ const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity)};
  for(const k of ['seq','steps','gold','scoutTurns','nextEventAt'])out[k]=validNumber(a[k]);validNumber(out.scoutTurns,0,100);
  for(const k of ['eventResolved','pendingEnding','clearRecorded'])out[k]=validBool(a[k]);
  for(const k of ['eventId','lastEvent']){if(a[k]!=null&&!Object.hasOwn(EVENTS,a[k]))throw new Error('未知的冒險事件');out[k]=a[k];}
@@ -47,7 +55,7 @@ function cleanAdventure(value){
  if((out.flags.fox&&out.flags.foxAt==null)||(out.flags.parcel&&out.flags.parcelAt==null))throw new Error('委託進度不完整');
  for(const key of ['wins','deaths','events','loot','bosses','rests'])out.stats[key]=validNumber(a.stats?.[key]);
  if(!Array.isArray(a.logs)||a.logs.length>80)throw new Error('冒險手札過長');out.logs=a.logs.map(s=>validText(s,1600));
- if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};}else out.result=null;
+ if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};if(r.portraitKey!=null){if(!Object.hasOwn(SCENE_PORTRAITS,r.portraitKey))throw new Error('事件人物造型無效');out.result.portraitKey=r.portraitKey;}}else out.result=null;
  if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round)};}else out.battle=null;
  return out;
 }

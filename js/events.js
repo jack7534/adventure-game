@@ -45,5 +45,5 @@ function chooseEvent(index){
  gameState='EVENT_RESOLVING';adventure.eventResolved=true;adventure.stats.events++;disableCommands(true);
  c.act();updateStatus();saveAuto();
 }
-function resultEvent(title,text,object=89){adventure.result={title,text,object,tag:'旅途的回聲'};adventure.eventId=null;gameState='RESULT';renderResult();saveAuto();}
+function resultEvent(title,text,object=89){adventure.result={title,text,object,tag:'旅途的回聲',portraitKey:eventPortraitKey(adventure.eventId)};adventure.eventId=null;gameState='RESULT';renderResult();saveAuto();}
 function giveEventLoot(type,source){log(`✦ ${source}：你發現了一件裝備。`);offerLoot(generateLoot(type,false));}

@@ -43,9 +43,13 @@ function setScene(mode='map', object=89) {
   const zone=Math.min(2,Math.max(0,bossLevel-1)); $('stage').dataset.zone=zone;drawLandscape(zone);
   $('region-label').textContent=`✦ ${SCENES[zone].name}`;
   $('enemy-actor').hidden=mode!=='battle';$('enemy-hud').hidden=mode!=='battle';$('scene-object').hidden=mode==='battle';
-  spriteAt($('hero-actor').querySelector('.actor-sprite'),96,80);
-  if(object===123)creatureAt($('scene-object'),23,64);else spriteAt($('scene-object'),object,64);
-  $('companion-actor').hidden=!adventure.flags.fox;creatureAt($('companion-actor'),23,40);
+  drawPortrait($('hero-actor').querySelector('.actor-sprite'),currentIdentity().appearance,80);
+  let portrait=mode==='event'?(gameState==='EVENT'?eventPortraitKey(adventure.eventId):adventure.result?.portraitKey):null;
+  if(!portrait&&object===122)portrait='postman';if(!portrait&&object===123)portrait='fox';
+  if(mode==='map'&&object===88)portrait=['ranger','auburn','veteran'][zone];
+  if(portrait)drawPortrait($('scene-object'),portrait,64);else {spriteAt($('scene-object'),object,64);delete $('scene-object').dataset.portrait;delete $('scene-object').dataset.portraitKind;}
+  $('scene-npc-name').hidden=mode==='battle'||!portrait;$('scene-npc-name').textContent=portrait?SCENE_PORTRAITS[portrait].name:'';
+  $('companion-actor').hidden=!adventure.flags.fox;drawPortrait($('companion-actor'),'fox',40);
   $('scene-caption').firstElementChild.textContent=mode==='battle'?'看穿對手的習慣，比一味亂砍更有用。':adventure.flags.fox?'小狐狸跟在你後面。牠堅持自己只是順路。':'森林很大。沒關係，今天走一小段也算。';
   if(mode==='battle'&&currentEnemy){creatureAt($('enemy-actor').querySelector('.actor-sprite'),ENEMY_SPRITES[currentEnemy.name]??123,80);$('enemy-name').textContent=currentEnemy.name;$('enemy-actor').classList.toggle('boss',!!adventure.battle?.isBoss);}
 }

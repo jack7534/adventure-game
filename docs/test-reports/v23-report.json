@@ -1,0 +1,183 @@
+{
+  "results": [
+    {
+      "name": "Five distinct bosses and level targets",
+      "pass": true
+    },
+    {
+      "name": "Lich magic defense is its explicit strength",
+      "pass": true
+    },
+    {
+      "name": "Lich soul siphon is interrupted by sword",
+      "pass": true
+    },
+    {
+      "name": "Dragon telegraphs charge before fire and then recovers",
+      "pass": true
+    },
+    {
+      "name": "Dragon guard reduces fire and prevents burn",
+      "pass": true
+    },
+    {
+      "name": "Ancient boss applies poison and magic counters it",
+      "pass": true
+    },
+    {
+      "name": "Cleanse clears poison, burn and break before damage",
+      "pass": true
+    },
+    {
+      "name": "Warden armor opens to magic and resists repeated move",
+      "pass": true
+    },
+    {
+      "name": "Warden stamp guard produces a punish window",
+      "pass": true
+    },
+    {
+      "name": "Dice seal requires different attacks and survives mid-charge save",
+      "pass": true
+    },
+    {
+      "name": "Dice repeated seal move does not bypass ultimate",
+      "pass": true
+    },
+    {
+      "name": "Tactical items cannot be consumed by duplicate clicks",
+      "pass": true
+    },
+    {
+      "name": "Empty or unnecessary tactical item is rejected",
+      "pass": true
+    },
+    {
+      "name": "Routes persist through reload without RNG reroll",
+      "pass": true
+    },
+    {
+      "name": "Route choice and clue are counted once",
+      "pass": true
+    },
+    {
+      "name": "Backtracking to camp preserves current choices",
+      "pass": true
+    },
+    {
+      "name": "Boss clues cannot be bypassed by map button",
+      "pass": true
+    },
+    {
+      "name": "Relics give stable stats without accumulating on render",
+      "pass": true
+    },
+    {
+      "name": "Five-relic cap retains existing relics",
+      "pass": true
+    },
+    {
+      "name": "Chicken follow-up repays only once",
+      "pass": true
+    },
+    {
+      "name": "Old v2 save missing new fields migrates without changing stats",
+      "pass": true
+    },
+    {
+      "name": "Old three-boss completion resumes chapter four without deleting record",
+      "pass": true
+    },
+    {
+      "name": "Boss 1 state and telegraph round-trip",
+      "pass": true
+    },
+    {
+      "name": "Boss 2 state and telegraph round-trip",
+      "pass": true
+    },
+    {
+      "name": "Boss 3 state and telegraph round-trip",
+      "pass": true
+    },
+    {
+      "name": "Boss 4 state and telegraph round-trip",
+      "pass": true
+    },
+    {
+      "name": "Boss 5 state and telegraph round-trip",
+      "pass": true
+    },
+    {
+      "name": "Reject invalid poisonStacks=6",
+      "pass": true
+    },
+    {
+      "name": "Reject invalid poisonStacks=-1",
+      "pass": true
+    },
+    {
+      "name": "Malformed route rejected before active state changes",
+      "pass": true
+    },
+    {
+      "name": "Relic imports reject duplicates and unknown items",
+      "pass": true
+    },
+    {
+      "name": "Seeded routes vary between journeys",
+      "pass": true
+    }
+  ],
+  "layout": [
+    {
+      "width": 1280,
+      "height": 900,
+      "y": 0,
+      "ok": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "y": 100000,
+      "ok": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "y": 0,
+      "ok": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "y": 100000,
+      "ok": true
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "y": 0,
+      "ok": true
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "y": 100000,
+      "ok": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "y": 0,
+      "ok": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "y": 100000,
+      "ok": true
+    }
+  ],
+  "errors": []
+}

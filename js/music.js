@@ -13,11 +13,15 @@ const GAME_SCORES={
  victory:{name:'終於可以休假了',bpm:124,root:60,scale:[0,2,4,5,7,9,11],chords:[0,4,5,3,0,3,4,0],lead:'triangle',energy:0,
  motifs:[[0,-1,2,4,7,-1,7,-1,9,-1,7,-1,4,-1,-1,-1],[4,-1,6,-1,7,9,11,-1,9,-1,7,-1,6,-1,-1,-1],[5,-1,7,-1,9,7,5,-1,4,-1,2,-1,0,-1,2,-1],[4,6,7,-1,9,-1,7,-1,4,-1,2,-1,0,-1,-1,-1]]}
 };
+Object.assign(GAME_SCORES,{
+ warden:{name:'發條典獄長・鐵鎖狂奏',bpm:184,root:45,scale:[0,2,3,5,6,8,11],chords:[0,3,0,4,5,3,1,4],lead:'sawtooth',energy:4,motifs:[[0,4,0,7,0,4,8,7,6,4,3,1,0,0,4,-1],[3,6,3,7,8,7,6,4,3,1,0,1,3,4,6,-1],[7,4,7,8,10,8,7,4,6,3,6,7,8,7,6,4],[4,3,1,0,7,4,3,1,0,1,3,4,6,4,0,-1]]},
+ dice:{name:'骰骨大公・世界不准重擲',bpm:196,root:48,scale:[0,1,4,5,7,8,11],chords:[0,1,4,0,5,6,3,4],lead:'square',energy:4,motifs:[[0,7,1,8,4,11,5,12,7,6,4,1,0,4,7,-1],[8,7,5,4,1,0,1,4,7,8,11,8,7,4,1,-1],[0,4,7,11,10,8,7,5,4,1,0,1,4,7,8,11],[11,8,7,4,8,7,4,1,7,4,1,0,1,4,7,-1]]}
+});
 const MUSIC_PREF_KEY='jack-adventure.audio.v1';
 function readMusicPrefs(){try{const p=JSON.parse(localStorage.getItem(MUSIC_PREF_KEY)||'{}');return {music:typeof p.music==='boolean'?p.music:true,sfx:typeof p.sfx==='boolean'?p.sfx:false,musicVolume:Number.isFinite(p.musicVolume)?Math.max(0,Math.min(1,p.musicVolume)):.32,sfxVolume:Number.isFinite(p.sfxVolume)?Math.max(0,Math.min(1,p.sfxVolume)):.45};}catch{return {music:true,sfx:false,musicVolume:.32,sfxVolume:.45};}}
 function scorePitch(track,degree,octave=0){const scale=track.scale,n=scale.length;return track.root+scale[((degree%n)+n)%n]+12*Math.floor(degree/n)+12*octave;}
 function frequency(midi){return 440*2**((midi-69)/12);}
-function trackForScene(){if(['BATTLE','BATTLE_ACTION'].includes(gameState)&&currentEnemy){if(adventure.battle?.isBoss)return {'不死巫妖':'lich','火焰巨龍':'dragon','遠古魔神':'ancient'}[currentEnemy.name]||'battle';return 'battle';}return gameState==='CREDITS'?'victory':'explore';}
+function trackForScene(){if(['BATTLE','BATTLE_ACTION'].includes(gameState)&&currentEnemy){if(adventure.battle?.isBoss)return {'不死巫妖':'lich','火焰巨龍':'dragon','遠古魔神':'ancient','發條典獄長':'warden','骰骨大公':'dice'}[currentEnemy.name]||'battle';return 'battle';}return gameState==='CREDITS'?'victory':'explore';}
 const Music={
  prefs:readMusicPrefs(),ctx:null,master:null,musicGain:null,sfxGain:null,noise:null,bus:null,timer:null,step:0,nextTime:0,track:null,unlocked:false,scheduled:0,switches:0,
  ensure(){

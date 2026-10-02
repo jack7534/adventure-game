@@ -7,6 +7,6 @@ function initGameUI(){
  $('btn-guide').onclick=()=>$('guide-dialog').showModal();
  $('btn-records').onclick=openRecords;
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
- initSaveUI();initEnhancementUI();initActionDock();initMusic();
+ initSaveUI();initEnhancementUI();initActionDock();initExpeditionUI();initNpcWorld();initMusic();
 }
 window.addEventListener('DOMContentLoaded',initGameUI);

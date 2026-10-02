@@ -1,0 +1,630 @@
+{
+  "timestamp": "2026-10-02T09:22:03.896Z",
+  "results": [
+    {
+      "name": "New run / initial save / title",
+      "pass": true
+    },
+    {
+      "name": "Dodge-counter kill grants XP and loot only once",
+      "pass": true
+    },
+    {
+      "name": "Rapid battle input consumes a single round",
+      "pass": true
+    },
+    {
+      "name": "Burn death settles once and cannot reopen combat",
+      "pass": true
+    },
+    {
+      "name": "Fatal hit cannot be revived by block or reflection",
+      "pass": true
+    },
+    {
+      "name": "Magic is never dodged / shield can be dodged",
+      "pass": true
+    },
+    {
+      "name": "Base dodge works without the dodge ring",
+      "pass": true
+    },
+    {
+      "name": "Overflow follow-up cannot recurse indefinitely",
+      "pass": true
+    },
+    {
+      "name": "Materials are retained while no equipment exists",
+      "pass": true
+    },
+    {
+      "name": "Weapon replacement keeps the refine just earned",
+      "pass": true
+    },
+    {
+      "name": "Low-value shield can be declined without losing refine",
+      "pass": true
+    },
+    {
+      "name": "Double loot decision cannot consume twice",
+      "pass": true
+    },
+    {
+      "name": "Old item click token cannot affect the next item",
+      "pass": true
+    },
+    {
+      "name": "Same ring upgrades to the higher tier, never down",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability CRIT",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability HEAL",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability DODGE",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability MAGIC",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability BERSERKER",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability BALANCE",
+      "pass": true
+    },
+    {
+      "name": "Round-trip ring ability NONE",
+      "pass": true
+    },
+    {
+      "name": "All five bosses: one reward and a persistent ending",
+      "pass": true
+    },
+    {
+      "name": "Weapon rarity unlock gates are honored",
+      "pass": true
+    },
+    {
+      "name": "Map event cannot overlap a new exploration",
+      "pass": true
+    },
+    {
+      "name": "Event choice applies once and survives a save",
+      "pass": true
+    },
+    {
+      "name": "Courier and fox follow-ups occur after their flags",
+      "pass": true
+    },
+    {
+      "name": "Event fox / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event fox / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event fox / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event foxGift / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event foxGift / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event foxGift / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event forge / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event forge / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event forge / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event chest / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event chest / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event chest / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event bridge / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event bridge / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event bridge / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event soup / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event soup / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event soup / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event courier / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event courier / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event courier / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event delivery / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event delivery / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event delivery / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event shrine / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event shrine / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event shrine / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event bard / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event bard / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event bard / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event spring / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event spring / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event spring / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event elite / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event elite / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event elite / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event merchant / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event merchant / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event merchant / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event campfire / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event campfire / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event campfire / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event relic_shrine / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event relic_shrine / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event relic_shrine / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event living_luggage / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event living_luggage / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event living_luggage / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event receipt_duel / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event receipt_duel / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event receipt_duel / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event chicken_loan / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event chicken_loan / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event chicken_loan / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event chicken_return / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event chicken_return / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event chicken_return / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event door_interview / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event door_interview / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event door_interview / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event ghost_band / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event ghost_band / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event ghost_band / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event slime_court / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event slime_court / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event slime_court / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event fortune_cookie / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event fortune_cookie / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event fortune_cookie / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event clock_fixer / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event clock_fixer / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event clock_fixer / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event soup_inspector / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event soup_inspector / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event soup_inspector / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event lost_hero / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event lost_hero / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event lost_hero / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_party / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_party / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_party / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_rival / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_rival / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_rival / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_bandits / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_bandits / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_bandits / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_pickpocket / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_pickpocket / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_pickpocket / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_ambush / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_ambush / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_ambush / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_tavern / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_tavern / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_tavern / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_wounded / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_wounded / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_wounded / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_fake_guard / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_fake_guard / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_fake_guard / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Event npc_camp / choice 1",
+      "pass": true
+    },
+    {
+      "name": "Event npc_camp / choice 2",
+      "pass": true
+    },
+    {
+      "name": "Event npc_camp / choice 3",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase MAP",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase BATTLE",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase EVENT",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase LOOT_DECISION",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase RESULT",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase DEFEAT",
+      "pass": true
+    },
+    {
+      "name": "Save/load stable phase CREDITS",
+      "pass": true
+    },
+    {
+      "name": "Save mid-animation resumes the already resolved next round",
+      "pass": true
+    },
+    {
+      "name": "Stale callback cannot interrupt a loaded map",
+      "pass": true
+    },
+    {
+      "name": "Pending loot reload does not roll or grant again",
+      "pass": true
+    },
+    {
+      "name": "Manual slot is not overwritten by autosave",
+      "pass": true
+    },
+    {
+      "name": "Corrupt automatic save falls back to valid backup",
+      "pass": true
+    },
+    {
+      "name": "Unavailable storage does not crash the game",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: zero XP threshold",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: negative HP",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: unknown ability",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: ring tier overflow",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: bad phase",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: missing loot",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: NaN stats",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: oversized story",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupt save: invalid event",
+      "pass": true
+    },
+    {
+      "name": "Import parser rejects prototype keys",
+      "pass": true
+    },
+    {
+      "name": "Imported display text cannot become HTML",
+      "pass": true
+    },
+    {
+      "name": "Rest is single-use during its cooldown",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

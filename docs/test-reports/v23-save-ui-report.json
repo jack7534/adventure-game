@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Export button produces a complete pending-loot save",
+    "Import restores the same unconsumed item without changing gold",
+    "Refresh, Continue, and Equip consume the pending item exactly once",
+    "Battle reload preserves enemy HP, round, and the already rolled next move",
+    "Invalid imported file leaves the ongoing battle untouched"
+  ],
+  "errors": []
+}

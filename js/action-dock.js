@@ -13,8 +13,8 @@ function syncActionDock(){
  dock.dataset.phase=phase;$('dock-title').textContent=mainView.querySelector('h2')?.textContent||'下一步，由你決定';
  let summary='按鈕固定在這裡，不必再滑到頁面底部。';
  if(phase==='LOOT_DECISION'&&newLoot){const c=equipmentComparison(newLoot);summary=c.risky?c.reasons.slice(0,2).join(' ／ '):'沒有偵測到能力下降；仍可查看詞條再決定。';dock.classList.toggle('dock-risk',c.risky);}
- else{dock.classList.remove('dock-risk');if(phase==='BATTLE'&&currentEnemy)summary=`你 HP ${Math.max(0,hero.hp)}/${hero.maxHp} · ${currentEnemy.name} ${Math.max(0,currentEnemy.hp)}/${currentEnemy.originalHp}`;else if(phase==='EVENT')summary='選項下方寫有代價；選好後才會繼續。';}
- $('dock-summary').textContent=summary;syncDockGeometry();
+ else{dock.classList.remove('dock-risk');if(phase==='ROUTE')summary='選好一條路再出發。相同存檔不會重抽路線。';if(phase==='BATTLE'&&currentEnemy)summary=`你 HP ${Math.max(0,hero.hp)}/${hero.maxHp} · ${currentEnemy.name} ${Math.max(0,currentEnemy.hp)}/${currentEnemy.originalHp}`;else if(phase==='EVENT')summary='選項下方寫有代價；選好後才會繼續。';}
+ if(phase==='BATTLE'&&activeBoss())summary=adventure.battle.boss?.plan?.hint||summary;$('dock-summary').textContent=summary;syncDockGeometry();
 }
 function revealCurrentContent(){
  const target=['LOOT_DECISION','RESULT','DEFEAT','CREDITS'].includes(gameState)?mainView:$('stage');

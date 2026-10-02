@@ -1,5 +1,7 @@
 /* Gold has visible uses; purchases are map-only, saved atomically and click-token checked. */
 const CAMP_OFFERS=[
+ {id:'potion',name:'應急藥水',price:10,description:'戰鬥時消耗一回合恢復 40% HP。最多帶 5 瓶。',canBuy:()=>ensureExpedition().potions<5,apply:()=>ensureExpedition().potions++},
+ {id:'antidote',name:'解毒藥',price:8,description:'戰鬥時消耗一回合解除毒、灼燒與破甲。最多帶 5 瓶。',canBuy:()=>ensureExpedition().antidotes<5,apply:()=>ensureExpedition().antidotes++},
  {id:'weapon',name:'武器零件包',price:12,description:'武器素材 +5。已有武器時立即自動精練；徒手時保留素材。',apply:()=>addMaterials('WEAPON',5)},
  {id:'shield',name:'盾牌零件包',price:12,description:'盾牌素材 +5。已有盾牌時立即自動精練；空手時保留素材。',apply:()=>addMaterials('SHIELD',5)},
  {id:'rations',name:'暖心便當',price:10,description:'接下來 5 個戰鬥回合，回復最大 HP 的 10%，至少 3 點。重買不疊加。',canBuy:()=>hero.regenTurns===0,apply:()=>{hero.regenTurns=5;hero.regenAmount=Math.max(3,Math.floor(hero.maxHp*.1));}},

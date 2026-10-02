@@ -6,7 +6,7 @@ const page=await browser.newPage({viewport:{width:1280,height:960}}),checks=[],e
 page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>errors.push(r.url()+': '+r.failure()?.errorText));
 page.on('dialog',async d=>{dialogs.push(d.message());await d[answer]();});
 const mark=(name,ok=true)=>{assert.ok(ok,name);checks.push(name);};
-const reset=()=>page.evaluate(()=>{confirmTitle();actionDelay=0;});
+const reset=()=>page.evaluate(()=>{confirmTitle();enterMap();actionDelay=0;});
 try{
  await page.goto(process.env.GAME_URL||'http://127.0.0.1:8770/',{waitUntil:'networkidle'});
  mark('AudioContext is not started before a user gesture',await page.evaluate(()=>Music.ctx===null));
@@ -77,7 +77,7 @@ try{
   return results;
  });
  for(const w of waveforms)mark(`Score ${w.id} renders actual nonzero unclipped audio`,w.rms>.001&&w.peak<1&&Number.isFinite(w.rms)&&w.notes>10);
- mark('All six scores have distinct waveforms',new Set(waveforms.map(w=>w.hash)).size===6);
+ mark('All soundtrack scores have distinct waveforms',new Set(waveforms.map(w=>w.hash)).size===waveforms.length);
  for(const [n,id]of [[1,'lich'],[2,'dragon'],[3,'ancient']]){
   await page.evaluate(n=>{bossLevel=n;createBattle({...ENEMIES.BOSS[n-1]},true);},n);
   await page.waitForFunction(id=>Music.track===id,id);

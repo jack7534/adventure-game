@@ -41,7 +41,7 @@
 
 
     const HERO_MAX_HP_START = 20;
-    const MAX_LEVEL = 25;
+    const MAX_LEVEL = 40;
     const HP_PER_LEVEL = 5;
 
     const RARITY_ORDER = ['Normal', 'Magic', 'Rare', 'Epic', 'Legendary', 'Mythic'];
@@ -80,6 +80,7 @@
         baseDodge: 5,       // 起始閃避 5%
         baseTieWinRate: 30,
         titleCritBonus: 0,
+        poisonStacks: 0,
         baseMagicAtk: 20,
         equipment: {
             WEAPON: { name: "徒手", power: 0, rarity: 'Normal', affixes: [] },
@@ -494,7 +495,7 @@
     }
 
     function getHeroBaseCritChance() {
-        let base = 0.05 + (hero.titleCritBonus || 0) / 100;
+        let base = 0.05 + (hero.titleCritBonus || 0) / 100 + relicBonus("crit") / 100;
         const affSet = getAllWeaponAffixSet();
         if (affSet.has('W_CRIT_UP')) base += 0.05;
         return base;
@@ -631,6 +632,7 @@
             hero.currentAttack = Math.floor(hero.currentAttack * 1.15);
         }
         if (hero.currentMagicAtk < 0) hero.currentMagicAtk = 0;
+        applyExpeditionStats();
     }
 
     function getAllWeaponAffixNames() {
@@ -849,7 +851,7 @@ if (
             return 0;
         }
         let dmg = applyHeroAttackEffects(SHIELD_DMG, true, 'SHIELD', label || '盾擊追打');
-        currentEnemy.hp -= dmg;
+        dealToEnemy(dmg, "🛡️");
         maybeExtraOverflowAttack('盾擊追擊');
         updateBattleView();
         return dmg;
@@ -872,7 +874,7 @@ if (
             return 0;
         }
         let dmg = applyHeroAttackEffects(baseSwordDmg, true, 'SWORD', label || '額外砍擊');
-        currentEnemy.hp -= dmg;
+        dealToEnemy(dmg, "⚔️");
         maybeExtraOverflowAttack('額外砍擊追擊');
         updateBattleView();
         return dmg;

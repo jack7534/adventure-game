@@ -44,7 +44,7 @@
 
 
     const HERO_MAX_HP_START = 20;
-    const MAX_LEVEL = 25;
+    const MAX_LEVEL = 40;
     const HP_PER_LEVEL = 5;
 
     const RARITY_ORDER = ['Normal', 'Magic', 'Rare', 'Epic', 'Legendary', 'Mythic'];
@@ -83,6 +83,7 @@
         baseDodge: 5,       // 起始閃避 5%
         baseTieWinRate: 30,
         titleCritBonus: 0,
+        poisonStacks: 0,
         baseMagicAtk: 20,
         equipment: {
             WEAPON: { name: "徒手", power: 0, rarity: 'Normal', affixes: [] },
@@ -497,7 +498,7 @@
     }
 
     function getHeroBaseCritChance() {
-        let base = 0.05 + (hero.titleCritBonus || 0) / 100;
+        let base = 0.05 + (hero.titleCritBonus || 0) / 100 + relicBonus("crit") / 100;
         const affSet = getAllWeaponAffixSet();
         if (affSet.has('W_CRIT_UP')) base += 0.05;
         return base;
@@ -634,6 +635,7 @@
             hero.currentAttack = Math.floor(hero.currentAttack * 1.15);
         }
         if (hero.currentMagicAtk < 0) hero.currentMagicAtk = 0;
+        applyExpeditionStats();
     }
 
     function getAllWeaponAffixNames() {
@@ -852,7 +854,7 @@ if (
             return 0;
         }
         let dmg = applyHeroAttackEffects(SHIELD_DMG, true, 'SHIELD', label || '盾擊追打');
-        currentEnemy.hp -= dmg;
+        dealToEnemy(dmg, "🛡️");
         maybeExtraOverflowAttack('盾擊追擊');
         updateBattleView();
         return dmg;
@@ -875,7 +877,7 @@ if (
             return 0;
         }
         let dmg = applyHeroAttackEffects(baseSwordDmg, true, 'SWORD', label || '額外砍擊');
-        currentEnemy.hp -= dmg;
+        dealToEnemy(dmg, "⚔️");
         maybeExtraOverflowAttack('額外砍擊追擊');
         updateBattleView();
         return dmg;
@@ -1234,18 +1236,19 @@ function drawLandscape(zone=0) {
 }
 function setScene(mode='map', object=89) {
   Music.sync();
-  const zone=Math.min(2,Math.max(0,bossLevel-1)); $('stage').dataset.zone=zone;drawLandscape(zone);
-  $('region-label').textContent=`✦ ${SCENES[zone].name}`;
+  const zone=Math.min(SCENES.length-1,Math.max(0,bossLevel-1)); $('stage').dataset.zone=zone;drawLandscape(zone);
+  $('region-label').textContent=`✦ ${SCENES[zone].name}`;showPlace(mode);
   $('enemy-actor').hidden=mode!=='battle';$('enemy-hud').hidden=mode!=='battle';$('scene-object').hidden=mode==='battle';
   drawPortrait($('hero-actor').querySelector('.actor-sprite'),currentIdentity().appearance,80);
   let portrait=mode==='event'?(gameState==='EVENT'?eventPortraitKey(adventure.eventId):adventure.result?.portraitKey):null;
   if(!portrait&&object===122)portrait='postman';if(!portrait&&object===123)portrait='fox';
-  if(mode==='map'&&object===88)portrait=['ranger','auburn','veteran'][zone];
+  if(mode==='map'&&object===88&&gameState!=='MAP')portrait=['ranger','auburn','veteran','smith','sage'][zone];
   if(portrait)drawPortrait($('scene-object'),portrait,64);else {spriteAt($('scene-object'),object,64);delete $('scene-object').dataset.portrait;delete $('scene-object').dataset.portraitKind;}
   $('scene-npc-name').hidden=mode==='battle'||!portrait;$('scene-npc-name').textContent=portrait?SCENE_PORTRAITS[portrait].name:'';
   $('companion-actor').hidden=!adventure.flags.fox;drawPortrait($('companion-actor'),'fox',40);
   $('scene-caption').firstElementChild.textContent=mode==='battle'?'看穿對手的習慣，比一味亂砍更有用。':adventure.flags.fox?'小狐狸跟在你後面。牠堅持自己只是順路。':'森林很大。沒關係，今天走一小段也算。';
   if(mode==='battle'&&currentEnemy){creatureAt($('enemy-actor').querySelector('.actor-sprite'),ENEMY_SPRITES[currentEnemy.name]??123,80);$('enemy-name').textContent=currentEnemy.name;$('enemy-actor').classList.toggle('boss',!!adventure.battle?.isBoss);}
+  renderNpcScene(mode);
 }
 function animateClass(el,cls,duration=350){el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),duration);}
 function flashBattleView(type){if(type==='heal')animateClass($('stage'),'heal-flash',450);else animateClass($(type==='monster-hit'?'hero-actor':'enemy-actor'),'hit');}
@@ -1294,8 +1297,8 @@ function pickEvent(){
  if(!adventure.eventDeck.some(id=>eligible.includes(id))){adventure.eventDeck=[...eligible];for(let i=adventure.eventDeck.length-1;i>0;i--){const j=randInt(0,i);[adventure.eventDeck[i],adventure.eventDeck[j]]=[adventure.eventDeck[j],adventure.eventDeck[i]];}}
  let id;while(adventure.eventDeck.length&&!eligible.includes(id))id=adventure.eventDeck.pop();return id||eligible[0]||'campfire';
 }
-function enterEvent(id){if(!EVENTS[id])return;gameState='EVENT';adventure.eventId=id;adventure.lastEvent=id;adventure.eventResolved=false;adventure.eventVisits[id]=(adventure.eventVisits[id]||0)+1;renderEvent();saveAuto();}
-function renderEvent(){const e=EVENTS[adventure.eventId];setScene('event',e.object);story(e.tag,e.title,e.text);const choices=e.choices();setCommands(...choices.map((c,i)=>({text:c.text,hint:c.hint,value:i,disabled:!c.enabled()})),chooseEvent,'EVENT');$('action-tip').textContent='先看代價，再做選擇。這個決定會留在你的旅程裡。';}
+function enterEvent(id){if(!EVENTS[id])return;gameState='EVENT';adventure.eventId=id;adventure.lastEvent=id;adventure.eventResolved=false;beginNpcEncounter(id);if(!NPC_ENCOUNTERS[id])ensureExpedition().place=EVENT_PLACES[id]||'forest';adventure.eventVisits[id]=(adventure.eventVisits[id]||0)+1;renderEvent();saveAuto();}
+function renderEvent(){const e=EVENTS[adventure.eventId];setScene('event',e.object);story(e.tag,e.title,typeof e.text==='function'?e.text():e.text);mainView.insertAdjacentHTML('beforeend',npcPanelMarkup());const choices=e.choices();setCommands(...choices.map((c,i)=>({text:c.text,hint:c.hint,value:i,disabled:!c.enabled()})),chooseEvent,'EVENT');$('action-tip').textContent='先看代價，再做選擇。這個決定會留在你的旅程裡。';}
 function chooseEvent(index){
  if(gameState!=='EVENT'||adventure.eventResolved||!Number.isInteger(index))return;
  const c=EVENTS[adventure.eventId]?.choices()[index];if(!c||!c.enabled())return;
@@ -1310,7 +1313,7 @@ function giveEventLoot(type,source){log(`✦ ${source}：你發現了一件裝�
 /* === game.js === */
 /* v2: one authoritative state transition for each action, reward and decision. */
 const INITIAL_HERO=JSON.parse(JSON.stringify(hero));
-const STABLE_PHASES=['MAP','BATTLE','EVENT','RESULT','LOOT_DECISION','DEFEAT','CREDITS'];
+const STABLE_PHASES=['MAP','ROUTE','BATTLE','EVENT','RESULT','LOOT_DECISION','DEFEAT','CREDITS'];
 const MOVE_NAMES={'⚔️':'砍擊','🌠':'魔法','🛡️':'盾擊'};
 const RARITY_NAMES={Normal:'普通',Magic:'魔法',Rare:'稀有',Epic:'史詩',Legendary:'傳說',Mythic:'神話'};
 let sessionEpoch=0, overflowActive=false, toastTimer=null, actionDelay=300;
@@ -1340,54 +1343,64 @@ function updateStatus(){
  eqDetailShield.textContent=`防禦 +${getEffectivePower(hero.equipment.SHIELD,'SHIELD')}`;
  const r=hero.equipment.RING;eqDetailRing.textContent=r.ability.id==='NONE'?'下一個寶箱，或許就有驚喜。':r.ability.desc;eqDetailRing.title=r.ability.desc;
  eqWeaponAffix.innerHTML=affixLines([...getAllWeaponAffixSet()],'WEAPON');eqShieldAffix.innerHTML=affixLines(hero.equipment.SHIELD.affixes,'SHIELD');
- const buffs=[];if(hero.buffDamageUpTurns)buffs.push(['加持',hero.buffDamageUpTurns]);if(hero.regenTurns)buffs.push(['回復',hero.regenTurns]);if(hero.magicGuardTurns)buffs.push(['魔盾',hero.magicGuardTurns]);if(adventure.scoutTurns)buffs.push(['洞察',adventure.scoutTurns]);if(hero.burnTurns)buffs.push(['灼燒',hero.burnTurns,true]);if(hero.defDownTurns)buffs.push(['破甲',hero.defDownTurns,true]);
+ const buffs=[];if(hero.buffDamageUpTurns)buffs.push(['加持',hero.buffDamageUpTurns]);if(hero.regenTurns)buffs.push(['回復',hero.regenTurns]);if(hero.magicGuardTurns)buffs.push(['魔盾',hero.magicGuardTurns]);if(adventure.scoutTurns)buffs.push(['洞察',adventure.scoutTurns]);if(hero.poisonStacks)buffs.push(['毒層',hero.poisonStacks,true]);if(hero.burnTurns)buffs.push(['灼燒',hero.burnTurns,true]);if(hero.defDownTurns)buffs.push(['破甲',hero.defDownTurns,true]);
  $('buff-list').innerHTML=buffs.map(([n,t,bad])=>`<span class="buff ${bad?'debuff':''}">${n} ${t}</span>`).join('');
- $('quest-text').textContent=adventure.flags.parcel?'幫骷髏郵差送出遲到八十年的信。再往前走幾段，尋找路邊的小屋。':bossLevel>3?'三位首領都已落敗。世界和平了，但你的故事還可以繼續。':`下一個目標：${SCENES[bossLevel-1].boss}。建議 Lv.${SCENES[bossLevel-1].level}，先探索、強化裝備，再去挑戰。`;
+ $('quest-text').textContent=adventure.flags.parcel?'幫骷髏郵差送出遲到八十年的信。再往前走幾段，尋找路邊的小屋。':bossLevel>ENEMIES.BOSS.length?'五位首領都已落敗。世界和平了，但你的故事還可以繼續。':`下一個目標：${SCENES[bossLevel-1].boss}。建議 Lv.${SCENES[bossLevel-1].level}，先探索、強化裝備，再去挑戰。`;
  updateCompanionPanel();
- $('journey-track').innerHTML=SCENES.map((s,i)=>`<div class="journey-node ${bossLevel>i+1?'done':bossLevel===i+1?'active':''}" ${bossLevel===i+1?'aria-current="step"':''}><span class="node-number">${bossLevel>i+1?'✓':['I','II','III'][i]}</span><div><strong>${s.name}</strong><small>${bossLevel>i+1?'已完成':s.boss}</small></div></div>`).join('');
+ $('journey-track').innerHTML=SCENES.map((s,i)=>`<div class="journey-node ${bossLevel>i+1?'done':bossLevel===i+1?'active':''}" ${bossLevel===i+1?'aria-current="step"':''}><span class="node-number">${bossLevel>i+1?'✓':['I','II','III','IV','V'][i]}</span><div><strong>${s.name}</strong><small>${bossLevel>i+1?'已完成':s.boss}</small></div></div>`).join('');
  $('time-label').textContent=['晨光','午後','暮色','星夜'][Math.floor(adventure.steps/8)%4];
- updateIdentityDisplay();syncActionDock();
+ updateIdentityDisplay();updateExpeditionPanel();syncTactics();syncActionDock();
 }
 function healFraction(rate){const n=Math.min(hero.maxHp-hero.hp,Math.max(1,Math.floor(hero.maxHp*rate)));hero.hp+=n;flashBattleView('heal');return n;}
-function healFully(){hero.hp=hero.maxHp;hero.burnTurns=hero.burnDamage=hero.defDownTurns=hero.defDownRate=0;flashBattleView('heal');}
+function healFully(){hero.hp=hero.maxHp;hero.burnTurns=hero.burnDamage=hero.defDownTurns=hero.defDownRate=0;hero.poisonStacks=0;flashBattleView('heal');}
 function addMaterials(type,amount){if(type==='WEAPON')weaponMaterials+=amount;else shieldMaterials+=amount;processMaterials();updateStatus();}
 function processMaterials(){
  if(hero.equipment.WEAPON.name!=='徒手')while(weaponMaterials>=5){weaponMaterials-=5;attemptWeaponRefine();}
  if(hero.equipment.SHIELD.name!=='無')while(shieldMaterials>=5){shieldMaterials-=5;attemptShieldRefine();}
 }
-function enterMap(){gameState='MAP';currentEnemy=null;adventure.battle=null;adventure.eventId=null;adventure.result=null;updateStatus();renderMap();saveAuto();}
-function renderMap(){setScene('map',88);story('THE ROAD AHEAD',bossLevel>3?'世界和平了，今天還是好天氣。':'下一段小冒險，正在等你。',bossLevel>3?'你可以繼續探索、完成小委託，或翻開旅程紀錄看看自己走了多遠。':'往林間小徑走走，碰碰運氣。累了就回到營火，等準備好了再敲首領的門。');setCommands({text:'✦ 出發探索',hint:'戰鬥、寶物與路邊的故事',value:'Small'},{text:bossLevel>3?'✓ 主線已完成':`⚑ 挑戰${SCENES[bossLevel-1].boss}`,hint:bossLevel>3?'仍可自由探索':`建議 Lv.${SCENES[bossLevel-1].level} · 裝備必掉`,value:'Boss',disabled:bossLevel>3},{text:'♨ 營火休息',hint:'HP 全滿 · 清除灼燒與破甲',value:'Heal'},handleMapAction,'MAP');checkHealCooldown();$('action-tip').textContent='戰敗不掉等、不掉裝備。準備好再挑戰，不必硬撐。';}
+function enterMap(){gameState='MAP';currentEnemy=null;adventure.battle=null;adventure.eventId=null;adventure.result=null;ensureExpedition();if(chapterIntro())return;updateStatus();renderMap();saveAuto();}
+
+function renderMap(){const e=ensureExpedition(),done=bossLevel>ENEMIES.BOSS.length,d=ENEMIES.BOSS[bossLevel-1];setScene('map',88);story('THE ROAD AHEAD',done?'五份和平合約，這次終於蓋完了。':CHAPTER_STORIES[e.chapter-1][0],done?'自由探索仍然開放。換個稱號開始新旅程，會遇到不同天氣、路線與奇物。':CHAPTER_STORIES[e.chapter-1][1],done?'每一段旅途，都值得被記住。':`建議 Lv.${d.target} · 通行線索 ${e.clues}/${requiredClues()} · ${d.trait}`);setCommands({text:'? 選擇探索路線',hint:'三條分岔 · 戰鬥、奇物與荒唐遭遇',value:'Small'},{text:done?'✓ 五章已完成':`⚑ 挑戰${d.name}`,hint:done?'仍可自由探索':e.clues<requiredClues()?`還需 ${requiredClues()-e.clues} 條探索線索`:`建議 Lv.${d.target} · 查看強項再出發`,value:'Boss',disabled:done||e.clues<requiredClues()},{text:'♨ 營火休息',hint:'HP 全滿 · 清除毒與負面狀態',value:'Heal'},handleMapAction,'MAP');checkHealCooldown();updateExpeditionPanel();$('action-tip').textContent='等級不是硬門檻；裝備、奇物、解毒與讀招才是勝負關鍵。';syncActionDock();}
+
 function checkHealCooldown(){clearTimeout(healCooldownTimer);if(gameState!=='MAP')return;const left=lastHealTime+4000-Date.now();btn3.disabled=left>0;if(left>0){btn3.querySelector('small').textContent=`整理營地中 · ${Math.ceil(left/1000)} 秒`;const epoch=sessionEpoch;healCooldownTimer=setTimeout(()=>{if(epoch===sessionEpoch&&gameState==='MAP')checkHealCooldown();},Math.min(1000,left));}else btn3.querySelector('small').textContent='HP 全滿 · 清除灼燒與破甲';}
 function handleMapAction(action){
  if(gameState!=='MAP'||!['Small','Boss','Heal'].includes(action))return;
- if(action==='Boss'&&bossLevel>3)return;
+ const e=ensureExpedition();if(action==='Small'){enterRoutes();return;}
+ if(action==='Boss'&&(bossLevel>ENEMIES.BOSS.length||e.clues<requiredClues()))return;
  if(action==='Heal'&&Date.now()-lastHealTime<4000)return;
- if(action==='Boss'&&hero.level<SCENES[bossLevel-1].level&&!confirm(`建議等級為 Lv.${SCENES[bossLevel-1].level}，你目前 Lv.${hero.level}。確定要挑戰？戰敗不會掉等或掉裝備。`))return;
- if(action==='Boss')saveCheckpoint();
- gameState='MAP_ACTION';disableCommands(true);countTurn();
- if(action==='Heal'){lastHealTime=Date.now();healFully();adventure.stats.rests++;log('♨ 你在營火旁休息，HP 全滿，灼燒與破甲解除。');playTone('heal');enterMap();saveCheckpoint();return;}
- if(action==='Boss'){startBossBattle();return;}
- adventure.steps++;
- if(adventure.steps>=adventure.nextEventAt||Math.random()<.28){adventure.nextEventAt=adventure.steps+randInt(2,3);enterEvent(pickEvent());}else startSmallBattle();
+ if(action==='Boss'&&hero.level<SCENES[bossLevel-1].level&&!confirm(`建議 Lv.${SCENES[bossLevel-1].level}，目前 Lv.${hero.level}。這次首領有蓄力與特殊機制，確定挑戰？`))return;
+ if(action==='Boss')saveCheckpoint();gameState='MAP_ACTION';disableCommands(true);countTurn();
+ if(action==='Heal'){lastHealTime=Date.now();healFully();adventure.stats.rests++;log('♨ 營火休息，HP 全滿，毒與負面狀態解除。');playTone('heal');enterMap();saveCheckpoint();return;}startBossBattle();
 }
+
 function confirmTitle(){
  sessionEpoch++;clearTimeout(healCooldownTimer);hero=JSON.parse(JSON.stringify(INITIAL_HERO));restoreRingAbility(hero.equipment.RING);adventure=freshAdventure();bossLevel=1;currentEnemy=newLoot=null;weaponMaterials=shieldMaterials=totalTurnCount=turnCount=lastHealTime=0;overflowActive=false;
+ adventure.expedition=makeExpedition();adventure.expedition.pendingIntro=true;
  const parts=resolveTitleParts();hero.name=hero.title=`${parts[0]}的${parts[1]}${parts[2]}`;applyStartingIdentity(parts,$('hero-look-select')?.value||'auto');
  $('titleSelectBox').hidden=true;$('app-shell').inert=false;redrawLog();log(`🧾 ${hero.title}，歡迎踏上旅程。這次，進度會替你記住。`);enterMap();saveCheckpoint();
 }
 function renderResult(){updateStatus();const r=adventure.result;setScene('event',r?.object??89);story(r?.tag||'休息一下',r?.title||'這一段路，走完了。',r?.text||'先整理一下行囊，再繼續走吧。');setCommands({text:'繼續旅程 →',hint:'回到小徑，決定下一步',value:'continue'},null,null,()=>{if(adventure.pendingEnding)showCredits();else enterMap();},gameState);$('action-tip').textContent='這一頁不會自動消失。看完了，再往前走。';}
-function renderCurrent(){updateStatus();redrawLog();if(gameState==='MAP')renderMap();else if(gameState==='BATTLE')renderBattle();else if(gameState==='EVENT')renderEvent();else if(gameState==='LOOT_DECISION')renderLootDecision();else if(gameState==='CREDITS')renderCredits();else renderResult();}
+function renderCurrent(){updateStatus();redrawLog();if(gameState==='MAP')renderMap();else if(gameState==='ROUTE')renderRoutes();else if(gameState==='BATTLE')renderBattle();else if(gameState==='EVENT')renderEvent();else if(gameState==='LOOT_DECISION')renderLootDecision();else if(gameState==='CREDITS')renderCredits();else renderResult();}
 
 function createBattle(enemy,isBoss=false){
+ if(!enemy.npcIds){const social=ensureSocial();social.active=[];social.event=null;}
  currentEnemy={...enemy,hp:Math.round(enemy.hp),originalHp:Math.round(enemy.hp),atk:Math.round(enemy.atk),def:Math.round(enemy.def||0),mDef:Math.round(enemy.mDef??enemy.def??0)};
  adventure.battle={id:++adventure.seq,settled:false,round:1,nextMove:rollEnemyMove(currentEnemy.bias),isBoss};adventure.eventId=null;adventure.result=null;
  gameState='BATTLE';if(ENEMY_INTRO_LINES[currentEnemy.name])log(`💬 ${ENEMY_INTRO_LINES[currentEnemy.name]}`);log(`⚔ 遭遇 ${currentEnemy.name}。`);
  if(hero.equipment.SHIELD.affixes.includes('S_REGEN')){hero.regenTurns=Math.max(hero.regenTurns,3);hero.regenAmount=Math.max(hero.regenAmount,Math.max(2,Math.floor(hero.maxHp*.03)));}
- renderBattle();saveAuto();
+ initBossState();renderBattle();saveAuto();
 }
-function startSmallBattle(index){const e=ENEMIES.SMALL[Number.isInteger(index)?index:randInt(0,ENEMIES.SMALL.length-1)],n=hero.level-1;createBattle({...e,hp:Math.floor(e.hp*(1+n*.12)),atk:Math.floor(e.atk*(1+n*.09)),def:Math.floor(e.def*(1+n*.07)),mDef:Math.floor(e.mDef*(1+n*.07)),exp:Math.round(e.exp*(1+n*.07))});}
-function startEliteBattle(){const index=Math.min(2,bossLevel-1),e=ENEMIES.BOSS[index];createBattle({...e,name:['迷路的牛頭人菁英','度假中的迷你九頭蛇','被縮小的遠古小魔神'][index],hp:Math.floor(e.hp*.65),atk:Math.floor(e.atk*.8),def:Math.floor(e.def*.8),mDef:Math.floor(e.mDef*.8),exp:Math.floor(e.exp*.5),lootChance:1,elite:true});}
-function startBossBattle(){if(bossLevel>3)return;createBattle({...ENEMIES.BOSS[bossLevel-1]},true);}
+function startSmallBattle(index){
+ const zone=Math.min(4,bossLevel-1),e=ENEMIES.SMALL[Number.isInteger(index)?index:randInt(0,ENEMIES.SMALL.length-1)],rank=Math.min(SCENES[zone].level+1,Math.max([1,7,12,19,26][zone],hero.level-1));
+ const xp=Math.max(8,Math.floor(hero.expToNextLevel*(hero.level>SCENES[zone].level+2?.10:.30)));let data={...e,hp:Math.round(e.hp*(1+(rank-1)*.17)),atk:Math.round(9+(rank-1)*3.3),def:Math.round(e.def*(1+(rank-1)*.065)),mDef:Math.round(e.mDef*(1+(rank-1)*.065)),exp:xp};
+ const weather=currentWeather();if(weather.id==='fog')data.dodge+=5;if(weather.id==='rain'){data.atk=Math.floor(data.atk*.95);data.mDef=Math.floor(data.mDef*1.1);}if(weather.id==='wind'){data.atk=Math.floor(data.atk*1.08);data.exp=Math.floor(data.exp*1.1);}if(weather.id==='glow'){data.hp=Math.floor(data.hp*1.1);data.lootChance=Math.min(1,data.lootChance+.08);}
+ const mod=runPick(['plain','fierce','armored','nimble']);if(mod==='fierce'){data.atk=Math.floor(data.atk*1.18);data.hp=Math.floor(data.hp*.9);}if(mod==='armored'){data.def=Math.floor(data.def*1.3);data.dodge=Math.max(0,data.dodge-10);}if(mod==='nimble'){data.dodge=Math.min(70,data.dodge+10);data.def=Math.floor(data.def*.8);}data.modifier=mod;
+ createBattle(data);
+}
+
+function startEliteBattle(){const index=Math.min(4,bossLevel-1),e=ENEMIES.BOSS[index];createBattle({...e,bossId:null,name:['迷路的牛頭人菁英','度假中的迷你九頭蛇','被縮小的遠古小魔神','剛打卡的裝甲看守','欠債的骰子騎士'][index],hp:Math.floor(e.hp*.34),atk:Math.floor(e.atk*.80),def:Math.floor(e.def*.8),mDef:Math.floor(e.mDef*.7),exp:Math.max(18,Math.floor(hero.expToNextLevel*.48)),lootChance:1,elite:true});}
+
+function startBossBattle(){if(bossLevel>ENEMIES.BOSS.length)return;createBattle({...ENEMIES.BOSS[bossLevel-1]},true);}
 function rollEnemyMove(bias){const r=Math.random(),b=bias||{'⚔️':.34,'🌠':.33,'🛡️':.33};return r<b['⚔️']?'⚔️':r<b['⚔️']+b['🌠']?'🌠':'🛡️';}
 function hasExactIntent(){return adventure.scoutTurns>0||adventure.battle.round%3===0;}
 function updateBattleView(){
@@ -1400,7 +1413,7 @@ function renderBattle(){
  setScene('battle');updateBattleView();const e=currentEnemy;
  story(adventure.battle.isBoss?'CHAPTER BOSS':'A CHANCE ENCOUNTER',`${e.name} 擋住了去路。`,`物防 ${e.def} · 魔防 ${e.mDef} · 閃避 ${e.dodge}%`,hasExactIntent()?'對手的破綻已經露出。用克制招式把握這一回合。':'砍擊克魔法，魔法克盾擊，盾擊克砍擊。每第 3 回合可看穿下一招。');
  setCommands({text:'⚔️ 砍擊',hint:`物理 ${Math.max(1,hero.currentAttack-e.def)} 起 · 可爆擊`,value:'⚔️'},{text:'🌠 魔法',hint:`魔法 ${Math.max(1,getMagicAttackValue()-e.mDef)} 起 · 不會被閃避`,value:'🌠'},{text:'🛡️ 盾擊',hint:`防禦 ${hero.currentDefense} · 無視防禦`,value:'🛡️'},handleBattleAction,'BATTLE');
- $('action-tip').textContent=`戰鬥第 ${adventure.battle.round} 回合 · 平手時，我方勝率 ${hero.currentTieWinRate.toFixed(0)}%`;
+ if(activeBoss())mainView.insertAdjacentHTML('beforeend',bossTacticMarkup());$('action-tip').textContent=`戰鬥第 ${adventure.battle.round} 回合 · 平手勝率 ${hero.currentTieWinRate.toFixed(0)}%${activeBoss()?' · 留意特殊招式預告':''}`;syncTactics();syncActionDock();
 }
 function enemyDodged(playerMove){return playerMove!=='🌠'&&Math.random()*100<(currentEnemy?.dodge||0);}
 function maybeExtraOverflowAttack(label){
@@ -1420,12 +1433,13 @@ function applyDamageToHero(rawDamage,isBoss=false){
  return actual;
 }
 function monsterAttack(monsterMove){
- if(!currentEnemy||currentEnemy.hp<=0||hero.hp<=0)return;
- if(Math.random()*100<hero.currentDodge){log(`💨 你閃過了 ${currentEnemy.name} 的攻擊！`);floatingNumber('閃避','hero');if(hero.equipment.RING.ability.id==='DODGE')heroDodgeCounterAttack();return;}
- const hit=calcBossAttackDamage(Math.max(1,currentEnemy.atk-hero.currentDefense));if(hit.skip)return;
- const n=applyDamageToHero(hit.damage,adventure.battle.isBoss);log(`💥 ${currentEnemy.name} 造成 ${n} 傷害。`);flashBattleView('monster-hit');floatingNumber(`−${n}`,'hero');
- if(hero.hp>0&&currentEnemy.hp>0)applyBossPostHitEffects(n);
+ if(!currentEnemy||currentEnemy.hp<=0||hero.hp<=0)return;const boss=activeBoss(),guard=adventure.battle.guarding;
+ const dodge=hero.currentDodge*(boss?.65:1);if(Math.random()*100<dodge){log(`💨 你閃過了 ${currentEnemy.name} 的攻擊！`);floatingNumber('閃避','hero');if(hero.equipment.RING.ability.id==='DODGE')heroDodgeCounterAttack();return;}
+ let damage=Math.max(boss?4+boss.level:1,Math.floor(currentEnemy.atk-hero.currentDefense*(boss?.9:1)));if(boss&&adventure.battle.boss?.phase===2)damage=Math.floor(damage*1.12);if(guard)damage=Math.max(1,Math.floor(damage*.35));
+ const n=applyDamageToHero(damage,!!boss);log(`💥 ${currentEnemy.name} 造成 ${n} 傷害${guard?'（堅守減傷）':''}。`);flashBattleView('monster-hit');floatingNumber(`−${n}`,'hero');
+ if(hero.hp>0&&currentEnemy.hp>0){if(!boss)applyBossPostHitEffects(n);else if(boss.id==='ancient'&&!guard&&Math.random()<.3){hero.poisonStacks=Math.min(5,hero.poisonStacks+1);log(`☣ 虛空毒素累積到 ${hero.poisonStacks} 層。`);}}
 }
+
 function applyHeroOngoingStatusAtTurnStart(){
  if(hero.burnTurns>0){const n=Math.min(hero.hp,hero.burnDamage);hero.hp-=n;hero.burnTurns--;if(!hero.burnTurns)hero.burnDamage=0;log(`🔥 灼燒造成 ${n} 傷害。`);if(hero.hp<=0){hero.hp=0;return true;}}
  if(hero.regenTurns>0){const n=Math.min(hero.maxHp-hero.hp,hero.regenAmount);hero.hp+=n;hero.regenTurns--;if(!hero.regenTurns)hero.regenAmount=0;if(n)log(`🍀 持續回復 ${n} HP。`);}
@@ -1439,36 +1453,38 @@ function heroStrike(move){
  if(move==='🛡️'&&currentEnemy.name==='石頭人'){damage*=2;log('💥 石頭人的弱點：盾擊傷害加倍！');}
  if(move!=='🌠')damage=applyHeroAttackEffects(damage,true,move==='⚔️'?'SWORD':'SHIELD','勇者攻擊');
  else if(currentEnemy.name==='遠古魔神'){damage+=Math.max(1,Math.floor(magic*.1));log('✦ 魔神遭受魔法反噬！');}
- currentEnemy.hp=Math.max(0,currentEnemy.hp-damage);log(`✅ 你造成 ${damage} 傷害。`);animateClass($('hero-actor'),'strike');flashBattleView('hero-hit');floatingNumber(`−${damage}`);playTone('hit');
+ damage=dealToEnemy(damage,move);log(`✅ 你造成 ${damage} 傷害。`);animateClass($('hero-actor'),'strike');flashBattleView('hero-hit');floatingNumber(`−${damage}`);playTone('hit');
  if(move!=='⚔️')tryTriggerMagicGuard();if(move==='🛡️')healFromLifeRing('SHIELD');maybeExtraOverflowAttack('主動追擊');
 }
 function handleBattleAction(playerMove){
- if(gameState!=='BATTLE'||!MOVE_NAMES[playerMove]||!adventure.battle||adventure.battle.settled)return;
- const epoch=sessionEpoch,id=adventure.battle.id;gameState='BATTLE_ACTION';disableCommands(true);countTurn();
- const previousBuff=hero.buffDamageUpTurns,previousDef=hero.defDownTurns;
+ const basic=Object.hasOwn(MOVE_NAMES,playerMove),tactical=['GUARD','POTION','CLEANSE','FLEE'].includes(playerMove);
+ if(gameState!=='BATTLE'||(!basic&&!tactical)||!adventure.battle||adventure.battle.settled||(tactical&&!tacticalActionAvailable(playerMove)))return;
+ const epoch=sessionEpoch,id=adventure.battle.id;gameState='BATTLE_ACTION';adventure.battle.guarding=playerMove==='GUARD';disableCommands(true);syncTactics();countTurn();
+ if(playerMove==='FLEE'&&tryBattleEscape())return;if(tactical)useTacticalItem(playerMove);const previousBuff=hero.buffDamageUpTurns,previousDef=hero.defDownTurns;
  if(applyHeroOngoingStatusAtTurnStart()){endBattle('lose');return;}
- const monsterMove=adventure.battle.nextMove;log(`第 ${adventure.battle.round} 回合：你 ${playerMove} ／ 對手 ${monsterMove}`);
- const tie=monsterMove===playerMove;const win=CLASH_RULES[playerMove]===monsterMove||(tie&&Math.random()<hero.currentTieWinRate/100);
- if(tie)log(win?'🤝 平手判定：你取得先機。':'🤝 平手判定：對手取得先機。');
- if(win)heroStrike(playerMove);else monsterAttack(monsterMove);
- petAssist();
+ const monsterMove=adventure.battle.nextMove;log(`第 ${adventure.battle.round} 回合：你 ${MOVE_NAMES[playerMove]||({GUARD:'堅守',POTION:'藥水',CLEANSE:'解毒',FLEE:'逃跑'})[playerMove]} ／ 對手 ${monsterMove}`);
+ if(!resolveBossSpecial(playerMove)){
+  const tie=monsterMove===playerMove,win=basic&&(CLASH_RULES[playerMove]===monsterMove||(tie&&Math.random()<hero.currentTieWinRate/100));
+  if(tie)log(win?'🤝 平手：你取得先機。':'🤝 平手：對手取得先機。');if(win)heroStrike(playerMove);else monsterAttack(monsterMove);
+ }
+ petAssist();npcSupport();bossAfterRound(playerMove);
+ if(!activeBoss()&&hero.poisonStacks>0&&hero.hp>0&&currentEnemy.hp>0){const n=Math.min(hero.hp,Math.max(1,Math.floor(hero.maxHp*.018*(1-relicBonus('poison'))))*hero.poisonStacks);hero.hp=Math.max(0,hero.hp-n);log(`☣ 毒素造成 ${n} 傷害。`);}
  if(previousBuff>0&&hero.buffDamageUpTurns===previousBuff){hero.buffDamageUpTurns--;if(!hero.buffDamageUpTurns)hero.buffDamageUpRate=0;}
  if(previousDef>0&&hero.defDownTurns===previousDef){hero.defDownTurns--;if(!hero.defDownTurns)hero.defDownRate=0;}
- if(adventure.scoutTurns>0)adventure.scoutTurns--;
- updateBattleView();
- if(hero.hp<=0){endBattle('lose');return;}if(currentEnemy.hp<=0){endBattle('win');return;}
- adventure.battle.round++;adventure.battle.nextMove=rollEnemyMove(currentEnemy.bias);
- saveAuto();
+ if(adventure.scoutTurns>0)adventure.scoutTurns--;adventure.battle.guarding=false;updateBattleView();
+ if(hero.hp<=0){hero.hp=0;endBattle('lose');return;}if(currentEnemy.hp<=0){endBattle('win');return;}
+ adventure.battle.round++;adventure.battle.nextMove=rollEnemyMove(currentEnemy.bias);prepareBossTurn();saveAuto();
  setTimeout(()=>{if(epoch!==sessionEpoch||gameState!=='BATTLE_ACTION'||adventure.battle?.id!==id)return;gameState='BATTLE';renderBattle();saveAuto();},actionDelay);
 }
+
 function endBattle(result){
  const b=adventure.battle;if(!b||b.settled||!currentEnemy||!['BATTLE','BATTLE_ACTION'].includes(gameState))return;
  if(result==='win'&&(currentEnemy.hp>0||hero.hp<=0))return;if(result==='lose'&&hero.hp>0)return;
- b.settled=true;gameState='SETTLING';disableCommands(true);currentEnemy.hp=Math.max(0,currentEnemy.hp);
+ b.settled=true;gameState='SETTLING';npcBattleFinished(result==='win');disableCommands(true);currentEnemy.hp=Math.max(0,currentEnemy.hp);
  if(result==='lose'){applyDeathPenalty();return;}
  const defeated={...currentEnemy};adventure.stats.wins++;const gold=(b.isBoss?20*bossLevel:randInt(4,8))+(adventure.flags.fox?2:0);adventure.gold+=gold;
- log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}${adventure.flags.fox?'（含狐狸尋寶 +2）':''}。`);gainExp(defeated.exp);
- if(b.isBoss){adventure.stats.bosses++;bossLevel++;unlockNewRarity();adventure.pendingEnding=bossLevel>3;}
+ log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}${adventure.flags.fox?'（含狐狸尋寶 +2）':''}。`);gainExp(Math.floor(defeated.exp*(1+relicBonus("xp"))));expeditionVictory(b.isBoss);
+ if(b.isBoss){adventure.stats.bosses++;bossLevel++;unlockNewRarity();adventure.pendingEnding=bossLevel>ENEMIES.BOSS.length;}
  adventure.result={tag:'戰鬥勝利',title:`${defeated.name}，暫時下班。`,text:`你獲得 ${defeated.exp} 經驗值與 ${gold} 金幣。${b.isBoss?'新的旅途已經開啟。':'整理好行囊，再繼續下一段路。'}`,object:91};
  handleLootDrop(defeated,b.isBoss);saveAuto();
 }
@@ -1550,9 +1566,9 @@ function handleLootDecision(choice,uid=newLoot?.uid){
  adventure.result={tag:'行囊整理好了',title:choice==='YES'?'帶上新的可能，繼續走。':'熟悉的裝備，也值得信任。',text:choice==='YES'?`${loot.name} 已經處理完成。裝備與素材的變動都已記錄。`:`你保留目前的裝備，${loot.type==='RING'?'新戒指已換成金幣':'新裝備已分解'}。`,object:91};
  gameState='RESULT';renderResult();saveAuto();
 }
-function showCredits(){gameState='CREDITS';adventure.pendingEnding=false;recordClearRun();renderCredits();saveAuto();}
+function showCredits(){gameState='CREDITS';adventure.pendingEnding=false;if(adventure.expedition)adventure.expedition.pendingIntro=false;recordClearRun();renderCredits();saveAuto();}
 function renderCredits(){
- updateStatus();setScene('map',88);story('THE END · AND A NEW BEGINNING','世界和平了。你終於可以休假了。',`三位首領都被你打倒了。這趟旅程走了 ${totalTurnCount} 回合，經歷 ${adventure.stats.events} 次路邊故事。謝謝你，讓這個小小的世界有了故事。`,'原創遊戲：Jack · 像素素材：Kenney、Clint Bellanger（CC0） · 特別感謝：沒有半途放棄的你。');
+ updateStatus();setScene('map',88);story('THE END · AND A NEW BEGINNING','世界和平了。你終於可以休假了。',`五位首領都被你打倒了。這趟旅程走了 ${totalTurnCount} 回合，經歷 ${adventure.stats.events} 次路邊故事。謝謝你，讓這個小小的世界有了故事。`,'原創遊戲：Jack · 像素素材：Kenney、Clint Bellanger（CC0） · 特別感謝：沒有半途放棄的你。');
  setCommands({text:'繼續自由探索',hint:'裝備與進度全部保留',value:'continue'},{text:'看看旅程紀錄',hint:'你的稱號與通關回合數',value:'records'},null,v=>v==='records'?openRecords():enterMap(),'CREDITS');$('action-tip').textContent='這不是倒數計時。想多坐一下也沒關係。';
 }
 
@@ -1579,11 +1595,11 @@ function cleanEquipment(value,type){
 function cleanHero(input){
  const value=validObject(input),out={};
  for(const [key,def]of Object.entries(INITIAL_HERO)){
-  if(typeof def==='number')out[key]=validNumber(key==='titleCritBonus'?(value[key]??0):value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
+  if(typeof def==='number')out[key]=validNumber(['titleCritBonus','poisonStacks'].includes(key)?(value[key]??0):value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
  }
- validNumber(out.titleCritBonus,0,5);
+ validNumber(out.titleCritBonus,0,5);validNumber(out.poisonStacks,0,5);
  out.name=validText(value.name,160);out.title=validText(value.title,160);
- validNumber(out.level,1,25);validNumber(out.highestLevel,out.level,25);validNumber(out.maxHp,1,1e7);validNumber(out.hp,1,out.maxHp);validNumber(out.expToNextLevel,1,1e12);if(out.exp>=out.expToNextLevel)throw new Error('經驗值門檻無效');
+ validNumber(out.level,1,MAX_LEVEL);validNumber(out.highestLevel,out.level,MAX_LEVEL);validNumber(out.maxHp,1,1e7);validNumber(out.hp,1,out.maxHp);validNumber(out.expToNextLevel,1,1e12);if(out.exp>=out.expToNextLevel)throw new Error('經驗值門檻無效');
  for(const k of ['magicGuardTurns','burnTurns','defDownTurns','buffDamageUpTurns','regenTurns'])validNumber(out[k],0,100);
  validNumber(out.buffDamageUpRate,0,2,false);validNumber(out.defDownRate,0,1,false);
  out.weaponRefineAffixes=validAffixes(value.weaponRefineAffixes,WEAPON_AFFIX_POOL);
@@ -1592,9 +1608,9 @@ function cleanHero(input){
 }
 function cleanEnemy(value){
  if(value==null)return null;const e=validObject(value),out={};
- out.name=validText(e.name,120);for(const k of ['hp','originalHp','atk','def','mDef','exp'])out[k]=validNumber(e[k],0,1e7);validNumber(out.originalHp,1,1e7);validNumber(out.hp,0,out.originalHp);out.dodge=validNumber(e.dodge,0,100,false);out.lootChance=validNumber(e.lootChance,0,1,false);
+ out.name=validText(e.name,120);cleanNpcEnemy(e,out);if(e.bossId!=null){if(!BOSS_DESIGNS.some(b=>b.id===e.bossId))throw new Error("首領代號無效");out.bossId=e.bossId;}if(e.modifier!=null){if(!["plain","fierce","armored","nimble"].includes(e.modifier))throw new Error("敵人特性無效");out.modifier=e.modifier;}for(const k of ['hp','originalHp','atk','def','mDef','exp'])out[k]=validNumber(e[k],0,1e7);validNumber(out.originalHp,1,1e7);validNumber(out.hp,0,out.originalHp);out.dodge=validNumber(e.dodge,0,100,false);out.lootChance=validNumber(e.lootChance,0,1,false);
  out.bias={};let total=0;for(const move of Object.keys(MOVE_NAMES)){out.bias[move]=validNumber(e.bias?.[move],0,1,false);total+=out.bias[move];}if(Math.abs(total-1)>.001)throw new Error('怪物出招機率無效');
- if(e.level!=null)out.level=validNumber(e.level,1,3);if(e.elite!=null)out.elite=validBool(e.elite);if(e.ancientChargeState!=null){if(e.ancientChargeState!=='CHARGING')throw new Error('首領蓄力狀態無效');out.ancientChargeState=e.ancientChargeState;}
+ if(e.level!=null)out.level=validNumber(e.level,1,ENEMIES.BOSS.length);if(e.elite!=null)out.elite=validBool(e.elite);if(e.ancientChargeState!=null){if(e.ancientChargeState!=='CHARGING')throw new Error('首領蓄力狀態無效');out.ancientChargeState=e.ancientChargeState;}
  return out;
 }
 function cleanIdentity(value){
@@ -1605,11 +1621,11 @@ function cleanIdentity(value){
  return {version:1,source:'new',parts:[...id.parts],appearance:id.appearance};
 }
 function cleanAdventure(value){
- const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity)};
+ const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity),expedition:cleanExpedition(a.expedition)};
  for(const k of ['seq','steps','gold','scoutTurns','nextEventAt'])out[k]=validNumber(a[k]);validNumber(out.scoutTurns,0,100);
  for(const k of ['eventResolved','pendingEnding','clearRecorded'])out[k]=validBool(a[k]);
  for(const k of ['eventId','lastEvent']){if(a[k]!=null&&!Object.hasOwn(EVENTS,a[k]))throw new Error('未知的冒險事件');out[k]=a[k];}
- if(!Array.isArray(a.eventDeck)||a.eventDeck.length>20||a.eventDeck.some(id=>!Object.hasOwn(EVENTS,id)))throw new Error('事件牌庫無效');out.eventDeck=[...a.eventDeck];
+ if(!Array.isArray(a.eventDeck)||a.eventDeck.length>64||a.eventDeck.some(id=>!Object.hasOwn(EVENTS,id)))throw new Error('事件牌庫無效');out.eventDeck=[...a.eventDeck];
  for(const [key,val]of Object.entries(validObject(a.eventVisits))){if(!Object.hasOwn(EVENTS,key))throw new Error('事件紀錄無效');out.eventVisits[key]=validNumber(val);}
  for(const key of ['fox','foxGift','parcel','delivered'])if(a.flags?.[key]!=null)out.flags[key]=validBool(a.flags[key]);
  for(const key of ['foxAt','parcelAt'])if(a.flags?.[key]!=null)out.flags[key]=validNumber(a.flags[key]);
@@ -1617,19 +1633,20 @@ function cleanAdventure(value){
  for(const key of ['wins','deaths','events','loot','bosses','rests'])out.stats[key]=validNumber(a.stats?.[key]);
  if(!Array.isArray(a.logs)||a.logs.length>80)throw new Error('冒險手札過長');out.logs=a.logs.map(s=>validText(s,1600));
  if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};if(r.portraitKey!=null){if(!Object.hasOwn(SCENE_PORTRAITS,r.portraitKey))throw new Error('事件人物造型無效');out.result.portraitKey=r.portraitKey;}}else out.result=null;
- if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round)};}else out.battle=null;
+ if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round),boss:cleanBossState(b.boss),guarding:false};}else out.battle=null;
  return out;
 }
 function validateSave(doc){
  validObject(doc);if(doc.format!=='jack-adventure'||doc.version!==2)throw new Error('這不是支援的勇者模擬器 v2 存檔');validNumber(doc.savedAt,1,9e15);
  const p=validObject(doc.payload);if(!STABLE_PHASES.includes(p.gameState))throw new Error('存檔停在不支援的階段');
- const out={gameState:p.gameState,hero:cleanHero(p.hero),adventure:cleanAdventure(p.adventure),bossLevel:validNumber(p.bossLevel,1,4),currentEnemy:cleanEnemy(p.currentEnemy),newLoot:null,totalTurnCount:validNumber(p.totalTurnCount),lastHealTime:validNumber(p.lastHealTime,0,9e15),weaponMaterials:validNumber(p.weaponMaterials,0,5000),shieldMaterials:validNumber(p.shieldMaterials,0,5000)};
+ const out={gameState:p.gameState,hero:cleanHero(p.hero),adventure:cleanAdventure(p.adventure),bossLevel:validNumber(p.bossLevel,1,ENEMIES.BOSS.length+1),currentEnemy:cleanEnemy(p.currentEnemy),newLoot:null,totalTurnCount:validNumber(p.totalTurnCount),lastHealTime:validNumber(p.lastHealTime,0,9e15),weaponMaterials:validNumber(p.weaponMaterials,0,5000),shieldMaterials:validNumber(p.shieldMaterials,0,5000)};
  if(p.newLoot){if(!['WEAPON','SHIELD','RING'].includes(p.newLoot.type))throw new Error('待領裝備種類無效');out.newLoot=cleanEquipment(p.newLoot,p.newLoot.type);validNumber(out.newLoot.uid,1,out.adventure.seq);}
  if(out.gameState==='BATTLE'&&(!out.currentEnemy||out.currentEnemy.hp<=0||!out.adventure.battle||out.adventure.battle.settled))throw new Error('戰鬥存檔不完整');
  if((out.gameState==='LOOT_DECISION')!==!!out.newLoot)throw new Error('戰利品存檔不完整');
  if(out.gameState==='EVENT'&&(!out.adventure.eventId||out.adventure.eventResolved))throw new Error('事件選擇存檔不完整');
  if(['RESULT','DEFEAT'].includes(out.gameState)&&!out.adventure.result)throw new Error('事件結果不完整');
- if(out.gameState==='CREDITS'&&out.bossLevel!==4)throw new Error('通關進度不完整');
+ if(out.gameState==='CREDITS'&&![4,ENEMIES.BOSS.length+1].includes(out.bossLevel))throw new Error('通關進度不完整');
+ if(out.gameState==='ROUTE'&&(!out.adventure.expedition||out.adventure.expedition.choices.length!==3))throw new Error('缺少路線選項');
  return {format:'jack-adventure',version:2,savedAt:doc.savedAt,payload:out};
 }
 function parseSave(text){
@@ -1658,7 +1675,7 @@ function applySave(doc,notice='已接回你的旅程。'){
  sessionEpoch++;clearTimeout(healCooldownTimer);overflowActive=false;
  hero=p.hero;adventure=p.adventure;bossLevel=p.bossLevel;currentEnemy=p.currentEnemy;newLoot=p.newLoot;totalTurnCount=turnCount=p.totalTurnCount;weaponMaterials=p.weaponMaterials;shieldMaterials=p.shieldMaterials;lastHealTime=Math.min(p.lastHealTime,Date.now());gameState=p.gameState;
  $('titleSelectBox').hidden=true;$('app-shell').inert=false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());
- if(gameState==='CREDITS')recordClearRun();renderCurrent();saveAuto();toast(notice);return true;
+ migrateExpeditionOnLoad();if(gameState==='CREDITS')recordClearRun();renderCurrent();saveAuto();toast(notice);return true;
 }
 function loadSlot(key,ask=true){const slot=readSlot(key);if(slot.kind!=='valid'){toast(slot.kind==='empty'?'這個存檔槽還是空的。':'這個存檔無法讀取，請改用備援或匯入備份。',true);return false;}if(ask&&gameState!=='TITLE'&&!confirm('讀取會回到這份存檔的進度，取代目前進度。確定讀取？'))return false;return applySave(slot.doc);}
 function openSaveDialog(){renderSaveSlots();$('save-dialog').showModal();}
@@ -1697,8 +1714,8 @@ function initSaveUI(){
 }
 function readClearRecords(){try{const list=JSON.parse(localStorage.getItem(RECORD_KEY)||'[]');return Array.isArray(list)?list.filter(r=>r&&typeof r.title==='string'&&Number.isFinite(r.totalTurn)&&Number.isFinite(r.level)&&Number.isFinite(r.time)).slice(0,10):[];}catch{return [];}}
 function recordClearRun(){
- const records=readClearRecords();if(records.some(r=>r.runId===adventure.runId)){adventure.clearRecorded=true;return;}
- const record={runId:adventure.runId,title:hero.title,level:hero.level,totalTurn:totalTurnCount,time:Date.now(),weapon:hero.equipment.WEAPON.name,shield:hero.equipment.SHIELD.name,ring:hero.equipment.RING.name};
+ const records=readClearRecords();if(records.some(r=>r.runId===adventure.runId&&r.campaign==='five-seals')){adventure.clearRecorded=true;return;}
+ const record={runId:adventure.runId,campaign:'five-seals',title:hero.title,level:hero.level,totalTurn:totalTurnCount,time:Date.now(),weapon:hero.equipment.WEAPON.name,shield:hero.equipment.SHIELD.name,ring:hero.equipment.RING.name};
  try{records.push(record);records.sort((a,b)=>a.totalTurn-b.totalTurn);localStorage.setItem(RECORD_KEY,JSON.stringify(records.slice(0,10)));adventure.clearRecorded=true;log('📒 通關紀錄已寫進旅程名冊。');}catch{adventure.clearRecorded=false;saveError('通關完成，但瀏覽器無法寫入紀錄；請匯出存檔保留。');}
 }
 function openRecords(){
@@ -1757,6 +1774,8 @@ function confirmEquipmentLoss(loot,c){
 /* === camp.js === */
 /* Gold has visible uses; purchases are map-only, saved atomically and click-token checked. */
 const CAMP_OFFERS=[
+ {id:'potion',name:'應急藥水',price:10,description:'戰鬥時消耗一回合恢復 40% HP。最多帶 5 瓶。',canBuy:()=>ensureExpedition().potions<5,apply:()=>ensureExpedition().potions++},
+ {id:'antidote',name:'解毒藥',price:8,description:'戰鬥時消耗一回合解除毒、灼燒與破甲。最多帶 5 瓶。',canBuy:()=>ensureExpedition().antidotes<5,apply:()=>ensureExpedition().antidotes++},
  {id:'weapon',name:'武器零件包',price:12,description:'武器素材 +5。已有武器時立即自動精練；徒手時保留素材。',apply:()=>addMaterials('WEAPON',5)},
  {id:'shield',name:'盾牌零件包',price:12,description:'盾牌素材 +5。已有盾牌時立即自動精練；空手時保留素材。',apply:()=>addMaterials('SHIELD',5)},
  {id:'rations',name:'暖心便當',price:10,description:'接下來 5 個戰鬥回合，回復最大 HP 的 10%，至少 3 點。重買不疊加。',canBuy:()=>hero.regenTurns===0,apply:()=>{hero.regenTurns=5;hero.regenAmount=Math.max(3,Math.floor(hero.maxHp*.1));}},
@@ -1816,11 +1835,15 @@ const GAME_SCORES={
  victory:{name:'終於可以休假了',bpm:124,root:60,scale:[0,2,4,5,7,9,11],chords:[0,4,5,3,0,3,4,0],lead:'triangle',energy:0,
  motifs:[[0,-1,2,4,7,-1,7,-1,9,-1,7,-1,4,-1,-1,-1],[4,-1,6,-1,7,9,11,-1,9,-1,7,-1,6,-1,-1,-1],[5,-1,7,-1,9,7,5,-1,4,-1,2,-1,0,-1,2,-1],[4,6,7,-1,9,-1,7,-1,4,-1,2,-1,0,-1,-1,-1]]}
 };
+Object.assign(GAME_SCORES,{
+ warden:{name:'發條典獄長・鐵鎖狂奏',bpm:184,root:45,scale:[0,2,3,5,6,8,11],chords:[0,3,0,4,5,3,1,4],lead:'sawtooth',energy:4,motifs:[[0,4,0,7,0,4,8,7,6,4,3,1,0,0,4,-1],[3,6,3,7,8,7,6,4,3,1,0,1,3,4,6,-1],[7,4,7,8,10,8,7,4,6,3,6,7,8,7,6,4],[4,3,1,0,7,4,3,1,0,1,3,4,6,4,0,-1]]},
+ dice:{name:'骰骨大公・世界不准重擲',bpm:196,root:48,scale:[0,1,4,5,7,8,11],chords:[0,1,4,0,5,6,3,4],lead:'square',energy:4,motifs:[[0,7,1,8,4,11,5,12,7,6,4,1,0,4,7,-1],[8,7,5,4,1,0,1,4,7,8,11,8,7,4,1,-1],[0,4,7,11,10,8,7,5,4,1,0,1,4,7,8,11],[11,8,7,4,8,7,4,1,7,4,1,0,1,4,7,-1]]}
+});
 const MUSIC_PREF_KEY='jack-adventure.audio.v1';
 function readMusicPrefs(){try{const p=JSON.parse(localStorage.getItem(MUSIC_PREF_KEY)||'{}');return {music:typeof p.music==='boolean'?p.music:true,sfx:typeof p.sfx==='boolean'?p.sfx:false,musicVolume:Number.isFinite(p.musicVolume)?Math.max(0,Math.min(1,p.musicVolume)):.32,sfxVolume:Number.isFinite(p.sfxVolume)?Math.max(0,Math.min(1,p.sfxVolume)):.45};}catch{return {music:true,sfx:false,musicVolume:.32,sfxVolume:.45};}}
 function scorePitch(track,degree,octave=0){const scale=track.scale,n=scale.length;return track.root+scale[((degree%n)+n)%n]+12*Math.floor(degree/n)+12*octave;}
 function frequency(midi){return 440*2**((midi-69)/12);}
-function trackForScene(){if(['BATTLE','BATTLE_ACTION'].includes(gameState)&&currentEnemy){if(adventure.battle?.isBoss)return {'不死巫妖':'lich','火焰巨龍':'dragon','遠古魔神':'ancient'}[currentEnemy.name]||'battle';return 'battle';}return gameState==='CREDITS'?'victory':'explore';}
+function trackForScene(){if(['BATTLE','BATTLE_ACTION'].includes(gameState)&&currentEnemy){if(adventure.battle?.isBoss)return {'不死巫妖':'lich','火焰巨龍':'dragon','遠古魔神':'ancient','發條典獄長':'warden','骰骨大公':'dice'}[currentEnemy.name]||'battle';return 'battle';}return gameState==='CREDITS'?'victory':'explore';}
 const Music={
  prefs:readMusicPrefs(),ctx:null,master:null,musicGain:null,sfxGain:null,noise:null,bus:null,timer:null,step:0,nextTime:0,track:null,unlocked:false,scheduled:0,switches:0,
  ensure(){
@@ -2032,8 +2055,8 @@ function syncActionDock(){
  dock.dataset.phase=phase;$('dock-title').textContent=mainView.querySelector('h2')?.textContent||'下一步，由你決定';
  let summary='按鈕固定在這裡，不必再滑到頁面底部。';
  if(phase==='LOOT_DECISION'&&newLoot){const c=equipmentComparison(newLoot);summary=c.risky?c.reasons.slice(0,2).join(' ／ '):'沒有偵測到能力下降；仍可查看詞條再決定。';dock.classList.toggle('dock-risk',c.risky);}
- else{dock.classList.remove('dock-risk');if(phase==='BATTLE'&&currentEnemy)summary=`你 HP ${Math.max(0,hero.hp)}/${hero.maxHp} · ${currentEnemy.name} ${Math.max(0,currentEnemy.hp)}/${currentEnemy.originalHp}`;else if(phase==='EVENT')summary='選項下方寫有代價；選好後才會繼續。';}
- $('dock-summary').textContent=summary;syncDockGeometry();
+ else{dock.classList.remove('dock-risk');if(phase==='ROUTE')summary='選好一條路再出發。相同存檔不會重抽路線。';if(phase==='BATTLE'&&currentEnemy)summary=`你 HP ${Math.max(0,hero.hp)}/${hero.maxHp} · ${currentEnemy.name} ${Math.max(0,currentEnemy.hp)}/${currentEnemy.originalHp}`;else if(phase==='EVENT')summary='選項下方寫有代價；選好後才會繼續。';}
+ if(phase==='BATTLE'&&activeBoss())summary=adventure.battle.boss?.plan?.hint||summary;$('dock-summary').textContent=summary;syncDockGeometry();
 }
 function revealCurrentContent(){
  const target=['LOOT_DECISION','RESULT','DEFEAT','CREDITS'].includes(gameState)?mainView:$('stage');
@@ -2055,6 +2078,369 @@ function initActionDock(){
 
 ;
 
+/* === bosses.js === */
+/* v2.3: fixed chapter budgets, visible telegraphs, tactical responses, no hidden level scaling. */
+const BOSS_DESIGNS=[
+ {id:'lich',level:1,target:7,name:'不死巫妖',hp:650,atk:56,def:16,mDef:58,dodge:6,exp:110,lootChance:1,bias:{'⚔️':.2,'🌠':.5,'🛡️':.3},trait:'魔防極高；砍擊與盾擊更適合拆骨。',skill:'靈魂催繳',counter:'⚔️',intro:'巫妖把你的靈魂列成分期付款。「利息不用錢，只要命。」',defeat:'巫妖嘆了口氣，開始填寫自己的離職證明。'},
+ {id:'dragon',level:2,target:12,name:'火焰巨龍',hp:1300,atk:110,def:28,mDef:18,dodge:8,exp:300,lootChance:1,bias:{'⚔️':.5,'🌠':.2,'🛡️':.3},trait:'物理攻擊高；深吸氣後會噴火，別只顧著連打。',skill:'報復性加熱',counter:'GUARD',intro:'巨龍看著你：「微辣、中辣，還是勇者本人熟一點？」',defeat:'巨龍答應戒宵夜。牠補充：「至少戒到明天。」'},
+ {id:'ancient',level:3,target:19,name:'遠古魔神',hp:2400,atk:143,def:44,mDef:32,dodge:10,exp:1000,lootChance:1,bias:{'⚔️':.25,'🌠':.35,'🛡️':.4},trait:'毒會逐層累積；魔法打斷毒霧，解毒要趁早。',skill:'祖傳秘製毒霧',counter:'🌠',intro:'魔神端出綠湯：「這不是毒，是尚未通過食安的祝福。」',defeat:'魔神承認祖傳秘方只有兩年，而且是網路買的。'},
+ {id:'warden',level:4,target:26,name:'發條典獄長',hp:3600,atk:195,def:74,mDef:54,dodge:8,exp:2300,lootChance:1,bias:{'⚔️':.35,'🌠':.25,'🛡️':.4},trait:'裝甲減傷；魔法解除裝甲，同一招連打會被讀懂。',skill:'加班大印章',counter:'GUARD',intro:'「你的離場申請少一個章。」典獄長舉起比你還大的印章。',defeat:'印章斷成兩半。典獄長震驚的是：這要填兩張報修單。'},
+ {id:'dice',level:5,target:34,name:'骰骨大公',hp:5000,atk:291,def:78,mDef:76,dodge:10,exp:5000,lootChance:1,bias:{'⚔️':.34,'🌠':.33,'🛡️':.33},trait:'每回合換抗性；兩回合蓄力要用不同招式破印，不能只賭運氣。',skill:'末日重新擲骰',counter:'SEQUENCE',intro:'大公翻開說明書：「公平？那是付費擴充包。」',defeat:'骰子終於停止。大公小聲問：這一局可不可以不算？'}
+];
+ENEMIES.BOSS.splice(0,ENEMIES.BOSS.length,...BOSS_DESIGNS.map(b=>({...b,bossId:b.id})));
+[7,12,19].forEach((level,i)=>SCENES[i].level=level);
+SCENES.push({name:'發條監獄',boss:'發條典獄長',level:26,sky:'#879792',light:'#dcebc0',far:'#667978',mid:'#46595c',ground:'#394749',grass:'#71886c'},{name:'倒轉賭城',boss:'骰骨大公',level:34,sky:'#6f6693',light:'#efce9f',far:'#5d537c',mid:'#453b64',ground:'#362e48',grass:'#7e6887'});
+Object.assign(ENEMY_SPRITES,{'發條典獄長':128,'骰骨大公':97,'剛打卡的裝甲看守':125,'欠債的骰子騎士':38});
+for(const b of BOSS_DESIGNS)ENEMY_INTRO_LINES[b.name]=`${b.name}：「${b.intro}」`;
+function activeBoss(){return adventure.battle?.isBoss?BOSS_DESIGNS.find(b=>b.id===currentEnemy?.bossId||b.name===currentEnemy?.name):null;}
+function initBossState(){const d=activeBoss();if(!d)return;const b=adventure.battle;b.boss??={id:d.id,ward:d.id==='warden'?3:0,exposed:0,lastMove:null,repeats:0,phase:1,charge:0,sealMoves:[],staggered:false};prepareBossTurn();}
+function prepareBossTurn(){
+ const d=activeBoss();if(!d)return;const b=adventure.battle,s=b.boss??{id:d.id,ward:d.id==='warden'?3:0,exposed:0,lastMove:null,repeats:0,phase:1,charge:0,sealMoves:[],staggered:false};b.boss=s;
+ const phase=currentEnemy.hp<=currentEnemy.originalHp*.4?2:1;if(phase>s.phase)log(`⚠ ${d.name} 進入第二階段！招式更急迫，但預告仍然有效。`);s.phase=phase;
+ let kind='normal',title='觀察對手',hint=d.trait,counter=null;
+ if(d.id==='lich'&&b.round%4===3){kind='siphon';title='☠ 靈魂催繳';hint='本回合用「砍擊」斬斷法杖可阻止吸血；其他招式會吃到詛咒。';counter='⚔️';}
+ if(d.id==='dragon'){
+  if(b.round%5===3){kind='charge';title='🔥 深吸一口氣';hint='本回合魔法攻擊可冷卻龍焰；下回合仍會噴火，可用「堅守」防住。';counter='🌠';}
+  if(b.round%5===4){kind='inferno';title=s.staggered?'🔥 被冷卻的龍焰':'🔥 龍焰即將爆發';hint='點「堅守」大幅減傷並免於灼燒；亂攻擊會吃完整噴火。';counter='GUARD';}
+  if(b.round%5===0){kind='recover';title='💨 巨龍打嗝中';hint='這回合巨龍不攻擊，受到傷害增加 30%。';}
+ }
+ if(d.id==='ancient'&&b.round%4===2){kind='venom';title='☣ 正在調配祖傳毒湯';hint='本回合用「魔法」打斷毒霧並清掉 1 層毒。解毒藥可清除全部毒。';counter='🌠';}
+ if(d.id==='warden'){
+  if(b.round%5===2){kind='armor';title='⚙ 裝甲重新上鎖';hint='本回合「魔法」命中可立即解除裝甲、製造破綻。';counter='🌠';}
+  if(b.round%5===4){kind='stamp';title='⚠ 巨型印章落下';hint='用「堅守」承受衝擊；之後露出兩回合破綻。不要連續使用同招。';counter='GUARD';}
+ }
+ if(d.id==='dice'){
+  s.resist=['⚔️','🌠','🛡️'][(b.round+Math.floor(b.id%3))%3];s.weak=CLASH_RULES[s.resist];
+  if(b.round%6===3||b.round%6===4){kind='seal';title='🎲 末日蓄力：雙重骰印';hint='這兩回合分別用不同的基本攻擊，湊齊兩種印記才能阻止末日。';if(b.round%6===3)s.sealMoves=[];counter='DIFFERENT';}
+  if(b.round%6===5){kind='judgment';title=s.sealMoves.length>=2?'🎲 骰印已破壞':'⚠ 末日即將結算';hint=s.sealMoves.length>=2?'兩種印記已集齊：末日失敗，本回合放心進攻。':'未能破解時請堅守！不能完全避開，但可以保命。';counter='GUARD';}
+ }
+ s.plan={kind,title,hint,counter};
+}
+function bossDamageMultiplier(kind){
+ const d=activeBoss();if(!d)return 1;const s=adventure.battle.boss;let m=1;
+ if(d.id==='warden'&&s.ward>0)m*=.65;
+ if(s.exposed>0||s.plan?.kind==='recover')m*=1.3;
+ if(d.id==='warden'&&s.lastMove===kind&&s.repeats>=2)m*=.45;
+ if(d.id==='dice'){if(kind===s.resist)m*=.55;else if(kind===s.weak)m*=1.3;}
+ return m;
+}
+function dealToEnemy(amount,move){const n=Math.max(1,Math.floor(amount*bossDamageMultiplier(move)*expeditionDamageRate()));const actual=Math.min(currentEnemy.hp,n);currentEnemy.hp=Math.max(0,currentEnemy.hp-n);return actual;}
+function bossHit(scale=1,guard=false,affliction=null){
+ const d=activeBoss();if(!d||hero.hp<=0||currentEnemy.hp<=0)return 0;const phase=adventure.battle.boss.phase;
+ const raw=Math.max(3+d.level,Math.floor((currentEnemy.atk*(phase===2?1.12:1)-hero.currentDefense*.9)*scale));
+ const actual=applyDamageToHero(Math.floor(raw*(guard ? 0.28 : 1)),true);log(`💥 ${d.name} 特殊攻擊造成 ${actual} 傷害${guard?'（堅守減傷）':''}。`);floatingNumber(`−${actual}`,'hero');flashBattleView('monster-hit');
+ if(hero.hp>0&&!guard){if(affliction==='burn'){hero.burnTurns=3;hero.burnDamage=Math.max(2,Math.floor(hero.maxHp*.05));}if(affliction==='poison')hero.poisonStacks=Math.min(5,hero.poisonStacks+2);}
+ return actual;
+}
+function resolveBossSpecial(move){
+ const d=activeBoss();if(!d)return false;const s=adventure.battle.boss,p=s.plan,guard=move==='GUARD',basic=!!MOVE_NAMES[move];
+ if(p.kind==='normal')return false;
+ if(p.kind==='siphon'){if(move==='⚔️'){heroStrike(move);s.exposed=1;log('⚔ 你砍斷催繳法杖！吸血被打斷。');}else{if(basic)heroStrike(move);const n=bossHit(.9,guard);currentEnemy.hp=Math.min(currentEnemy.originalHp,currentEnemy.hp+n*2);if(!guard){hero.defDownTurns=2;hero.defDownRate=.15;}}}
+ if(p.kind==='charge'){s.staggered=move==='🌠';if(basic)heroStrike(move);log(s.staggered?'❄ 魔法冷卻了龍焰，下回合噴火威力下降。':'🔥 巨龍深吸氣，準備下回合噴火。');}
+ if(p.kind==='inferno'){if(basic)heroStrike(move);bossHit(s.staggered?1.3:2.1,guard,'burn');s.staggered=false;}
+ if(p.kind==='recover'){if(basic)heroStrike(move);log('💨 巨龍只打了一個長長的嗝。');}
+ if(p.kind==='venom'){if(move==='🌠'){heroStrike(move);hero.poisonStacks=Math.max(0,hero.poisonStacks-1);log('🌠 毒湯鍋被掀翻！毒霧中斷，毒層 −1。');}else{if(basic)heroStrike(move);bossHit(.7,guard,'poison');}}
+ if(p.kind==='armor'){if(move==='🌠'){s.ward=0;s.exposed=3;heroStrike(move);log('⚙ 魔法打開裝甲鎖！接下來露出破綻。');}else{s.ward=Math.min(3,s.ward+1);if(basic)heroStrike(move);bossHit(.7,guard);}}
+ if(p.kind==='stamp'){if(basic)heroStrike(move);bossHit(1.9,guard);s.exposed=3;log('🛡 大印章卡進地板，典獄長露出兩回合破綻。');}
+ if(p.kind==='seal'){if(basic){if(!s.sealMoves.includes(move))s.sealMoves.push(move);heroStrike(move);}log(`🎲 破印進度 ${s.sealMoves.length}/2：${s.sealMoves.join('、')||'尚未取得'}。`);if(s.phase===2)bossHit(.35,guard);}
+ if(p.kind==='judgment'){if(s.sealMoves.length>=2){s.exposed=2;if(basic)heroStrike(move);log('💥 末日反噬大公！趁現在攻擊。');}else{if(basic)heroStrike(move);bossHit(2.8,guard);}s.sealMoves=[];}
+ return true;
+}
+function bossAfterRound(move){
+ const d=activeBoss();if(!d||hero.hp<=0||currentEnemy.hp<=0)return;const s=adventure.battle.boss;
+ if(MOVE_NAMES[move]){if(s.lastMove===move)s.repeats++;else{s.lastMove=move;s.repeats=1;}if(d.id==='warden'&&move==='🌠'&&s.ward>0)s.ward--;}
+ if(s.exposed>0)s.exposed--;
+ if(hero.poisonStacks>0){const n=Math.min(hero.hp,Math.max(1,Math.floor(hero.maxHp*.018*(1-relicBonus('poison'))))*hero.poisonStacks);hero.hp-=n;log(`☣ ${hero.poisonStacks} 層毒造成 ${n} 傷害。`);}
+ if(adventure.battle.round>=35){const n=Math.min(hero.hp,Math.max(2,Math.floor(hero.maxHp*.08)));hero.hp-=n;log(`⏳ 戰鬥拖得太久，首領威壓造成 ${n} 傷害。`);}
+}
+function bossTacticMarkup(){const d=activeBoss();if(!d)return '';const s=adventure.battle.boss,p=s?.plan;if(!p)return '';
+ return `<section class="boss-plan"><strong>${escapeHtml(p.title)}${s.phase===2?' · 第二階段':''}</strong><p>${escapeHtml(p.hint)}</p>${d.id==='warden'?`<small>裝甲鎖 ${s.ward}/3 · 連用同招 ${s.repeats} 次</small>`:''}${d.id==='dice'?`<small>本回合抗性 ${s.resist} · 弱點 ${s.weak} · 骰印 ${s.sealMoves.length}/2</small>`:''}<small>建議 Lv.${d.target} · ${escapeHtml(d.trait)}</small></section>`;
+}
+
+;
+
+/* === expedition.js === */
+/* A persistent run: route choices, weather, relics and story flags are saved before selection. */
+const RUN_RELICS={
+ red_quill:{name:'會催稿的紅筆',desc:'物理攻擊 ATK +8%。「別拖稿，拖刀可以。」',stat:'atk',value:.08},
+ tin_bell:{name:'拒絕加班鈴',desc:'防禦 DEF +8%。響了也不一定有人准你走。',stat:'def',value:.08},
+ blue_cup:{name:'不洗的法師茶杯',desc:'魔攻 MATK +8%。杯底沉澱的是智慧。',stat:'matk',value:.08},
+ feather:{name:'狐狸的離職羽毛',desc:'閃避 +3 個百分點。狐狸沒有羽毛，別問。',stat:'dodge',value:3},
+ receipt:{name:'永遠報不了帳的收據',desc:'每次戰鬥勝利額外 +3 金幣。',stat:'gold',value:3},
+ lunchbox:{name:'自動續湯便當盒',desc:'戰鬥勝利回復最大 HP 的 8%。',stat:'heal',value:.08},
+ filter:{name:'護肝符',desc:'毒傷害減少 35%。不能拿來泡酒。',stat:'poison',value:.35},
+ glasses:{name:'只看得見破綻的眼鏡',desc:'平手勝率 +4 個百分點。',stat:'tie',value:4},
+ lucky_coin:{name:'兩面都是正面的硬幣',desc:'砍擊爆擊率 +3 個百分點。',stat:'crit',value:3},
+ map:{name:'把北畫在下面的地圖',desc:'戰鬥經驗值 +12%。至少迷路很有教育意義。',stat:'xp',value:.12}
+};
+const RUN_WEATHER=[
+ {id:'clear',name:'好天氣，壞預感',desc:'沒有額外修正。別因此大意。'},
+ {id:'fog',name:'濃霧',desc:'普通敵人閃避 +5%，勝利金幣 +2。'},
+ {id:'rain',name:'下雨但沒帶傘',desc:'普通敵人物攻 −5%，魔防 +10%。'},
+ {id:'wind',name:'亂吹的風',desc:'普通敵人物攻 +8%，經驗值 +10%。'},
+ {id:'glow',name:'地脈打嗝',desc:'普通敵人 HP +10%，掉寶率 +8%。'}
+];
+const ROUTE_KINDS={battle:{icon:'⚔',name:'不太友善的小徑',hint:'普通戰鬥 · 經驗與裝備',weight:5},event:{icon:'?',name:'有人在喊你的名字',hint:'隨機劇情 · 選擇會有後續',weight:5},elite:{icon:'☠',name:'門口貼滿警告的巷子',hint:'菁英挑戰 · 高風險高報酬',weight:2},treasure:{icon:'✧',name:'閃閃發光的不明物',hint:'寶物、素材或小小惡作劇',weight:3},rest:{icon:'♨',name:'冒煙的流動食堂',hint:'恢復 35% HP · 補給',weight:2},relic:{icon:'◈',name:'神明的失物招領',hint:'選擇一件旅途奇物 · 最多 5 件',weight:2}};
+const CHAPTER_STORIES=[
+ ['世界末日，請先抽號碼牌','村長交給你一張「世界和平申請書」。第一關不是魔王，是管印章的巫妖。牠已經死了，卻還不肯下班。'],
+ ['印章蓋好了，紙卻燒起來','巫妖的章總算到手。紙上多了一句：「請巨龍烘乾後再送件。」這個世界連行政流程都會噴火。'],
+ ['巨龍認為，綠色就是健康','你帶著微焦的申請書抵達遺跡。有人請你試喝祖傳綠湯。狐狸聞了一下，直接把你的遺照先畫好了。'],
+ ['和平只有三章試用期','魔神倒下後，天空跳出小字：「您的和平試用已到期。」發條監獄保存著正式合約，而典獄長從不准時放人。'],
+ ['最後一關，骰子自己會作弊','典獄長交出合約，卻說簽名得由骰骨大公批准。你走進倒轉賭城，發現連地板都在擲你的命運。']
+];
+function makeExpedition(){const seed=stableIdentityHash(adventure.runId)||1;return {version:1,seed,rng:seed,chapter:Math.min(5,bossLevel),depth:0,clues:0,choices:[],weather:null,relics:[],relicOffers:[],potions:2,antidotes:2,flags:{},recent:[],pendingIntro:false,lastRoute:null,history:[],generation:0};}
+function ensureExpedition(){if(!adventure.expedition){adventure.expedition=makeExpedition();adventure.expedition.clues=Math.min(requiredClues(),Math.floor(adventure.steps/2));}const e=adventure.expedition;if(e.chapter!==Math.min(5,bossLevel)){e.chapter=Math.min(5,bossLevel);e.depth=0;e.clues=0;e.choices=[];e.weather=null;e.pendingIntro=true;}return e;}
+function runRandom(){const e=ensureExpedition();let x=e.rng>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;e.rng=x>>>0||1;return e.rng/4294967296;}
+function runPick(array){return array[Math.min(array.length-1,Math.floor(runRandom()*array.length))];}
+function requiredClues(){return [4,5,6,7,8][Math.min(4,bossLevel-1)];}
+function currentWeather(){const e=ensureExpedition();if(!e.weather)e.weather=RUN_WEATHER[Math.floor(runRandom()*RUN_WEATHER.length)].id;return RUN_WEATHER.find(w=>w.id===e.weather);}
+function relicBonus(key){return (adventure.expedition?.relics||[]).reduce((sum,id)=>sum+(RUN_RELICS[id]?.stat===key?RUN_RELICS[id].value:0),0);}
+function expeditionDamageRate(){return 1;}
+function applyExpeditionStats(){if(!adventure?.expedition)return;hero.currentAttack=Math.floor(hero.currentAttack*(1+relicBonus('atk')));hero.currentDefense=Math.floor(hero.currentDefense*(1+relicBonus('def')));hero.currentMagicAtk=Math.floor(hero.currentMagicAtk*(1+relicBonus('matk')));hero.currentDodge=Math.min(75,hero.currentDodge+relicBonus('dodge'));hero.currentTieWinRate=Math.min(100,hero.currentTieWinRate+relicBonus('tie'));}
+function generateRoutes(){const e=ensureExpedition();if(e.choices.length)return;const pool=Object.keys(ROUTE_KINDS);const picks=[];while(picks.length<3){const weighted=pool.filter(x=>!picks.includes(x)).flatMap(id=>Array(ROUTE_KINDS[id].weight).fill(id));picks.push(runPick(weighted));}e.generation++;e.choices=picks.map((kind,i)=>({kind,id:`${e.chapter}-${e.generation}-${i}`,flavor:Math.floor(runRandom()*4)}));saveAuto();}
+function enterRoutes(){if(gameState!=='MAP')return;generateRoutes();gameState='ROUTE';renderRoutes();saveAuto();}
+function renderRoutes(){const e=ensureExpedition(),weather=currentWeather();setScene('map',88);story('CHOOSE YOUR PATH',`第 ${e.chapter} 章 · 這次要往哪裡走？`,`${weather.name}：${weather.desc}`,`首領通行線索 ${e.clues}/${requiredClues()} · 路線一旦出現就會保存，重新整理不重抽。`);const id=e.generation;setCommands(...e.choices.map((c,i)=>({text:`${ROUTE_KINDS[c.kind].icon} ${ROUTE_KINDS[c.kind].name}`,hint:ROUTE_KINDS[c.kind].hint,value:i})),i=>chooseRoute(i,id),'ROUTE');mainView.insertAdjacentHTML('beforeend','<button id="route-back" class="text-button">先回營地準備</button>');$('route-back').onclick=()=>{gameState='MAP';renderMap();saveAuto();};syncActionDock();}
+function chooseRoute(index,generation=ensureExpedition().generation){
+ const e=ensureExpedition();if(gameState!=='ROUTE'||generation!==e.generation||!Number.isInteger(index)||!e.choices[index])return;
+ const c=e.choices[index];gameState='MAP_ACTION';disableCommands(true);e.choices=[];e.depth++;e.clues=Math.min(requiredClues(),e.clues+1);e.lastRoute=c.kind;e.history.push(`${e.chapter}:${c.kind}`);e.history=e.history.slice(-120);adventure.steps++;countTurn();e.place=c.kind==='battle'?runPick(['forest','road','cave','marsh']):c.kind==='elite'?'road':c.kind==='treasure'?'cave':c.kind==='rest'?'camp':'ruins';
+ if(c.kind==='battle')startSmallBattle();else if(c.kind==='elite')enterEvent('elite');else if(c.kind==='event')enterEvent(pickEvent());else if(c.kind==='rest'){const n=healFraction(.35);if(runRandom()<.4)e.antidotes=Math.min(5,e.antidotes+1);resultEvent('你坐下來，世界沒有因此毀滅',`恢復 ${n} HP。老闆娘：「飯要吃，世界也要救，順序別搞錯。」`,86);}else if(c.kind==='relic'){prepareRelicOffers();enterEvent('relic_shrine');}else{if(runRandom()<.65)giveEventLoot(runPick(['WEAPON','SHIELD','RING']),'路邊失物招領');else enterEvent(runPick(['chest','living_luggage','receipt_duel']));}
+ updateStatus();saveAuto();
+}
+function prepareRelicOffers(){const e=ensureExpedition(),pool=Object.keys(RUN_RELICS).filter(id=>!e.relics.includes(id));e.relicOffers=[];while(e.relicOffers.length<Math.min(3,pool.length)){const id=runPick(pool.filter(id=>!e.relicOffers.includes(id)));e.relicOffers.push(id);}}
+function takeRelic(index){const e=ensureExpedition(),id=e.relicOffers[index];if(!id)return;if(e.relics.length>=5){adventure.gold+=18;resultEvent('神明說，你的背包已經夠吵了','奇物已達 5 件，改拿 18 金幣，不會強制丟掉舊奇物。',84);}else{e.relics.push(id);resultEvent(`收下「${RUN_RELICS[id].name}」`,RUN_RELICS[id].desc,84);}e.relicOffers=[];updateStatus();saveAuto();}
+function chapterIntro(){const e=ensureExpedition();if(!e.pendingIntro)return false;e.pendingIntro=false;const s=CHAPTER_STORIES[e.chapter-1];adventure.result={tag:`第 ${e.chapter} 章`,title:s[0],text:s[1],object:84,portraitKey:e.chapter===4?'smith':'sage'};gameState='RESULT';renderResult();saveAuto();return true;}
+function updateExpeditionPanel(){const host=$('expedition-summary');if(!host||gameState==='TITLE')return;const e=ensureExpedition(),weather=currentWeather();const helper=e.social?.helper;host.innerHTML=`${helper?`<p>🤝 同行：${NPC_ROSTER[helper].name} · 剩 ${e.social.helperBattles} 場</p>`:''}<div class="run-header"><b>第 ${e.chapter} 章 · 線索 ${e.clues}/${requiredClues()}</b><small>旅程 ${e.seed.toString(16).toUpperCase()}</small></div><p>${escapeHtml(weather.name)} · ${escapeHtml(weather.desc)}</p><div class="run-relics">${e.relics.length?e.relics.map(id=>`<span title="${escapeHtml(RUN_RELICS[id].desc)}">◈ ${escapeHtml(RUN_RELICS[id].name)}</span>`).join(''):'奇物 0/5 · 探索神明的失物招領，組出不同的能力組合。'}</div>`;}
+function expeditionVictory(isBoss){const e=ensureExpedition();adventure.gold+=relicBonus('gold')+(currentWeather().id==='fog'&&!isBoss?2:0);if(relicBonus('heal'))healFraction(relicBonus('heal'));if(isBoss){e.pendingIntro=true;log(`📜 ${BOSS_DESIGNS.find(b=>b.name===currentEnemy.name)?.defeat||'前方還有新的故事。'}`);}}
+function tacticalActionAvailable(action){const e=ensureExpedition();return (action==='FLEE'&&!adventure.battle?.isBoss)||action==='GUARD'||action==='POTION'&&e.potions>0||action==='CLEANSE'&&e.antidotes>0&&(hero.poisonStacks>0||hero.burnTurns>0||hero.defDownTurns>0);}
+function useTacticalItem(action){const e=ensureExpedition();if(action==='POTION'){e.potions--;healFraction(.4);log('🧪 喝下藥水，回復 40% HP。本回合不攻擊。');}if(action==='CLEANSE'){e.antidotes--;hero.poisonStacks=0;hero.burnTurns=hero.burnDamage=hero.defDownTurns=hero.defDownRate=0;log('✧ 解毒藥洗去毒、灼燒與破甲。本回合不攻擊。');}}
+function syncTactics(){const el=$('tactical-actions');if(!el)return;const active=['BATTLE','BATTLE_ACTION'].includes(gameState);const flee=$('tactic-flee');if(flee){flee.disabled=gameState!=='BATTLE'||!!adventure.battle?.isBoss;flee.textContent=adventure.battle?.isBoss?'首領不可逃':`逃跑 ${active?battleEscapeChance():0}%`;}el.hidden=!active;if(!active)return;const e=ensureExpedition();$('tactic-guard').disabled=gameState!=='BATTLE';$('tactic-potion').disabled=gameState!=='BATTLE'||e.potions<=0;$('tactic-potion').textContent=`藥水 ×${e.potions}`;$('tactic-cleanse').disabled=gameState!=='BATTLE'||!tacticalActionAvailable('CLEANSE');$('tactic-cleanse').textContent=`解毒 ×${e.antidotes}`;}
+function initExpeditionUI(){
+ const panel=document.createElement('section');panel.id='expedition-summary';panel.className='panel run-panel';document.querySelector('.play-column').insertBefore(panel,document.querySelector('.adventure-panel'));
+ const row=document.createElement('div');row.id='tactical-actions';row.hidden=true;row.innerHTML='<button id="tactic-guard" title="消耗一回合，普通傷害減少 65%，大幅減少蓄力衝擊">堅守</button><button id="tactic-potion" title="消耗一回合回復 40% HP，敵人仍會行動">藥水</button><button id="tactic-cleanse" title="消耗一回合解除毒、灼燒與破甲">解毒</button>';commandMenu.after(row);
+ for(const [id,action]of [['guard','GUARD'],['potion','POTION'],['cleanse','CLEANSE']])$(`tactic-${id}`).onclick=e=>{if(e.detail>1)return;handleBattleAction(action);};
+ updateExpeditionPanel();syncTactics();
+}
+
+;
+
+/* === chronicle.js === */
+/* Odd little stories with costs, persistent consequences and a few delayed payoffs. */
+function journeyXP(fraction=.16){gainExp(Math.max(8,Math.floor(hero.expToNextLevel*fraction)));}
+function safeWound(rate){const n=Math.min(hero.hp-1,Math.max(1,Math.floor(hero.maxHp*rate)));hero.hp-=Math.max(0,n);return Math.max(0,n);}
+Object.assign(EVENTS,{
+ relic_shrine:{title:'神明清倉，不接受退貨',tag:'失物招領',object:84,available:()=>false,text:'神像把桌上三樣破爛推給你：「這些不是垃圾，是尚未被理解的神器。」',choices:()=>ensureExpedition().relicOffers.map((id,i)=>choice(RUN_RELICS[id].name,RUN_RELICS[id].desc,()=>takeRelic(i)))},
+ living_luggage:{title:'你的行李說它也要休假',tag:'勞資糾紛（背包限定）',object:92,text:'一只箱子追上你，堅稱自己才是主角。「你只是負責背我的交通工具。」',choices:()=>[
+ choice('支付行李的交通費','6 金幣 → 藥水 +2',()=>{adventure.gold-=6;ensureExpedition().potions=Math.min(5,ensureExpedition().potions+2);resultEvent('箱子收錢後，態度非常親切','牠吐出兩瓶藥水，並偷偷把你列為常客。',91);},()=>adventure.gold>=6),
+ choice('跟牠比誰比較會裝','50% 拿戒指；50% 損失 15% HP',()=>{if(runRandom()<.5)giveEventLoot('RING','行李認輸的賠禮');else{safeWound(.15);resultEvent('你裝得太像，被當行李摔了一下','損失 15% 最大 HP，最低保留 1 HP。箱子給你的演技五顆星。',92);}}),
+ choice('把牠寄回家','免費 · 經驗值',()=>{journeyXP(.12);resultEvent('沒有填地址，照樣寄出了','郵差說他們從不保證送達，但保證會迷路。',122);})]},
+ receipt_duel:{title:'收據比怪物還難打',tag:'報帳副本',object:85,text:'商人說你上次救了世界沒有開發票，所以世界和平不能報帳。',choices:()=>[
+ choice('補開統一發票','花 8 金幣 · 防禦素材 +5',()=>{adventure.gold-=8;addMaterials('SHIELD',5);resultEvent('發票的紙比你的盾還硬','盾牌素材 +5，商人提醒你月底前送件。',85);},()=>adventure.gold>=8),
+ choice('把收據當武器','武器素材 +3 · 損失 10% HP',()=>{safeWound(.1);addMaterials('WEAPON',3);resultEvent('紙割傷是真的傷','武器素材 +3。你從此不敢輕視文書工作。',103);}),
+ choice('宣稱自己是贈品','免費 · 獲得 5 金幣',()=>{adventure.gold+=5;resultEvent('商人把你放進買一送一專區','你趁他轉身找膠帶時逃走，順手領了 5 金幣的體驗費。',85);})]},
+ chicken_loan:{title:'一隻雞跟你借創業基金',tag:'高風險投資（雞界）',object:88,available:()=>!ensureExpedition().flags.chickenLoan&&!ensureExpedition().flags.chickenDone,text:'「咕。」雞說。旁邊寫著：年化報酬一百顆蛋，保本不保命。',choices:()=>[
+ choice('投資雞的夢想','12 金幣 · 幾次探索後收到回報',()=>{adventure.gold-=12;const e=ensureExpedition();e.flags.chickenLoan=adventure.steps;resultEvent('牠留下了一個腳印當合約','雞帶著錢跑了。也許牠真的是去創業。',88);},()=>adventure.gold>=12),
+ choice('只投資一頓飯','回復 25% HP',()=>{healFraction(.25);resultEvent('你和雞一起吃了素食','牠開始相信這世界還有好人。',86);}),
+ choice('要求五年營運計畫','經驗值 · 免費',()=>{journeyXP(.12);resultEvent('雞沉默了，你學到很多','至少你現在知道，咕咕叫不等於有商業模式。',85);})]},
+ chicken_return:{title:'雞真的回來了，還穿著領帶',tag:'前面的選擇有了回音',object:85,available:()=>false,text:'牠帶著兩個保鑣，還有一張人類看不懂的損益表。你決定先問錢在哪。',choices:()=>[
+ choice('領取現金分紅','收回 30 金幣',()=>{const e=ensureExpedition();e.flags.chickenDone=true;e.flags.chickenLoan=0;adventure.gold+=30;resultEvent('這是你見過最守信用的雞','金幣 +30。狐狸對自己一直只撿兩塊錢感到壓力。',85);}),
+ choice('把分紅換成奇物','選一件旅途奇物',()=>{const e=ensureExpedition();e.flags.chickenDone=true;e.flags.chickenLoan=0;prepareRelicOffers();enterEvent('relic_shrine');}),
+ choice('要一年的雞蛋','藥水與解毒藥各 +2（上限 5）',()=>{const e=ensureExpedition();e.flags.chickenDone=true;e.flags.chickenLoan=0;e.potions=Math.min(5,e.potions+2);e.antidotes=Math.min(5,e.antidotes+2);resultEvent('雞把業務轉交給了鴨','補給各 +2。你決定不追究為什麼雞蛋會裝在藥瓶裡。',86);})]},
+ door_interview:{title:'一扇門要求你先面試',tag:'會說話的捷徑',object:33,text:'「請用三個詞形容你自己。」門問。你懷疑牠只是想收集你的稱號資料。',choices:()=>[
+ choice('誠實、自律、沒帶鑰匙','免費 · 多取得 1 通行線索',()=>{const e=ensureExpedition();e.clues=Math.min(requiredClues(),e.clues+1);resultEvent('門笑得把鉸鏈震鬆了','通行線索 +1。你從門框旁邊走了過去。',33);}),
+ choice('敲門，但用劍','武器素材 +4 · 損失 12% HP',()=>{safeWound(.12);addMaterials('WEAPON',4);resultEvent('面試結束，雙方都不太滿意','武器素材 +4。門說你的溝通方式非常直接。',103);}),
+ choice('反問薪資與休假','獲得經驗，門不再說話',()=>{journeyXP(.18);resultEvent('這次輪到門保持沉默','你學會了讓任何面試快速結束的方法。',33);})]},
+ ghost_band:{title:'幽靈樂團缺一個活人觀眾',tag:'地下音樂會（真的地下）',object:84,text:'主唱說只要有人鼓掌，他們就能安心成佛。鼓手提醒他這是搖滾樂團。',choices:()=>[
+ choice('聽完安可曲','花 6 金幣 · 下 5 回合傷害 +25%',()=>{adventure.gold-=6;hero.buffDamageUpTurns=5;hero.buffDamageUpRate=.25;resultEvent('你獲得了不屬於這個世界的節拍','砍擊與魔法基礎攻擊 +25%，持續 5 個戰鬥回合。',84);},()=>adventure.gold>=6),
+ choice('上台敲三角鐵','看穿下 3 回合敵人出招',()=>{adventure.scoutTurns=Math.max(adventure.scoutTurns,3);resultEvent('三角鐵一響，靈魂都震清醒了','洞察至少 3 回合。主唱說你搶戲搶得很專業。',87);}),
+ choice('幫他們把音量調小','恢復 25% HP',()=>{healFraction(.25);resultEvent('你終於聽見自己的心跳','恢復 25% HP。樂團對這種前衛的寂靜十分感動。',84);})]},
+ slime_court:{title:'史萊姆告你踩到牠的影子',tag:'森林小額法庭',object:108,text:'法官也是史萊姆，陪審團也是。唯一的證人是一灘水。',choices:()=>[
+ choice('庭外和解','8 金幣 · 解毒藥 +3',()=>{adventure.gold-=8;const e=ensureExpedition();e.antidotes=Math.min(5,e.antidotes+3);resultEvent('法官判定：皆大歡喜','解毒藥 +3。原告主動替你擦乾鞋子。',108);},()=>adventure.gold>=8),
+ choice('要求影子出庭作證','免費 · 經驗值 + 金幣 4',()=>{journeyXP(.15);adventure.gold+=4;resultEvent('法庭陷入了哲學危機','你在休庭期間離開，還拿到 4 金幣交通補助。',108);}),
+ choice('把整間法庭舀進桶子','普通戰鬥 · 勝利可打寶',()=>{log('史萊姆的律師開始憤怒冒泡！');startSmallBattle(0);})]},
+ fortune_cookie:{title:'預言餅乾預言了你會吃它',tag:'百分之百準確',object:86,text:'紙條寫著：「接下來你會看到三個選項。」太準了，令人毛骨悚然。',choices:()=>[
+ choice('把紙條也吃掉','損失 8% HP · 看穿下 6 回合出招',()=>{safeWound(.08);adventure.scoutTurns=Math.max(6,adventure.scoutTurns);resultEvent('你吃下了未來，也有點噎到','洞察至少 6 回合。未來的味道像廉價油墨。',86);}),
+ choice('分給狐狸／路人','藥水 +1',()=>{const e=ensureExpedition();e.potions=Math.min(5,e.potions+1);resultEvent('紙條說：好心會有好報','你得到 1 瓶藥水。餅乾公司對這次業配很滿意。',88);}),
+ choice('要求餅乾先報明牌','50% +18 金幣；50% 沒中',()=>{const win=runRandom()<.5;if(win)adventure.gold+=18;resultEvent(win?'你中了！但只有十八塊':'餅乾說，它只預言過去',win?'金幣 +18。不要拿去加碼。':'沒有損失，也沒有收穫。至少餅乾不難吃。',86);})]},
+ clock_fixer:{title:'修鐘師傅把星期一拆掉了',tag:'時間維修站',object:87,text:'「所以大家都精神很好。」他說。你看著牆上的星期二，感覺它也快下班了。',choices:()=>[
+ choice('買一段午休時間','10 金幣 · HP 全滿、負面狀態全清',()=>{adventure.gold-=10;healFully();hero.poisonStacks=0;resultEvent('你醒來時，天氣還是剛才那樣','HP 全滿，毒、灼燒與破甲解除。',87);},()=>adventure.gold>=10),
+ choice('幫忙撿地上的秒針','盾牌素材 +3',()=>{addMaterials('SHIELD',3);resultEvent('時間就是金錢，秒針就是素材','盾牌素材 +3。別把它調回星期一。',87);}),
+ choice('把明天的勇氣借來','下 4 回合傷害 +30%',()=>{hero.buffDamageUpTurns=4;hero.buffDamageUpRate=.3;resultEvent('明天的你可能會有點慫','本次先勇敢一下：砍擊與魔法 +30%，持續 4 回合。',87);})]},
+ soup_inspector:{title:'假冒的食安員，真的會解毒',tag:'遺跡攤販',object:85,text:'證件上寫「食安猿」，照片是一隻猴子。他堅稱是印刷錯誤。',choices:()=>[
+ choice('買他的解毒藥','7 金幣 → 解毒藥 +2',()=>{adventure.gold-=7;const e=ensureExpedition();e.antidotes=Math.min(5,e.antidotes+2);resultEvent('證件雖假，藥倒是真的','解毒藥 +2。猿先生祝你食用愉快。',85);},()=>adventure.gold>=7),
+ choice('舉發他的錯字','獲得 6 金幣封口費',()=>{adventure.gold+=6;resultEvent('他現場改成了「食安元」','金幣 +6。你決定讓他先去學國字。',85);}),
+ choice('試喝免費檢驗樣本','HP +30%，50% 中 1 層毒',()=>{healFraction(.3);if(runRandom()<.5)hero.poisonStacks=Math.min(5,hero.poisonStacks+1);resultEvent('檢驗結果是：需要再檢驗','恢復 30% HP；可能帶有 1 層毒，開打前留意狀態。',86);})]},
+ lost_hero:{title:'有人穿著跟你一樣的裝備',tag:'主角撞衫',object:98,text:'對方拿出一張主角證明。「你也是？」你們決定先不要吵，兩個主角打折嗎？',choices:()=>[
+ choice('交換打王心得','下 5 回合洞察',()=>{adventure.scoutTurns=Math.max(adventure.scoutTurns,5);resultEvent('他說，看到蓄力就不要裝沒看到','洞察至少 5 回合。這建議居然真的有用。',98);}),
+ choice('交換剩下的零件','兩種素材各 +2',()=>{addMaterials('WEAPON',2);addMaterials('SHIELD',2);resultEvent('互相交換之後，兩個背包都更重了','武器與盾牌素材各 +2。',98);}),
+ choice('決定誰當下一集主角','菁英切磋 · 較高風險',()=>startEliteBattle())]}
+});
+Object.assign(EVENT_CAST,{relic_shrine:['sage','violet'],receipt_duel:['merchant'],chicken_loan:['auburn'],chicken_return:['merchant'],door_interview:['sentinel'],ghost_band:['violet','sage'],fortune_cookie:['veteran'],clock_fixer:['smith'],soup_inspector:['merchant'],lost_hero:['swordsman','silver','ranger']});
+const oldPickEvent=pickEvent;
+pickEvent=function(){const e=ensureExpedition();if(e.flags.chickenLoan&&adventure.steps-e.flags.chickenLoan>=4)return 'chicken_return';const id=oldPickEvent();e.recent.push(id);e.recent=e.recent.slice(-5);return id;};
+
+;
+
+/* === expedition-save.js === */
+/* Strict additive save fields. Older v2/v2.1/v2.2 journeys keep their stats and equipment. */
+function cleanExpedition(input){
+ if(input==null)return null;const e=validObject(input);if(e.version!==1)throw new Error('旅程規則版本無效');
+ const out={version:1,seed:validNumber(e.seed,1,4294967295),rng:validNumber(e.rng,1,4294967295),chapter:validNumber(e.chapter,1,5),depth:validNumber(e.depth),clues:validNumber(e.clues,0,8),generation:validNumber(e.generation),potions:validNumber(e.potions,0,5),antidotes:validNumber(e.antidotes,0,5),pendingIntro:validBool(e.pendingIntro),flags:{},choices:[],relics:[],relicOffers:[],recent:[],history:[],lastRoute:e.lastRoute??null,weather:e.weather??null,place:e.place??null,social:cleanSocial(e.social)};
+ if(out.place!==null&&!Object.hasOwn(WORLD_PLACES,out.place))throw Error("地點無效");
+ if(out.weather!==null&&!RUN_WEATHER.some(w=>w.id===out.weather))throw new Error('天氣資料無效');if(out.lastRoute!==null&&!Object.hasOwn(ROUTE_KINDS,out.lastRoute))throw new Error('路線類型無效');
+ if(!Array.isArray(e.choices)||e.choices.length>3)throw new Error('路線選項無效');
+ out.choices=e.choices.map(c=>{if(!Object.hasOwn(ROUTE_KINDS,c.kind))throw new Error('路線類型無效');return {kind:c.kind,id:validText(c.id,80),flavor:validNumber(c.flavor,0,3)};});
+ for(const [key,limit]of [['relics',5],['relicOffers',3]]){if(!Array.isArray(e[key])||e[key].length>limit||new Set(e[key]).size!==e[key].length||e[key].some(id=>!Object.hasOwn(RUN_RELICS,id)))throw new Error('奇物資料無效');out[key]=[...e[key]];}
+ if(!Array.isArray(e.recent)||e.recent.length>5||e.recent.some(id=>!Object.hasOwn(EVENTS,id)))throw new Error('遭遇紀錄無效');out.recent=[...e.recent];
+ if(!Array.isArray(e.history)||e.history.length>120||e.history.some(v=>typeof v!=='string'||!/^([1-5]):(battle|event|elite|treasure|rest|relic)$/.test(v)))throw new Error('路程紀錄無效');out.history=[...e.history];
+ if(e.flags?.chickenLoan!=null)out.flags.chickenLoan=validNumber(e.flags.chickenLoan);if(e.flags?.chickenDone!=null)out.flags.chickenDone=validBool(e.flags.chickenDone);
+ return out;
+}
+function cleanBossState(input){
+ if(input==null)return null;const s=validObject(input);if(!BOSS_DESIGNS.some(b=>b.id===s.id))throw new Error('首領機制無效');
+ if(s.lastMove!=null&&!Object.hasOwn(MOVE_NAMES,s.lastMove))throw new Error('前次招式無效');
+ if(!Array.isArray(s.sealMoves)||s.sealMoves.length>3||new Set(s.sealMoves).size!==s.sealMoves.length||s.sealMoves.some(m=>!Object.hasOwn(MOVE_NAMES,m)))throw new Error('破印資料無效');
+ const out={id:s.id,ward:validNumber(s.ward,0,3),exposed:validNumber(s.exposed,0,4),lastMove:s.lastMove??null,repeats:validNumber(s.repeats),phase:validNumber(s.phase,1,2),charge:validNumber(s.charge,0,5),sealMoves:[...s.sealMoves],staggered:validBool(s.staggered)};
+ if(s.resist!=null){if(!Object.hasOwn(MOVE_NAMES,s.resist)||!Object.hasOwn(MOVE_NAMES,s.weak))throw new Error('首領抗性無效');out.resist=s.resist;out.weak=s.weak;}
+ if(s.plan){if(!['normal','siphon','charge','inferno','recover','venom','armor','stamp','seal','judgment'].includes(s.plan.kind))throw new Error('首領預告無效');if(s.plan.counter!=null&&!['⚔️','🌠','🛡️','GUARD','SEQUENCE','DIFFERENT'].includes(s.plan.counter))throw new Error('應對招式無效');out.plan={kind:s.plan.kind,title:validText(s.plan.title,150),hint:validText(s.plan.hint,400),counter:s.plan.counter??null};}
+ return out;
+}
+function migrateExpeditionOnLoad(){
+ ensureExpedition();if(bossLevel<=ENEMIES.BOSS.length){adventure.pendingEnding=false;if(gameState==='CREDITS'){gameState='MAP';adventure.expedition.pendingIntro=true;adventure.clearRecorded=false;log('📜 原來和平只有試用期：新增第四、第五章已接上，原裝備與等級全保留。');}}
+ if(gameState==='BATTLE')initBossState();
+}
+
+;
+
+/* === places.js === */
+/* Named scene variants for the game's local display. */
+const WORLD_PLACES={forest:'林間小徑',village:'風鈴村莊',market:'流動市集',tavern:'歪杯子酒館',cave:'迴聲洞穴',marsh:'迷霧沼澤',road:'舊石板商道',camp:'旅人營地',ruins:'巫妖祠堂',volcano:'餘燼龍巢',citadel:'發條城寨',casino:'倒轉骰宮'};
+const EVENT_PLACES={forge:'village',merchant:'market',soup:'tavern',bard:'tavern',courier:'road',delivery:'village',spring:'marsh',bridge:'road',chest:'cave',campfire:'camp',shrine:'ruins',elite:'road',relic_shrine:'ruins',living_luggage:'market',receipt_duel:'market',chicken_loan:'village',chicken_return:'market',door_interview:'citadel',ghost_band:'cave',slime_court:'marsh',fortune_cookie:'tavern',clock_fixer:'village',soup_inspector:'market',lost_hero:'camp'};
+function settlementPlace(){return ['village','market','camp','citadel','tavern'][Math.min(4,bossLevel-1)];}
+function currentPlace(mode){
+ if(gameState==='TITLE')return 'forest';
+ if(mode==='battle'&&adventure.battle?.isBoss)return ['ruins','volcano','marsh','citadel','casino'][Math.min(4,bossLevel-1)];
+ if(gameState==='MAP')return settlementPlace();
+ if(gameState==='ROUTE')return 'road';
+ return adventure.expedition?.place||'forest';
+}
+function showPlace(mode){
+ const place=currentPlace(mode);$('stage').dataset.place=place;
+ $('region-label').textContent=WORLD_PLACES[place];
+ let layer=$('place-scenery');
+ if(!layer){layer=document.createElement('div');layer.id='place-scenery';layer.setAttribute('aria-hidden','true');for(let i=0;i<5;i++){const item=document.createElement('i');item.className='scenery-piece piece-'+i;layer.append(item);}$('stage').insertBefore(layer,$('hero-actor'));}
+ layer.dataset.place=place;
+}
+
+;
+
+/* === npc-world.js === */
+/* Single-player NPC adventurers. No network players or external services. */
+const NPC_ROSTER={
+ moss:{name:'阿苔',title:'很會迷路的遊俠',look:'ranger',role:'斥候',nature:'嘴硬、喜歡當隊長',base:3,line:'我沒有迷路，是這條路還沒跟上我。'},
+ lune:{name:'露娜',title:'欠睡眠的法師',look:'violet',role:'法師',nature:'毒舌但會照顧人',base:4,line:'我不是在打瞌睡，我在冥想你的智商。'},
+ iron:{name:'鐵餅',title:'背鍋專用的盾衛',look:'jade',role:'守衛',nature:'老實、怕欠錢',base:4,line:'我扛得住傷害，扛不住房租。'},
+ tink:{name:'小叮',title:'工具比朋友多的工匠',look:'smith',role:'工匠',nature:'熱心、工具不外借',base:3,line:'你的劍能修。你的操作我不保證。'},
+ amber:{name:'阿栗',title:'不帶地圖的商旅',look:'merchant',role:'商人',nature:'精明、記得恩情',base:2,line:'朋友歸朋友，打折要看交情。'},
+ snow:{name:'白梨',title:'堅稱自己是新手的劍士',look:'silver',role:'劍士',nature:'愛切磋、有輸有贏',base:5,line:'我才玩一下下。上一次是三百年前。'},
+ snip:{name:'小剪',title:'手比嘴快的小偷',look:'shadow',role:'盜賊',nature:'膽小、跑得快',base:3,bad:true,line:'你的錢包剛才說想跟我回家。'},
+ coin:{name:'金牙',title:'按人頭收費的路霸',look:'ruby',role:'路霸',nature:'貪財、欺軟怕硬',base:5,bad:true,line:'此路是我開，團體沒有優惠。'},
+ brick:{name:'板磚',title:'不太懂搶劫的打手',look:'sentinel',role:'打手',nature:'力氣大、容易說服',base:4,bad:true,line:'老大說劫財。我以為他要借柴。'},
+ ember:{name:'紅豆',title:'把補血當辣椒的牧師',look:'sun',role:'補給員',nature:'開朗、偶爾不靠譜',base:3,line:'喝下去會熱熱的，代表還活著！'}
+};
+for(const [id,n]of Object.entries(NPC_ROSTER))SCENE_PORTRAITS['npc_'+id]={...SCENE_PORTRAITS[n.look],id:'npc_'+id,name:n.name,kind:'person'};
+const NPC_ENCOUNTERS={npc_party:{members:['moss','lune','iron'],place:'forest'},npc_rival:{members:['snow','tink'],place:'village'},npc_bandits:{members:['coin','brick','snip'],place:'road'},npc_pickpocket:{members:['snip','amber'],place:'market'},npc_ambush:{members:['amber','coin','brick'],place:'cave'},npc_tavern:{members:['moss','snow','ember'],place:'tavern'},npc_wounded:{members:['iron','lune'],place:'marsh'},npc_fake_guard:{members:['brick','coin'],place:'citadel'},npc_camp:{members:[],place:'village'}};
+function ensureSocial(){const e=ensureExpedition();return e.social??={version:1,roster:{},active:[],event:null,campVisits:[],helper:null,helperBattles:0,lastHelpRound:0,lastHelpBattle:0,escapes:0,repute:0};}
+function npcRecord(id){const s=ensureSocial();if(!s.roster[id]){const level=NPC_ROSTER[id].base+Math.max(0,bossLevel-1)*5;s.roster[id]={level,hp:25+level*7,maxHp:25+level*7,trust:0,meetings:0,wins:0,lastSeen:adventure.steps};}return s.roster[id];}
+function npcMeet(id){const n=npcRecord(id);if(adventure.steps-n.lastSeen>=4){n.level=Math.min(40,n.level+1);n.maxHp=25+n.level*7;n.hp=Math.min(n.maxHp,n.hp+12);}n.meetings++;n.lastSeen=adventure.steps;}
+function npcBond(ids,delta){for(const id of ids){const n=npcRecord(id);n.trust=Math.max(-5,Math.min(5,n.trust+delta));}}
+function beginNpcEncounter(id){const s=ensureSocial(),spec=NPC_ENCOUNTERS[id];if(!spec){s.active=[];s.event=null;return;}s.event=id;if(id!=='npc_camp'){s.active=[...spec.members];if(id==='npc_party'&&runRandom()<.4)s.active=s.active.slice(0,2);}for(const n of s.active)npcMeet(n);ensureExpedition().place=id==='npc_camp'?settlementPlace():spec.place;}
+function npcNames(){return ensureSocial().active.map(id=>NPC_ROSTER[id].name).join('、');}
+function npcPanelMarkup(){const s=ensureSocial();if(!s.event||!s.active.length)return '';return `<div class="npc-profiles"><small>NPC 冒險者 · 單機模擬，不是真人連線</small>${s.active.map(id=>{const d=NPC_ROSTER[id],n=npcRecord(id);return `<section><strong>${d.name} <em>Lv.${n.level} · ${d.role}</em></strong><span>${d.title}</span><small>HP ${n.hp}/${n.maxHp} · ${d.nature} · 交情 ${n.trust>0?'+':''}${n.trust} · 相遇 ${n.meetings} 次</small><p>「${n.trust>=2?'是你啊，這次別再讓我一個人扛。':n.trust<=-2?'你上次的事，我還沒忘。':d.line}」</p></section>`;}).join('')}</div>`;}
+function npcCheckChance(kind='escape',level=null){const n=level??Math.max(...ensureSocial().active.map(id=>npcRecord(id).level),hero.level);const base=kind==='talk'?36+hero.currentTieWinRate*.55+ensureSocial().repute*2:35+hero.currentDodge*.65;return Math.round(Math.max(15,Math.min(90,base+(hero.level-n)*3+(adventure.flags.fox&&kind==='escape'?5:0))));}
+function npcEscapeHint(){return `逃離成功率 ${npcCheckChance('escape')}% · 依等級、閃避與狐狸；失敗遭突襲`;}
+function npcTryEscape(ids=ensureSocial().active.filter(id=>NPC_ROSTER[id].bad)){const chance=npcCheckChance('escape');if(runRandom()*100<chance){ensureSocial().escapes++;resultEvent('你跑得很快，尊嚴勉強跟上','成功脫身，沒有戰利品，也沒有金幣損失。',88);}else{safeWound(.08);log(`🏃 逃離失敗（${chance}%）：擦傷 8% HP，對手追上來了。`);startNpcBattle(ids.length?ids:['snip']);}}
+function npcNegotiate(ids=ensureSocial().active.filter(id=>NPC_ROSTER[id].bad)){const chance=npcCheckChance('talk');if(runRandom()*100<chance){npcBond(ids,1);ensureSocial().repute=Math.min(5,ensureSocial().repute+1);resultEvent('你說得太有道理，對方開始懷疑人生','交涉成功，沒有損失。他們打算先開會討論搶劫的必要性。',85);}else{log(`🗣 交涉失敗（${chance}%），對方決定用武器投票。`);startNpcBattle(ids.length?ids:['coin']);}}
+function startNpcBattle(ids,duel=false,bounty=0){
+ const s=ensureSocial();s.active=ids;s.event=duel?'npc_rival':'npc_bandits';for(const id of ids)npcRecord(id);const rank=Math.max(1,Math.min(38,hero.level+1)),count=ids.length;
+ const hp=ids.reduce((sum,id)=>sum+npcRecord(id).hp,0),atk=Math.round(11+ids.reduce((sum,id)=>sum+npcRecord(id).level,0)/count*3.3+(count-1)*3),group=ids.map(id=>NPC_ROSTER[id].name).join('、');
+ createBattle({name:duel?`${group}的切磋`:`${group}的盜賊隊`,hp,atk,def:Math.round(3+rank*.8),mDef:Math.round(2+rank*.65),dodge:ids.includes('snip')?22:10,exp:Math.floor(hero.expToNextLevel*(duel?.23:.38)),lootChance:duel?.65:1,bias:ids.includes('snip')?{'⚔️':.3,'🌠':.2,'🛡️':.5}:{'⚔️':.5,'🌠':.25,'🛡️':.25},npcIds:[...ids],npcBounty:Math.max(0,Math.min(50,bounty)),npcDuel:duel},false);
+}
+function recruitNpc(id){const s=ensureSocial();if(s.helper&&s.helperBattles>0){adventure.scoutTurns=Math.max(2,adventure.scoutTurns);resultEvent('隊伍不是無限大的，便當也不是','已有同行夥伴，這次交換情報：洞察至少 2 回合。',88);return;}s.helper=id;s.helperBattles=2;s.lastHelpRound=0;s.lastHelpBattle=0;npcBond([id],1);resultEvent(`${NPC_ROSTER[id].name}：這兩場我跟你走`,'接下來 2 場戰鬥，每第 4 回合追加你 ATK 的 15%＋其等級一半的傷害。之後重逢仍記得交情。',88);}
+function npcSupport(){const s=ensureSocial(),b=adventure.battle;if(!s.helper||s.helperBattles<=0||!b||b.settled||gameState!=='BATTLE_ACTION'||b.round%4||hero.hp<=0||currentEnemy.hp<=0||(s.lastHelpRound===b.round&&s.lastHelpBattle===b.id))return 0;s.lastHelpRound=b.round;s.lastHelpBattle=b.id;const n=npcRecord(s.helper),dmg=Math.min(currentEnemy.hp,Math.max(2,Math.floor(hero.currentAttack*.15+n.level*.5)));currentEnemy.hp-=dmg;log(`🤝 ${NPC_ROSTER[s.helper].name} 支援 ${dmg} 傷害。`);return dmg;}
+function npcBattleFinished(won){const s=ensureSocial();if(currentEnemy?.npcIds){for(const id of currentEnemy.npcIds){const n=npcRecord(id);if(won){n.hp=Math.max(1,Math.floor(n.maxHp*.25));npcBond([id],currentEnemy.npcDuel?1:-1);}else{n.wins++;n.hp=Math.max(1,Math.floor(n.maxHp*.7));}}if(won){const gold=8+Math.min(30,currentEnemy.npcIds.length*4+bossLevel*2)+(currentEnemy.npcBounty||0);adventure.gold+=gold;log(`🎒 NPC 戰利品：額外 ${gold} 金幣${currentEnemy.npcDuel?'，對手認輸並記住你':'，並可取得裝備'}。`);}}
+ if(s.helper&&s.helperBattles>0){const n=npcRecord(s.helper);if(won)n.wins++;else n.hp=Math.max(1,Math.floor(n.hp*.7));s.helperBattles--;if(!s.helperBattles){log(`👋 ${NPC_ROSTER[s.helper].name} 先去補給，之後有緣再見。`);s.helper=null;}}
+}
+function battleEscapeChance(){return npcCheckChance('escape',currentEnemy?.npcIds?Math.max(...currentEnemy.npcIds.map(id=>npcRecord(id).level)):Math.max(1,hero.level+bossLevel-1));}
+function tryBattleEscape(){const b=adventure.battle;if(!b||b.isBoss)return false;const chance=battleEscapeChance();if(runRandom()*100>=chance){log(`🏃 逃跑失敗（${chance}%）：放棄這回合攻擊，敵人追擊。`);return false;}b.settled=true;ensureSocial().escapes++;log(`🏃 逃跑成功（${chance}%），不發放經驗、金幣或戰利品。`);adventure.result={tag:'安全最重要',title:'打不過，至少還跑得動。',text:'你與同行夥伴成功撤離。這場沒有戰利品，下次準備好再來。',object:88};gameState='RESULT';renderResult();saveAuto();return true;}
+function campResidents(){const ids=Object.keys(NPC_ROSTER).filter(id=>!NPC_ROSTER[id].bad),e=ensureExpedition(),start=(e.seed+e.chapter*3+e.depth)%ids.length;return [ids[start],ids[(start+2)%ids.length]];}
+function meetCampNpc(id){if(gameState!=='MAP'||!campResidents().includes(id))return;const e=ensureExpedition(),s=ensureSocial(),key=`${e.chapter}:${e.depth}:${id}`;if(s.campVisits.includes(key)){toast(`${NPC_ROSTER[id].name}：剛不是聊過了嗎？先去冒險，回來再說。`);return;}s.campVisits.push(key);s.campVisits=s.campVisits.slice(-20);s.active=[id];enterEvent('npc_camp');revealCurrentContent();}
+function renderNpcScene(mode){const layer=$('npc-scene-layer');if(!layer)return;const s=ensureSocial();const ids=gameState==='MAP'?campResidents():currentEnemy?.npcIds&&mode==='battle'?currentEnemy.npcIds:['EVENT','RESULT'].includes(gameState)&&s.event?s.active:[];layer.hidden=!ids.length;layer.replaceChildren();if(!ids.length)return;$('scene-object').hidden=true;$('scene-npc-name').hidden=true;if(mode==='battle')$('enemy-actor').hidden=true;
+ for(const id of ids){const d=NPC_ROSTER[id],n=npcRecord(id),el=document.createElement(gameState==='MAP'?'button':'div');el.className='npc-scene-actor';el.dataset.npc=id;if(gameState==='MAP'){el.type='button';el.onclick=()=>meetCampNpc(id);el.title=`跟 ${d.name} 說話`;}const art=document.createElement('span');art.className='sprite';drawPortrait(art,'npc_'+id,56);const caption=document.createElement('small');caption.textContent=`${d.name} · Lv.${n.level}${gameState==='MAP'?' 💬':''}`;el.append(art,caption);layer.append(el);}
+ if(currentEnemy?.npcIds&&mode==='battle')$('scene-caption').firstElementChild.textContent=`NPC ${ids.length} 人隊伍 · 血條是隊伍合計生命，可用逃跑撤離。`;else if(gameState==='MAP')$('scene-caption').firstElementChild.textContent='點人物可以聊聊；探索回來，村裡可能換了一批冒險者。';
+}
+function initNpcWorld(){const layer=document.createElement('div');layer.id='npc-scene-layer';layer.hidden=true;$('stage').append(layer);const flee=document.createElement('button');flee.id='tactic-flee';flee.textContent='逃跑';flee.title='普通敵人與盜賊可嘗試逃跑；失敗會被追擊。Boss 不可逃離。';flee.onclick=e=>{if(e.detail<=1)handleBattleAction('FLEE');};$('tactical-actions').append(flee);renderNpcScene(gameState==='BATTLE'?'battle':'map');}
+
+;
+
+/* === npc-events.js === */
+/* Dialogue choices are explicit; danger, costs and chances are disclosed before selection. */
+Object.assign(EVENTS,{
+ npc_party:{title:'三個冒險者，四種前進方向',tag:'其他冒險隊',object:88,text:()=>`${npcNames()} 正在吵誰拿反地圖。阿苔堅持自己只是測試大家有沒有在看路。`,choices:()=>[
+ choice('一起走兩場','阿苔暫時加入 · 交情 +1',()=>recruitNpc('moss')),
+ choice('交換路線情報','交情 +1 · 洞察至少 3 回合',()=>{npcBond(ensureSocial().active,1);adventure.scoutTurns=Math.max(3,adventure.scoutTurns);resultEvent('露娜把地圖轉正，世界突然順眼了','你記下情報。他們會記得你曾幫忙，往後說話也會不同。',84);}),
+ choice('假裝自己只是在散步','安全離開 · 無報酬',()=>resultEvent('你把吵架的工作留給專業人士','沒損失，也沒拿獎勵。三個人的友情暫時還沒有解散。',88))]},
+ npc_rival:{title:'白梨說：切磋而已，我會放水',tag:'主角以外的冒險者',object:98,text:'白梨拔出劍，小叮則準備好計分板。你發現「放水」旁邊寫著很小的免責聲明。',choices:()=>[
+ choice('接受切磋','真正戰鬥 · 勝利有經驗、金幣與掉落機會',()=>startNpcBattle(['snow'],true)),
+ choice('請她示範招式','6 金幣 · 經驗、交情 +1',()=>{adventure.gold-=6;journeyXP(.16);npcBond(['snow'],1);resultEvent('她示範得很慢，你還是只看到殘影','得到經驗值。白梨說你有進步，至少這次沒拿反劍。',98);},()=>adventure.gold>=6),
+ choice('誠實承認今天懶得打','安全離開',()=>resultEvent('白梨說，她也只是想找人聊天','你們交換一句抱怨。不是每次見面都需要打架。',98))]},
+ npc_bandits:{title:'盜賊三人組的收費站',tag:'不太友善的遭遇',object:85,text:()=>`${npcNames()} 擋在路中央。金牙喊「此路是我開」，板磚補了一句「其實是公家鋪的」。`,choices:()=>[
+ choice('打敗他們','三人隊伍戰 · 勝利必掉裝備與額外金幣',()=>startNpcBattle(['coin','brick','snip'])),
+ choice('說服他們改行',`交涉成功率 ${npcCheckChance('talk')}% · 依平手率、等級與名聲`,()=>npcNegotiate(['coin','brick','snip'])),
+ choice('找空隙逃離',npcEscapeHint(),()=>npcTryEscape(['coin','brick','snip']))]},
+ npc_pickpocket:{title:'小剪的手，放在不太對的口袋',tag:'市場扒手',object:85,text:'阿栗故意大喊「誰的錢包掉了」，小剪轉頭比你還快。你這才發現他的手在你包裡。',choices:()=>[
+ choice('當場抓住他','單人戰 · 勝利額外金幣、裝備',()=>startNpcBattle(['snip'])),
+ choice('追他進小巷',`追上機率 ${npcCheckChance('escape')}% · 失敗最多損失 15% 金幣（上限18）`,()=>{if(runRandom()*100<npcCheckChance('escape')){npcBond(['amber'],1);startNpcBattle(['snip']);}else{const loss=Math.min(18,Math.floor(adventure.gold*.15));adventure.gold-=loss;resultEvent('他跑得快，你罵得更快',`損失 ${loss} 金幣，裝備沒有被偷。阿栗替你記下他的特徵。`,85);}}),
+ choice('緊抓錢包，先離開','無損失 · 不追擊',()=>resultEvent('有時候，不上鉤就是贏了','你保住所有金幣和裝備，沒有拿到戰利品。',85))]},
+ npc_ambush:{title:'商人的護衛，正在搶自己的老闆',tag:'洞穴裡的翻臉',object:85,text:'阿栗看到你差點哭出來。「他們剛才說加薪，我還以為在開玩笑！」金牙表示這叫內部轉帳。',choices:()=>[
+ choice('幫阿栗擺平護衛','兩人戰 · 商人交情 +2；勝利另有懸賞',()=>{npcBond(['amber'],2);startNpcBattle(['coin','brick'],false,12);}),
+ choice('勸板磚看清勞動合約',`交涉 ${npcCheckChance('talk')}% · 失敗會開戰`,()=>npcNegotiate(['coin','brick'])),
+ choice('先顧好自己',npcEscapeHint(),()=>{npcBond(['amber'],-1);npcTryEscape(['coin','brick']);})]},
+ npc_tavern:{title:'酒館組隊，隊名吵了半小時',tag:'三人一桌的冒險者',object:86,text:'阿苔提議「方向感很好」，白梨投反對票。紅豆只在乎隊伍能不能報銷晚餐。',choices:()=>[
+ choice('請大家吃點東西','8 金幣 · 回復 30% HP、三人交情 +1',()=>{adventure.gold-=8;healFraction(.3);npcBond(ensureSocial().active,1);resultEvent('隊名最後叫「先吃再說」','HP 回復 30%。三個人都記得這頓飯是你請的。',86);},()=>adventure.gold>=8),
+ choice('邀白梨暫時同行','接下來 2 場有夥伴支援',()=>recruitNpc('snow')),
+ choice('只聽旅途八卦','免費 · 洞察至少 2 回合',()=>{adventure.scoutTurns=Math.max(2,adventure.scoutTurns);resultEvent('你聽到三個版本，只有一個是真的','但首領會蓄力這件事，三個人都同意。洞察至少 2 回合。',86);})]},
+ npc_wounded:{title:'盾衛的盾沒壞，人先累了',tag:'沼澤救援',object:88,text:'鐵餅坐在泥地裡，露娜正把補血咒語念成請假申請書。他們這場冒險顯然不太順。',choices:()=>[
+ choice('分一瓶藥水給鐵餅','消耗藥水 1 · 他會陪你打兩場',()=>{ensureExpedition().potions--;npcRecord('iron').hp=npcRecord('iron').maxHp;recruitNpc('iron');},()=>ensureExpedition().potions>0),
+ choice('一起修補裝備','兩人交情 +1 · 盾素材 +2',()=>{npcBond(['iron','lune'],1);addMaterials('SHIELD',2);resultEvent('修好盾之後，他說還想修一下人生','盾素材 +2。露娜記住你願意蹲下來幫忙。',88);}),
+ choice('說你去叫人，然後先走','安全離開 · 交情 −1',()=>{npcBond(['iron','lune'],-1);resultEvent('他們目送你離開，沒說什麼','以後再遇到，可能不會那麼熱情。',88);})]},
+ npc_fake_guard:{title:'這位守衛的制服好像穿反了',tag:'假哨站',object:97,text:'板磚拿著通行費牌子，金牙在後面教他念。「我代表村長收稅！」背後的字卻是「盜賊公會」。',choices:()=>[
+ choice('拆穿並交手','兩人戰 · 勝利有懸賞',()=>startNpcBattle(['brick','coin'],false,8)),
+ choice('問他村長叫什麼',`交涉 ${npcCheckChance('talk')}% · 失敗開戰`,()=>npcNegotiate(['brick','coin'])),
+ choice('付錢通過','8 金幣 · 確定安全，不給裝備',()=>{adventure.gold-=8;resultEvent('板磚收錢後還找了你一張發票','你安全離開，決定不去研究那張發票。',97);},()=>adventure.gold>=8)]},
+ npc_camp:{title:'營地裡不只有你在冒險',tag:'坐下來聊兩句',object:88,available:()=>false,text:()=>`${npcNames()} 朝你揮手。這些是有自己性格與旅程紀錄的 NPC；他們會記得前幾次相遇。`,choices:()=>[
+ choice('聊聊最近打的怪','免費 · 交情 +1、洞察至少 1 回合',()=>{npcBond(ensureSocial().active,1);adventure.scoutTurns=Math.max(1,adventure.scoutTurns);resultEvent('你們交換了一點用得到的抱怨','洞察至少 1 回合。探索一次再回來，可以看到誰還留在營地。',88);}),
+ choice('用補給交換情報','6 金幣 · 交情 +1、洞察至少 4 回合',()=>{adventure.gold-=6;npcBond(ensureSocial().active,1);adventure.scoutTurns=Math.max(4,adventure.scoutTurns);resultEvent('他把真正有用的部分畫在地圖背面','洞察至少 4 回合。這次沒有畫反。',88);},()=>adventure.gold>=6),
+ choice('說聲嗨就走','沒有代價 · 回營地',()=>resultEvent('路上小心，下次再聊','他們繼續整理自己的行囊。你也還有路要走。',88))]}
+});
+
+;
+
+/* === npc-save.js === */
+/* Validate NPC save data before applying it. Old saves default to an empty social ledger. */
+function cleanSocial(input){
+ if(input==null)return null;const s=validObject(input);if(s.version!==1)throw Error('NPC 紀錄版本無效');
+ const out={version:1,roster:{},active:[],event:s.event??null,campVisits:[],helper:s.helper??null,helperBattles:validNumber(s.helperBattles,0,2),lastHelpRound:validNumber(s.lastHelpRound),lastHelpBattle:validNumber(s.lastHelpBattle),escapes:validNumber(s.escapes),repute:validNumber(s.repute,-5,5)};
+ if(out.event!==null&&!Object.hasOwn(NPC_ENCOUNTERS,out.event))throw Error('NPC 遭遇無效');if(out.helper!==null&&!Object.hasOwn(NPC_ROSTER,out.helper))throw Error('同行 NPC 無效');
+ if(!Array.isArray(s.active)||s.active.length>3||new Set(s.active).size!==s.active.length||s.active.some(id=>!Object.hasOwn(NPC_ROSTER,id)))throw Error('NPC 隊伍資料無效');out.active=[...s.active];
+ if(!Array.isArray(s.campVisits)||s.campVisits.length>20||s.campVisits.some(x=>typeof x!=='string'||!/^([1-5]):\d{1,8}:[a-z]+$/.test(x)))throw Error('營地相遇紀錄無效');out.campVisits=[...s.campVisits];
+ const roster=validObject(s.roster);if(Object.keys(roster).length>Object.keys(NPC_ROSTER).length)throw Error('NPC 名冊過大');
+ for(const [id,n]of Object.entries(roster)){if(!Object.hasOwn(NPC_ROSTER,id))throw Error('未知 NPC');const maxHp=validNumber(n.maxHp,1,10000);out.roster[id]={level:validNumber(n.level,1,40),hp:validNumber(n.hp,1,maxHp),maxHp,trust:validNumber(n.trust,-5,5),meetings:validNumber(n.meetings),wins:validNumber(n.wins),lastSeen:validNumber(n.lastSeen)};}
+ return out;
+}
+function cleanNpcEnemy(e,out){if(e.npcIds!=null){if(!Array.isArray(e.npcIds)||e.npcIds.length<1||e.npcIds.length>3||e.npcIds.some(id=>!Object.hasOwn(NPC_ROSTER,id))||new Set(e.npcIds).size!==e.npcIds.length)throw Error('敵方 NPC 隊伍無效');out.npcIds=[...e.npcIds];out.npcBounty=validNumber(e.npcBounty??0,0,50);out.npcDuel=validBool(e.npcDuel??false);}return out;}
+
+;
+
 /* === ui.js === */
 /* Initialize the visible game controls after the page is ready. */
 function initGameUI(){
@@ -2065,7 +2451,7 @@ function initGameUI(){
  $('btn-guide').onclick=()=>$('guide-dialog').showModal();
  $('btn-records').onclick=openRecords;
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
- initSaveUI();initEnhancementUI();initActionDock();initMusic();
+ initSaveUI();initEnhancementUI();initActionDock();initExpeditionUI();initNpcWorld();initMusic();
 }
 window.addEventListener('DOMContentLoaded',initGameUI);
 

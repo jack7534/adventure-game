@@ -1,0 +1,276 @@
+{
+  "method": "20 fixed seeds each. Natural level growth; documented mid-grade gear fixtures, 3 potions, 3 antidotes. No relics or fox. Compare telegraph-aware play against sword-only spam. Rendering/timers accelerated; damage formulas unmodified.",
+  "rows": [
+    {
+      "chapter": 1,
+      "level": 4,
+      "tactic": "smart",
+      "wins": 1,
+      "trials": 20,
+      "rounds": 9.3,
+      "hp": 2.5
+    },
+    {
+      "chapter": 1,
+      "level": 4,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 7.2,
+      "hp": 0
+    },
+    {
+      "chapter": 1,
+      "level": 7,
+      "tactic": "smart",
+      "wins": 15,
+      "trials": 20,
+      "rounds": 18.6,
+      "hp": 45
+    },
+    {
+      "chapter": 1,
+      "level": 7,
+      "tactic": "spam",
+      "wins": 4,
+      "trials": 20,
+      "rounds": 12.3,
+      "hp": 12
+    },
+    {
+      "chapter": 1,
+      "level": 10,
+      "tactic": "smart",
+      "wins": 20,
+      "trials": 20,
+      "rounds": 14.5,
+      "hp": 70
+    },
+    {
+      "chapter": 1,
+      "level": 10,
+      "tactic": "spam",
+      "wins": 18,
+      "trials": 20,
+      "rounds": 14.7,
+      "hp": 63
+    },
+    {
+      "chapter": 2,
+      "level": 9,
+      "tactic": "smart",
+      "wins": 3,
+      "trials": 20,
+      "rounds": 15.6,
+      "hp": 11.3
+    },
+    {
+      "chapter": 2,
+      "level": 9,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 3.6,
+      "hp": 0
+    },
+    {
+      "chapter": 2,
+      "level": 12,
+      "tactic": "smart",
+      "wins": 11,
+      "trials": 20,
+      "rounds": 22.8,
+      "hp": 46.8
+    },
+    {
+      "chapter": 2,
+      "level": 12,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 4,
+      "hp": 0
+    },
+    {
+      "chapter": 2,
+      "level": 15,
+      "tactic": "smart",
+      "wins": 19,
+      "trials": 20,
+      "rounds": 23,
+      "hp": 90.3
+    },
+    {
+      "chapter": 2,
+      "level": 15,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 5.5,
+      "hp": 0
+    },
+    {
+      "chapter": 3,
+      "level": 16,
+      "tactic": "smart",
+      "wins": 3,
+      "trials": 20,
+      "rounds": 14.2,
+      "hp": 16.5
+    },
+    {
+      "chapter": 3,
+      "level": 16,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 4.8,
+      "hp": 0
+    },
+    {
+      "chapter": 3,
+      "level": 19,
+      "tactic": "smart",
+      "wins": 13,
+      "trials": 20,
+      "rounds": 19.6,
+      "hp": 78
+    },
+    {
+      "chapter": 3,
+      "level": 19,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 6.7,
+      "hp": 0
+    },
+    {
+      "chapter": 3,
+      "level": 22,
+      "tactic": "smart",
+      "wins": 17,
+      "trials": 20,
+      "rounds": 21.5,
+      "hp": 110.5
+    },
+    {
+      "chapter": 3,
+      "level": 22,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 6.2,
+      "hp": 0
+    },
+    {
+      "chapter": 4,
+      "level": 23,
+      "tactic": "smart",
+      "wins": 2,
+      "trials": 20,
+      "rounds": 17.9,
+      "hp": 14.5
+    },
+    {
+      "chapter": 4,
+      "level": 23,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 4.8,
+      "hp": 0
+    },
+    {
+      "chapter": 4,
+      "level": 26,
+      "tactic": "smart",
+      "wins": 12,
+      "trials": 20,
+      "rounds": 25.4,
+      "hp": 93
+    },
+    {
+      "chapter": 4,
+      "level": 26,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 5.3,
+      "hp": 0
+    },
+    {
+      "chapter": 4,
+      "level": 29,
+      "tactic": "smart",
+      "wins": 14,
+      "trials": 20,
+      "rounds": 24.8,
+      "hp": 115.5
+    },
+    {
+      "chapter": 4,
+      "level": 29,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 6.1,
+      "hp": 0
+    },
+    {
+      "chapter": 5,
+      "level": 31,
+      "tactic": "smart",
+      "wins": 5,
+      "trials": 20,
+      "rounds": 18.4,
+      "hp": 45
+    },
+    {
+      "chapter": 5,
+      "level": 31,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 4.8,
+      "hp": 0
+    },
+    {
+      "chapter": 5,
+      "level": 34,
+      "tactic": "smart",
+      "wins": 13,
+      "trials": 20,
+      "rounds": 21.8,
+      "hp": 123.5
+    },
+    {
+      "chapter": 5,
+      "level": 34,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 5.3,
+      "hp": 0
+    },
+    {
+      "chapter": 5,
+      "level": 37,
+      "tactic": "smart",
+      "wins": 15,
+      "trials": 20,
+      "rounds": 19.5,
+      "hp": 153.8
+    },
+    {
+      "chapter": 5,
+      "level": 37,
+      "tactic": "spam",
+      "wins": 0,
+      "trials": 20,
+      "rounds": 5.8,
+      "hp": 0
+    }
+  ],
+  "errors": []
+}

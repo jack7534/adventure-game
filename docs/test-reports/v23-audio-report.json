@@ -1,0 +1,122 @@
+{
+  "checks": [
+    "AudioContext is not started before a user gesture",
+    "37 → 22 downgrade is visibly marked",
+    "Affix descriptions explain the original veteran effect",
+    "Risky equip button is not styled as a safe upgrade",
+    "Comparison does not mutate state or consume random rolls",
+    "Cancel leaves equipment, pending loot, materials and stats intact",
+    "Second confirmation explains stat loss and dismantling",
+    "Explicit confirmation permits a deliberate build change",
+    "Inherited weapon affix is preserved, not falsely removed",
+    "Shield refinement and lost effects both trigger warnings",
+    "Ring ability loss is warned even when its rarity improves",
+    "Same-ring fusion is not mislabelled as a downgrade",
+    "All 24 original affixes have inline guide explanations",
+    "Guide close stays top-right after full scroll at 1280px",
+    "Guide close stays top-right after full scroll at 390px",
+    "Guide close stays top-right after full scroll at 320px",
+    "Sticky close remains clickable",
+    "Gold buys real materials and preserves them without a weapon",
+    "Purchase result is in the automatic save",
+    "Purchase button is briefly locked against rapid duplicate clicks",
+    "Shopping cannot change equipment or buffs during battle",
+    "Fox supports every third round, once only",
+    "v2 save without pet bookkeeping loads and keeps its existing fox",
+    "Fox kill is settled exactly once",
+    "Fox never attacks for a dead hero",
+    "Music starts from the audio control user gesture",
+    "Score explore renders actual nonzero unclipped audio",
+    "Score battle renders actual nonzero unclipped audio",
+    "Score lich renders actual nonzero unclipped audio",
+    "Score dragon renders actual nonzero unclipped audio",
+    "Score ancient renders actual nonzero unclipped audio",
+    "Score victory renders actual nonzero unclipped audio",
+    "Score warden renders actual nonzero unclipped audio",
+    "Score dice renders actual nonzero unclipped audio",
+    "All soundtrack scores have distinct waveforms",
+    "Boss 1 selects its own score lich",
+    "Boss 1 rendering does not restart or layer the soundtrack",
+    "Boss 2 selects its own score dragon",
+    "Boss 2 rendering does not restart or layer the soundtrack",
+    "Boss 3 selects its own score ancient",
+    "Boss 3 rendering does not restart or layer the soundtrack",
+    "Ordinary battles select the regular battle track",
+    "Leaving combat restores upbeat exploration",
+    "One reusable AudioContext is retained across every transition",
+    "Music scheduling never changes game random outcomes",
+    "Music off stops its timer and future music notes",
+    "Sound effects can play while background music is off",
+    "Music choices survive reload without autoplay",
+    "Hidden page suspends audio and cancels the scheduler",
+    "Returning to the page resumes one soundtrack",
+    "Active voices remain bounded"
+  ],
+  "waveforms": [
+    {
+      "id": "explore",
+      "bpm": 112,
+      "rms": 0.01869370230472176,
+      "peak": 0.09562685340642929,
+      "hash": -1219925199,
+      "notes": 23
+    },
+    {
+      "id": "battle",
+      "bpm": 144,
+      "rms": 0.02351791604955696,
+      "peak": 0.11098252981901169,
+      "hash": -1871542246,
+      "notes": 42
+    },
+    {
+      "id": "lich",
+      "bpm": 154,
+      "rms": 0.02090730812022363,
+      "peak": 0.11599769443273544,
+      "hash": 210371140,
+      "notes": 56
+    },
+    {
+      "id": "dragon",
+      "bpm": 168,
+      "rms": 0.02232478832809148,
+      "peak": 0.11371729522943497,
+      "hash": 1415400217,
+      "notes": 58
+    },
+    {
+      "id": "ancient",
+      "bpm": 180,
+      "rms": 0.024835131366852305,
+      "peak": 0.1064351424574852,
+      "hash": -1399109620,
+      "notes": 62
+    },
+    {
+      "id": "victory",
+      "bpm": 124,
+      "rms": 0.01806638610026075,
+      "peak": 0.10278155654668808,
+      "hash": -496338065,
+      "notes": 22
+    },
+    {
+      "id": "warden",
+      "bpm": 184,
+      "rms": 0.022595897350415468,
+      "peak": 0.11366521567106247,
+      "hash": 92670696,
+      "notes": 63
+    },
+    {
+      "id": "dice",
+      "bpm": 196,
+      "rms": 0.024869117975681573,
+      "peak": 0.11940238624811172,
+      "hash": -882248642,
+      "notes": 63
+    }
+  ],
+  "errors": []
+}

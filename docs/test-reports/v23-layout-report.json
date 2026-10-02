@@ -1,0 +1,197 @@
+{
+  "report": [
+    {
+      "width": 320,
+      "phase": "TITLE",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "TITLE_SAVE_DIALOG",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "MAP",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "BOSS_BATTLE",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "GUIDE",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "RING_DECISION",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "SAVE_DIALOG",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 320,
+      "phase": "EVENT",
+      "scroll": 320,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "TITLE",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "TITLE_SAVE_DIALOG",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "MAP",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "BOSS_BATTLE",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "GUIDE",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "RING_DECISION",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "SAVE_DIALOG",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "phase": "EVENT",
+      "scroll": 390,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "TITLE",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "TITLE_SAVE_DIALOG",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "MAP",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "BOSS_BATTLE",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "GUIDE",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "RING_DECISION",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "SAVE_DIALOG",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "phase": "EVENT",
+      "scroll": 768,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "TITLE",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "TITLE_SAVE_DIALOG",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "MAP",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "BOSS_BATTLE",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "GUIDE",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "RING_DECISION",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "SAVE_DIALOG",
+      "scroll": 1440,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "phase": "EVENT",
+      "scroll": 1440,
+      "pass": true
+    }
+  ],
+  "errors": []
+}

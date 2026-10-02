@@ -1,0 +1,207 @@
+{
+  "results": [
+    {
+      "name": "Village has two named clickable NPCs, not a static ranger",
+      "pass": true
+    },
+    {
+      "name": "Camp dialogue cannot be farmed without exploring",
+      "pass": true
+    },
+    {
+      "name": "NPC bond and identity survive saves",
+      "pass": true
+    },
+    {
+      "name": "Friendly party can have several members",
+      "pass": true
+    },
+    {
+      "name": "Bandit team starts real combat with summed HP",
+      "pass": true
+    },
+    {
+      "name": "NPC victory gives one reward and records wounds",
+      "pass": true
+    },
+    {
+      "name": "Escape chance responds to stats and remains bounded",
+      "pass": true
+    },
+    {
+      "name": "Successful event escape has no rewards",
+      "pass": true
+    },
+    {
+      "name": "Failed escape creates actual pursuit battle",
+      "pass": true
+    },
+    {
+      "name": "Battle escape completes once without victory rewards",
+      "pass": true
+    },
+    {
+      "name": "Boss escape is rejected without consuming the turn",
+      "pass": true
+    },
+    {
+      "name": "Temporary companion supports once per eligible round",
+      "pass": true
+    },
+    {
+      "name": "Companion ends after two settled battles",
+      "pass": true
+    },
+    {
+      "name": "Thief cannot remove equipment or unlimited gold",
+      "pass": true
+    },
+    {
+      "name": "Old save missing social ledger stays compatible",
+      "pass": true
+    },
+    {
+      "name": "Malformed NPC or place is rejected before mutation",
+      "pass": true
+    },
+    {
+      "name": "Twelve distinct named location variants",
+      "pass": true
+    },
+    {
+      "name": "npc_party option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_party option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_party option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_rival option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_rival option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_rival option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_bandits option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_bandits option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_bandits option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_pickpocket option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_pickpocket option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_pickpocket option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_ambush option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_ambush option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_ambush option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_tavern option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_tavern option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_tavern option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_wounded option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_wounded option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_wounded option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_fake_guard option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_fake_guard option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_fake_guard option 3",
+      "pass": true
+    },
+    {
+      "name": "npc_camp option 1",
+      "pass": true
+    },
+    {
+      "name": "npc_camp option 2",
+      "pass": true
+    },
+    {
+      "name": "npc_camp option 3",
+      "pass": true
+    }
+  ],
+  "views": [
+    {
+      "width": 1280,
+      "scroll": 1280,
+      "actors": 3,
+      "place": "road"
+    },
+    {
+      "width": 390,
+      "scroll": 390,
+      "actors": 3,
+      "place": "road"
+    },
+    {
+      "width": 320,
+      "scroll": 320,
+      "actors": 3,
+      "place": "road"
+    },
+    {
+      "width": 844,
+      "scroll": 844,
+      "actors": 3,
+      "place": "road"
+    }
+  ],
+  "errors": []
+}

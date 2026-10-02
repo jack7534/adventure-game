@@ -1,0 +1,29 @@
+{
+  "checks": [
+    "1280: title bonus, change look and real reload",
+    "1280: postman never spider",
+    "1280: fixed buttons top/middle/bottom and cancel safe",
+    "1280: keep equipment is actionable",
+    "1440: title bonus, change look and real reload",
+    "1440: postman never spider",
+    "1440: fixed buttons top/middle/bottom and cancel safe",
+    "1440: keep equipment is actionable",
+    "768: title bonus, change look and real reload",
+    "768: postman never spider",
+    "768: fixed buttons top/middle/bottom and cancel safe",
+    "768: keep equipment is actionable",
+    "390: title bonus, change look and real reload",
+    "390: postman never spider",
+    "390: fixed buttons top/middle/bottom and cancel safe",
+    "390: keep equipment is actionable",
+    "320: title bonus, change look and real reload",
+    "320: postman never spider",
+    "320: fixed buttons top/middle/bottom and cancel safe",
+    "320: keep equipment is actionable",
+    "844: title bonus, change look and real reload",
+    "844: postman never spider",
+    "844: fixed buttons top/middle/bottom and cancel safe",
+    "844: keep equipment is actionable"
+  ],
+  "errors": []
+}

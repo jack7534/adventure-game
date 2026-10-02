@@ -13,7 +13,7 @@ try{
   let ready=false;for(let i=0;i<50;i++){try{const response=await fetch(url);if(response.ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,100));}
   if(!ready)throw new Error('The local preview server did not start.');
  }
- for(const name of ['regression','campaign','layout','save-ui','v21','v22-release']){
+ for(const name of ['regression','campaign','layout','save-ui','v21','v22-release','v23','npc-world','v23-balance']){
   console.log(`\n=== ${name} ===`);
   const child=spawn(process.execPath,[path.join(root,'tests',name+'.mjs')],{cwd:out,stdio:'inherit',env:{...process.env,GAME_URL:url}});
   const status=await new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',resolve);});

@@ -18,11 +18,11 @@ function cleanEquipment(value,type){
 function cleanHero(input){
  const value=validObject(input),out={};
  for(const [key,def]of Object.entries(INITIAL_HERO)){
-  if(typeof def==='number')out[key]=validNumber(key==='titleCritBonus'?(value[key]??0):value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
+  if(typeof def==='number')out[key]=validNumber(['titleCritBonus','poisonStacks'].includes(key)?(value[key]??0):value[key],0,key==='expToNextLevel'?1e12:1e7,!['berserkerBonus','berserkerPenalty','healRingDefBonus','currentDodge','dodgeOverflow','currentTieWinRate','buffDamageUpRate','defDownRate'].includes(key));
  }
- validNumber(out.titleCritBonus,0,5);
+ validNumber(out.titleCritBonus,0,5);validNumber(out.poisonStacks,0,5);
  out.name=validText(value.name,160);out.title=validText(value.title,160);
- validNumber(out.level,1,25);validNumber(out.highestLevel,out.level,25);validNumber(out.maxHp,1,1e7);validNumber(out.hp,1,out.maxHp);validNumber(out.expToNextLevel,1,1e12);if(out.exp>=out.expToNextLevel)throw new Error('經驗值門檻無效');
+ validNumber(out.level,1,MAX_LEVEL);validNumber(out.highestLevel,out.level,MAX_LEVEL);validNumber(out.maxHp,1,1e7);validNumber(out.hp,1,out.maxHp);validNumber(out.expToNextLevel,1,1e12);if(out.exp>=out.expToNextLevel)throw new Error('經驗值門檻無效');
  for(const k of ['magicGuardTurns','burnTurns','defDownTurns','buffDamageUpTurns','regenTurns'])validNumber(out[k],0,100);
  validNumber(out.buffDamageUpRate,0,2,false);validNumber(out.defDownRate,0,1,false);
  out.weaponRefineAffixes=validAffixes(value.weaponRefineAffixes,WEAPON_AFFIX_POOL);
@@ -31,9 +31,9 @@ function cleanHero(input){
 }
 function cleanEnemy(value){
  if(value==null)return null;const e=validObject(value),out={};
- out.name=validText(e.name,120);for(const k of ['hp','originalHp','atk','def','mDef','exp'])out[k]=validNumber(e[k],0,1e7);validNumber(out.originalHp,1,1e7);validNumber(out.hp,0,out.originalHp);out.dodge=validNumber(e.dodge,0,100,false);out.lootChance=validNumber(e.lootChance,0,1,false);
+ out.name=validText(e.name,120);cleanNpcEnemy(e,out);if(e.bossId!=null){if(!BOSS_DESIGNS.some(b=>b.id===e.bossId))throw new Error("首領代號無效");out.bossId=e.bossId;}if(e.modifier!=null){if(!["plain","fierce","armored","nimble"].includes(e.modifier))throw new Error("敵人特性無效");out.modifier=e.modifier;}for(const k of ['hp','originalHp','atk','def','mDef','exp'])out[k]=validNumber(e[k],0,1e7);validNumber(out.originalHp,1,1e7);validNumber(out.hp,0,out.originalHp);out.dodge=validNumber(e.dodge,0,100,false);out.lootChance=validNumber(e.lootChance,0,1,false);
  out.bias={};let total=0;for(const move of Object.keys(MOVE_NAMES)){out.bias[move]=validNumber(e.bias?.[move],0,1,false);total+=out.bias[move];}if(Math.abs(total-1)>.001)throw new Error('怪物出招機率無效');
- if(e.level!=null)out.level=validNumber(e.level,1,3);if(e.elite!=null)out.elite=validBool(e.elite);if(e.ancientChargeState!=null){if(e.ancientChargeState!=='CHARGING')throw new Error('首領蓄力狀態無效');out.ancientChargeState=e.ancientChargeState;}
+ if(e.level!=null)out.level=validNumber(e.level,1,ENEMIES.BOSS.length);if(e.elite!=null)out.elite=validBool(e.elite);if(e.ancientChargeState!=null){if(e.ancientChargeState!=='CHARGING')throw new Error('首領蓄力狀態無效');out.ancientChargeState=e.ancientChargeState;}
  return out;
 }
 function cleanIdentity(value){
@@ -44,11 +44,11 @@ function cleanIdentity(value){
  return {version:1,source:'new',parts:[...id.parts],appearance:id.appearance};
 }
 function cleanAdventure(value){
- const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity)};
+ const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity),expedition:cleanExpedition(a.expedition)};
  for(const k of ['seq','steps','gold','scoutTurns','nextEventAt'])out[k]=validNumber(a[k]);validNumber(out.scoutTurns,0,100);
  for(const k of ['eventResolved','pendingEnding','clearRecorded'])out[k]=validBool(a[k]);
  for(const k of ['eventId','lastEvent']){if(a[k]!=null&&!Object.hasOwn(EVENTS,a[k]))throw new Error('未知的冒險事件');out[k]=a[k];}
- if(!Array.isArray(a.eventDeck)||a.eventDeck.length>20||a.eventDeck.some(id=>!Object.hasOwn(EVENTS,id)))throw new Error('事件牌庫無效');out.eventDeck=[...a.eventDeck];
+ if(!Array.isArray(a.eventDeck)||a.eventDeck.length>64||a.eventDeck.some(id=>!Object.hasOwn(EVENTS,id)))throw new Error('事件牌庫無效');out.eventDeck=[...a.eventDeck];
  for(const [key,val]of Object.entries(validObject(a.eventVisits))){if(!Object.hasOwn(EVENTS,key))throw new Error('事件紀錄無效');out.eventVisits[key]=validNumber(val);}
  for(const key of ['fox','foxGift','parcel','delivered'])if(a.flags?.[key]!=null)out.flags[key]=validBool(a.flags[key]);
  for(const key of ['foxAt','parcelAt'])if(a.flags?.[key]!=null)out.flags[key]=validNumber(a.flags[key]);
@@ -56,19 +56,20 @@ function cleanAdventure(value){
  for(const key of ['wins','deaths','events','loot','bosses','rests'])out.stats[key]=validNumber(a.stats?.[key]);
  if(!Array.isArray(a.logs)||a.logs.length>80)throw new Error('冒險手札過長');out.logs=a.logs.map(s=>validText(s,1600));
  if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};if(r.portraitKey!=null){if(!Object.hasOwn(SCENE_PORTRAITS,r.portraitKey))throw new Error('事件人物造型無效');out.result.portraitKey=r.portraitKey;}}else out.result=null;
- if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round)};}else out.battle=null;
+ if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round),boss:cleanBossState(b.boss),guarding:false};}else out.battle=null;
  return out;
 }
 function validateSave(doc){
  validObject(doc);if(doc.format!=='jack-adventure'||doc.version!==2)throw new Error('這不是支援的勇者模擬器 v2 存檔');validNumber(doc.savedAt,1,9e15);
  const p=validObject(doc.payload);if(!STABLE_PHASES.includes(p.gameState))throw new Error('存檔停在不支援的階段');
- const out={gameState:p.gameState,hero:cleanHero(p.hero),adventure:cleanAdventure(p.adventure),bossLevel:validNumber(p.bossLevel,1,4),currentEnemy:cleanEnemy(p.currentEnemy),newLoot:null,totalTurnCount:validNumber(p.totalTurnCount),lastHealTime:validNumber(p.lastHealTime,0,9e15),weaponMaterials:validNumber(p.weaponMaterials,0,5000),shieldMaterials:validNumber(p.shieldMaterials,0,5000)};
+ const out={gameState:p.gameState,hero:cleanHero(p.hero),adventure:cleanAdventure(p.adventure),bossLevel:validNumber(p.bossLevel,1,ENEMIES.BOSS.length+1),currentEnemy:cleanEnemy(p.currentEnemy),newLoot:null,totalTurnCount:validNumber(p.totalTurnCount),lastHealTime:validNumber(p.lastHealTime,0,9e15),weaponMaterials:validNumber(p.weaponMaterials,0,5000),shieldMaterials:validNumber(p.shieldMaterials,0,5000)};
  if(p.newLoot){if(!['WEAPON','SHIELD','RING'].includes(p.newLoot.type))throw new Error('待領裝備種類無效');out.newLoot=cleanEquipment(p.newLoot,p.newLoot.type);validNumber(out.newLoot.uid,1,out.adventure.seq);}
  if(out.gameState==='BATTLE'&&(!out.currentEnemy||out.currentEnemy.hp<=0||!out.adventure.battle||out.adventure.battle.settled))throw new Error('戰鬥存檔不完整');
  if((out.gameState==='LOOT_DECISION')!==!!out.newLoot)throw new Error('戰利品存檔不完整');
  if(out.gameState==='EVENT'&&(!out.adventure.eventId||out.adventure.eventResolved))throw new Error('事件選擇存檔不完整');
  if(['RESULT','DEFEAT'].includes(out.gameState)&&!out.adventure.result)throw new Error('事件結果不完整');
- if(out.gameState==='CREDITS'&&out.bossLevel!==4)throw new Error('通關進度不完整');
+ if(out.gameState==='CREDITS'&&![4,ENEMIES.BOSS.length+1].includes(out.bossLevel))throw new Error('通關進度不完整');
+ if(out.gameState==='ROUTE'&&(!out.adventure.expedition||out.adventure.expedition.choices.length!==3))throw new Error('缺少路線選項');
  return {format:'jack-adventure',version:2,savedAt:doc.savedAt,payload:out};
 }
 function parseSave(text){
@@ -97,7 +98,7 @@ function applySave(doc,notice='已接回你的旅程。'){
  sessionEpoch++;clearTimeout(healCooldownTimer);overflowActive=false;
  hero=p.hero;adventure=p.adventure;bossLevel=p.bossLevel;currentEnemy=p.currentEnemy;newLoot=p.newLoot;totalTurnCount=turnCount=p.totalTurnCount;weaponMaterials=p.weaponMaterials;shieldMaterials=p.shieldMaterials;lastHealTime=Math.min(p.lastHealTime,Date.now());gameState=p.gameState;
  $('titleSelectBox').hidden=true;$('app-shell').inert=false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());
- if(gameState==='CREDITS')recordClearRun();renderCurrent();saveAuto();toast(notice);return true;
+ migrateExpeditionOnLoad();if(gameState==='CREDITS')recordClearRun();renderCurrent();saveAuto();toast(notice);return true;
 }
 function loadSlot(key,ask=true){const slot=readSlot(key);if(slot.kind!=='valid'){toast(slot.kind==='empty'?'這個存檔槽還是空的。':'這個存檔無法讀取，請改用備援或匯入備份。',true);return false;}if(ask&&gameState!=='TITLE'&&!confirm('讀取會回到這份存檔的進度，取代目前進度。確定讀取？'))return false;return applySave(slot.doc);}
 function openSaveDialog(){renderSaveSlots();$('save-dialog').showModal();}
@@ -136,8 +137,8 @@ function initSaveUI(){
 }
 function readClearRecords(){try{const list=JSON.parse(localStorage.getItem(RECORD_KEY)||'[]');return Array.isArray(list)?list.filter(r=>r&&typeof r.title==='string'&&Number.isFinite(r.totalTurn)&&Number.isFinite(r.level)&&Number.isFinite(r.time)).slice(0,10):[];}catch{return [];}}
 function recordClearRun(){
- const records=readClearRecords();if(records.some(r=>r.runId===adventure.runId)){adventure.clearRecorded=true;return;}
- const record={runId:adventure.runId,title:hero.title,level:hero.level,totalTurn:totalTurnCount,time:Date.now(),weapon:hero.equipment.WEAPON.name,shield:hero.equipment.SHIELD.name,ring:hero.equipment.RING.name};
+ const records=readClearRecords();if(records.some(r=>r.runId===adventure.runId&&r.campaign==='five-seals')){adventure.clearRecorded=true;return;}
+ const record={runId:adventure.runId,campaign:'five-seals',title:hero.title,level:hero.level,totalTurn:totalTurnCount,time:Date.now(),weapon:hero.equipment.WEAPON.name,shield:hero.equipment.SHIELD.name,ring:hero.equipment.RING.name};
  try{records.push(record);records.sort((a,b)=>a.totalTurn-b.totalTurn);localStorage.setItem(RECORD_KEY,JSON.stringify(records.slice(0,10)));adventure.clearRecorded=true;log('📒 通關紀錄已寫進旅程名冊。');}catch{adventure.clearRecorded=false;saveError('通關完成，但瀏覽器無法寫入紀錄；請匯出存檔保留。');}
 }
 function openRecords(){

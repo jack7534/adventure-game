@@ -67,8 +67,8 @@ function handleLootDecision(choice,uid=newLoot?.uid){
  adventure.result={tag:'行囊整理好了',title:choice==='YES'?'帶上新的可能，繼續走。':'熟悉的裝備，也值得信任。',text:choice==='YES'?`${loot.name} 已經處理完成。裝備與素材的變動都已記錄。`:`你保留目前的裝備，${loot.type==='RING'?'新戒指已換成金幣':'新裝備已分解'}。`,object:91};
  gameState='RESULT';renderResult();saveAuto();
 }
-function showCredits(){gameState='CREDITS';adventure.pendingEnding=false;recordClearRun();renderCredits();saveAuto();}
+function showCredits(){gameState='CREDITS';adventure.pendingEnding=false;if(adventure.expedition)adventure.expedition.pendingIntro=false;recordClearRun();renderCredits();saveAuto();}
 function renderCredits(){
- updateStatus();setScene('map',88);story('THE END · AND A NEW BEGINNING','世界和平了。你終於可以休假了。',`三位首領都被你打倒了。這趟旅程走了 ${totalTurnCount} 回合，經歷 ${adventure.stats.events} 次路邊故事。謝謝你，讓這個小小的世界有了故事。`,'原創遊戲：Jack · 像素素材：Kenney、Clint Bellanger（CC0） · 特別感謝：沒有半途放棄的你。');
+ updateStatus();setScene('map',88);story('THE END · AND A NEW BEGINNING','世界和平了。你終於可以休假了。',`五位首領都被你打倒了。這趟旅程走了 ${totalTurnCount} 回合，經歷 ${adventure.stats.events} 次路邊故事。謝謝你，讓這個小小的世界有了故事。`,'原創遊戲：Jack · 像素素材：Kenney、Clint Bellanger（CC0） · 特別感謝：沒有半途放棄的你。');
  setCommands({text:'繼續自由探索',hint:'裝備與進度全部保留',value:'continue'},{text:'看看旅程紀錄',hint:'你的稱號與通關回合數',value:'records'},null,v=>v==='records'?openRecords():enterMap(),'CREDITS');$('action-tip').textContent='這不是倒數計時。想多坐一下也沒關係。';
 }

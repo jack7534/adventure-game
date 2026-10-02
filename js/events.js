@@ -37,7 +37,7 @@ function pickEvent(){
  if(!adventure.eventDeck.some(id=>eligible.includes(id))){adventure.eventDeck=[...eligible];for(let i=adventure.eventDeck.length-1;i>0;i--){const j=randInt(0,i);[adventure.eventDeck[i],adventure.eventDeck[j]]=[adventure.eventDeck[j],adventure.eventDeck[i]];}}
  let id;while(adventure.eventDeck.length&&!eligible.includes(id))id=adventure.eventDeck.pop();return id||eligible[0]||'campfire';
 }
-function enterEvent(id){if(!EVENTS[id])return;gameState='EVENT';adventure.eventId=id;adventure.lastEvent=id;adventure.eventResolved=false;beginNpcEncounter(id);if(!NPC_ENCOUNTERS[id])ensureExpedition().place=EVENT_PLACES[id]||'forest';adventure.eventVisits[id]=(adventure.eventVisits[id]||0)+1;renderEvent();saveAuto();}
+function enterEvent(id){if(!EVENTS[id])return;preparePetEncounter(id);gameState='EVENT';adventure.eventId=id;adventure.lastEvent=id;adventure.eventResolved=false;beginNpcEncounter(id);if(!NPC_ENCOUNTERS[id])ensureExpedition().place=EVENT_PLACES[id]||'forest';adventure.eventVisits[id]=(adventure.eventVisits[id]||0)+1;renderEvent();saveAuto();}
 function renderEvent(){const e=EVENTS[adventure.eventId];setScene('event',e.object);story(e.tag,e.title,typeof e.text==='function'?e.text():e.text);mainView.insertAdjacentHTML('beforeend',npcPanelMarkup());const choices=e.choices();setCommands(...choices.map((c,i)=>({text:c.text,hint:c.hint,value:i,disabled:!c.enabled()})),chooseEvent,'EVENT');$('action-tip').textContent='先看代價，再做選擇。這個決定會留在你的旅程裡。';}
 function chooseEvent(index){
  if(gameState!=='EVENT'||adventure.eventResolved||!Number.isInteger(index))return;

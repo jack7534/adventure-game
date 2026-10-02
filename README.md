@@ -60,3 +60,7 @@ GitHub Actions 在 main 與本次修復分支上執行相同測試；使用標�
 原創遊戲：Jack。場景以程式繪製。圖集使用 Kenney 的 Tiny Dungeon 與 Clint Bellanger 的 Tiny Creatures，兩者均為 CC0；原始授權保留於 assets/，詳見 docs/ASSET_CREDITS.md。
 
 修改前的版本：commit `45b1d14e4f1e847a7a13961cf11ad3b8fbc4f543`，備份分支 `backup/pre-repair-20261002`。本次未改動原有的 indexAAA.html。
+
+## v2.4 馭獸同行
+
+正式遊戲新增頁首版本號與檢查更新，32 種免費造型、8 種可收集寵物及馭獸契約戒指（最多 4 隻出戰）。底部固定選單點「寵物」，回營地後可領養、換隊與取得契約。沿用舊存檔；不清除玩家 localStorage。完整規則、素材來源與驗證紀錄見 docs/V2_4_RELEASE.md。

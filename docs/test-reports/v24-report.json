@@ -1,0 +1,169 @@
+{
+  "results": [
+    {
+      "name": "32 unique free appearances",
+      "pass": true
+    },
+    {
+      "name": "Changing all 16 new looks never changes hero stats",
+      "pass": true
+    },
+    {
+      "name": "All new appearances survive strict save round trip",
+      "pass": true
+    },
+    {
+      "name": "Default and ring tiers grant 1,2,3,4,4 slots",
+      "pass": true
+    },
+    {
+      "name": "Old fox save gains one owned and selected fox without stat changes",
+      "pass": true
+    },
+    {
+      "name": "Fox migration is idempotent",
+      "pass": true
+    },
+    {
+      "name": "Removing beast ring rests overflow pets without deleting roster",
+      "pass": true
+    },
+    {
+      "name": "Ring comparison warns about lost pet slots",
+      "pass": true
+    },
+    {
+      "name": "Beast ring participates in drops while NONE is excluded",
+      "pass": true
+    },
+    {
+      "name": "Same beast ring fuses to tier 4 and never downgrades",
+      "pass": true
+    },
+    {
+      "name": "Fox support remains unchanged without beast ring",
+      "pass": true
+    },
+    {
+      "name": "Four pets act once even when repeatedly called in the same round",
+      "pass": true
+    },
+    {
+      "name": "Active-only fox bonus; resting fox adds no gold",
+      "pass": true
+    },
+    {
+      "name": "Rabbit heals and cannot exceed max HP",
+      "pass": true
+    },
+    {
+      "name": "Rabbit and other pets cannot resurrect a fallen hero",
+      "pass": true
+    },
+    {
+      "name": "Pet kill does not settle or grant rewards twice",
+      "pass": true
+    },
+    {
+      "name": "Turtle shield consumes finite points and never deals phantom reflect damage",
+      "pass": true
+    },
+    {
+      "name": "Turtle shield expires and cannot stack infinitely",
+      "pass": true
+    },
+    {
+      "name": "Deer removes one poison layer and shortens burn only",
+      "pass": true
+    },
+    {
+      "name": "Owl reveals only the following round",
+      "pass": true
+    },
+    {
+      "name": "Beast tier affects power but not treasure gold or cleanse layers",
+      "pass": true
+    },
+    {
+      "name": "Round trip preserves shield, reveal and once-per-round markers",
+      "pass": true
+    },
+    {
+      "name": "Buying a pet charges once and keeps unavailable offers locked",
+      "pass": true
+    },
+    {
+      "name": "Buying a beast ring creates one saved loot decision",
+      "pass": true
+    },
+    {
+      "name": "Pet party cannot change during an encounter or battle",
+      "pass": true
+    },
+    {
+      "name": "Full party refuses to silently replace another pet",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupted pet save: duplicate roster",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupted pet save: unknown species",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupted pet save: unowned member",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupted pet save: invalid shield",
+      "pass": true
+    },
+    {
+      "name": "Reject corrupted pet save: future trigger",
+      "pass": true
+    },
+    {
+      "name": "Guild offer remains the same after reload",
+      "pass": true
+    }
+  ],
+  "ui": [
+    {
+      "width": 1280,
+      "height": 940,
+      "scroll": 1280,
+      "petCount": 4,
+      "dockBottom": 930,
+      "dockTop": 697.421875
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scroll": 390,
+      "petCount": 4,
+      "dockBottom": 844,
+      "dockTop": 650.015625
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "scroll": 320,
+      "petCount": 4,
+      "dockBottom": 568,
+      "dockTop": 434
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "scroll": 844,
+      "petCount": 4,
+      "dockBottom": 380,
+      "dockTop": 242.203125
+    }
+  ],
+  "reload": true,
+  "manifest": true,
+  "errors": []
+}

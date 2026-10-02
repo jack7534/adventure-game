@@ -44,7 +44,7 @@ function cleanIdentity(value){
  return {version:1,source:'new',parts:[...id.parts],appearance:id.appearance};
 }
 function cleanAdventure(value){
- const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity),expedition:cleanExpedition(a.expedition)};
+ const a=validObject(value),out={runId:validText(a.runId,100),flags:{},stats:{},eventVisits:{},identity:cleanIdentity(a.identity),expedition:cleanExpedition(a.expedition),pets:cleanPets(a.pets)};
  for(const k of ['seq','steps','gold','scoutTurns','nextEventAt'])out[k]=validNumber(a[k]);validNumber(out.scoutTurns,0,100);
  for(const k of ['eventResolved','pendingEnding','clearRecorded'])out[k]=validBool(a[k]);
  for(const k of ['eventId','lastEvent']){if(a[k]!=null&&!Object.hasOwn(EVENTS,a[k]))throw new Error('未知的冒險事件');out[k]=a[k];}
@@ -56,7 +56,7 @@ function cleanAdventure(value){
  for(const key of ['wins','deaths','events','loot','bosses','rests'])out.stats[key]=validNumber(a.stats?.[key]);
  if(!Array.isArray(a.logs)||a.logs.length>80)throw new Error('冒險手札過長');out.logs=a.logs.map(s=>validText(s,1600));
  if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};if(r.portraitKey!=null){if(!Object.hasOwn(SCENE_PORTRAITS,r.portraitKey))throw new Error('事件人物造型無效');out.result.portraitKey=r.portraitKey;}}else out.result=null;
- if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round),boss:cleanBossState(b.boss),guarding:false};}else out.battle=null;
+ if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round),pets:cleanPetBattle(b.pets,b.round),boss:cleanBossState(b.boss),guarding:false};}else out.battle=null;
  return out;
 }
 function validateSave(doc){

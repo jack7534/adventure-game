@@ -50,9 +50,9 @@ function titleProfile(parts){
  return {role:role.name,bonus,sources,look:role.looks[stableIdentityHash(parts.join('|'))%role.looks.length]};
 }
 function bonusText(bonus){return Object.entries(bonus).map(([key,n])=>`${TITLE_STAT_LABELS[key]} +${n}${['baseDodge','baseTieWinRate','titleCritBonus'].includes(key)?'%':''}`).join('、');}
-function drawPortrait(el,key,size){if(!el)return;const p=SCENE_PORTRAITS[key]||SCENE_PORTRAITS.iron;(p.atlas==='creatures'?creatureAt:spriteAt)(el,p.tile,size);el.dataset.portrait=p.id;el.dataset.portraitKind=p.kind;}
+function drawPortrait(el,key,size){if(!el)return;const p=SCENE_PORTRAITS[key]||SCENE_PORTRAITS.iron;(p.atlas==='expansion'?expansionAt:p.atlas==='creatures'?creatureAt:spriteAt)(el,p.tile,size);el.dataset.portrait=p.id;el.dataset.portraitKind=p.kind;}
 function eventPortraitKey(id){const cast=EVENT_CAST[id];return cast?cast[stableIdentityHash(`${adventure.runId}|${id}|${adventure.eventVisits[id]||0}`)%cast.length]:null;}
-function currentIdentity(){return adventure.identity||{version:1,source:'legacy',parts:null,appearance:HERO_LOOKS[stableIdentityHash(hero.title||hero.name)%HERO_LOOKS.length].id};}
+function currentIdentity(){return adventure.identity||{version:1,source:'legacy',parts:null,appearance:HERO_LOOKS[stableIdentityHash(hero.title||hero.name)%16].id};}
 function applyStartingIdentity(parts,appearance='auto'){
  if(adventure.identity?.source==='new')return false;
  const profile=titleProfile(parts);adventure.identity={version:1,source:'new',parts:[...parts],appearance:appearance==='auto'?profile.look:appearance};

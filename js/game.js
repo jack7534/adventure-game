@@ -30,7 +30,7 @@ function updateStatus(){
  eqDetailShield.textContent=`防禦 +${getEffectivePower(hero.equipment.SHIELD,'SHIELD')}`;
  const r=hero.equipment.RING;eqDetailRing.textContent=r.ability.id==='NONE'?'下一個寶箱，或許就有驚喜。':r.ability.desc;eqDetailRing.title=r.ability.desc;
  eqWeaponAffix.innerHTML=affixLines([...getAllWeaponAffixSet()],'WEAPON');eqShieldAffix.innerHTML=affixLines(hero.equipment.SHIELD.affixes,'SHIELD');
- const buffs=[];if(hero.buffDamageUpTurns)buffs.push(['加持',hero.buffDamageUpTurns]);if(hero.regenTurns)buffs.push(['回復',hero.regenTurns]);if(hero.magicGuardTurns)buffs.push(['魔盾',hero.magicGuardTurns]);if(adventure.scoutTurns)buffs.push(['洞察',adventure.scoutTurns]);if(hero.poisonStacks)buffs.push(['毒層',hero.poisonStacks,true]);if(hero.burnTurns)buffs.push(['灼燒',hero.burnTurns,true]);if(hero.defDownTurns)buffs.push(['破甲',hero.defDownTurns,true]);
+ const buffs=[];if(adventure.battle?.pets?.shield>0&&adventure.battle.round<=adventure.battle.pets.shieldUntil)buffs.push(['龜盾',adventure.battle.pets.shield]);if(petHasReveal())buffs.push(['小鴞洞察',1]);if(hero.buffDamageUpTurns)buffs.push(['加持',hero.buffDamageUpTurns]);if(hero.regenTurns)buffs.push(['回復',hero.regenTurns]);if(hero.magicGuardTurns)buffs.push(['魔盾',hero.magicGuardTurns]);if(adventure.scoutTurns)buffs.push(['洞察',adventure.scoutTurns]);if(hero.poisonStacks)buffs.push(['毒層',hero.poisonStacks,true]);if(hero.burnTurns)buffs.push(['灼燒',hero.burnTurns,true]);if(hero.defDownTurns)buffs.push(['破甲',hero.defDownTurns,true]);
  $('buff-list').innerHTML=buffs.map(([n,t,bad])=>`<span class="buff ${bad?'debuff':''}">${n} ${t}</span>`).join('');
  $('quest-text').textContent=adventure.flags.parcel?'幫骷髏郵差送出遲到八十年的信。再往前走幾段，尋找路邊的小屋。':bossLevel>ENEMIES.BOSS.length?'五位首領都已落敗。世界和平了，但你的故事還可以繼續。':`下一個目標：${SCENES[bossLevel-1].boss}。建議 Lv.${SCENES[bossLevel-1].level}，先探索、強化裝備，再去挑戰。`;
  updateCompanionPanel();
@@ -89,7 +89,7 @@ function startEliteBattle(){const index=Math.min(4,bossLevel-1),e=ENEMIES.BOSS[i
 
 function startBossBattle(){if(bossLevel>ENEMIES.BOSS.length)return;createBattle({...ENEMIES.BOSS[bossLevel-1]},true);}
 function rollEnemyMove(bias){const r=Math.random(),b=bias||{'⚔️':.34,'🌠':.33,'🛡️':.33};return r<b['⚔️']?'⚔️':r<b['⚔️']+b['🌠']?'🌠':'🛡️';}
-function hasExactIntent(){return adventure.scoutTurns>0||adventure.battle.round%3===0;}
+function hasExactIntent(){return adventure.scoutTurns>0||adventure.battle.round%3===0||petHasReveal();}
 function updateBattleView(){
  updateStatus();if(!currentEnemy||!adventure.battle)return;
  $('enemy-hud-name').textContent=currentEnemy.name;$('enemy-hp-label').textContent=`${Math.max(0,currentEnemy.hp)} / ${currentEnemy.originalHp}`;$('enemy-hp-fill').style.width=`${Math.max(0,Math.min(100,currentEnemy.hp/currentEnemy.originalHp*100))}%`;
@@ -114,8 +114,8 @@ function applyDamageToHero(rawDamage,isBoss=false){
  if(hero.magicGuardTurns>0){dmg*=.5;hero.magicGuardTurns--;log('✦ 魔法護盾擋下了一半傷害。');}
  if(aff.includes('S_BLOCK')&&Math.random()<.2){dmg*=.5;blocked=true;log('🛡「我擋~」格擋成功。');}
  if(aff.includes(isBoss?'S_BOSS_GUARD':'S_SMALL_GUARD'))dmg*=.9;
- const actual=Math.min(hero.hp,Math.max(1,Math.floor(dmg)));hero.hp-=actual;
- if(aff.includes('S_REFLECT')&&currentEnemy&&currentEnemy.hp>0){const n=Math.max(1,Math.floor(actual*.2));currentEnemy.hp=Math.max(0,currentEnemy.hp-n);log(`🔁 反彈 ${n} 傷害。`);}
+ const actual=Math.min(hero.hp,petShieldDamage(Math.max(1,Math.floor(dmg))));hero.hp-=actual;
+ if(actual>0&&aff.includes('S_REFLECT')&&currentEnemy&&currentEnemy.hp>0){const n=Math.max(1,Math.floor(actual*.2));currentEnemy.hp=Math.max(0,currentEnemy.hp-n);log(`🔁 反彈 ${n} 傷害。`);}
  if(blocked&&hero.hp>0){healFromLifeRing('BLOCK');triggerBlockFollowUps();}
  return actual;
 }
@@ -169,8 +169,8 @@ function endBattle(result){
  if(result==='win'&&(currentEnemy.hp>0||hero.hp<=0))return;if(result==='lose'&&hero.hp>0)return;
  b.settled=true;gameState='SETTLING';npcBattleFinished(result==='win');disableCommands(true);currentEnemy.hp=Math.max(0,currentEnemy.hp);
  if(result==='lose'){applyDeathPenalty();return;}
- const defeated={...currentEnemy};adventure.stats.wins++;const gold=(b.isBoss?20*bossLevel:randInt(4,8))+(adventure.flags.fox?2:0);adventure.gold+=gold;
- log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}${adventure.flags.fox?'（含狐狸尋寶 +2）':''}。`);gainExp(Math.floor(defeated.exp*(1+relicBonus("xp"))));expeditionVictory(b.isBoss);
+ const defeated={...currentEnemy};adventure.stats.wins++;const gold=(b.isBoss?20*bossLevel:randInt(4,8))+petGoldBonus();adventure.gold+=gold;
+ log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}${petGoldBonus()?'（含狐狸尋寶 +2）':''}。`);gainExp(Math.floor(defeated.exp*(1+relicBonus("xp"))));expeditionVictory(b.isBoss);
  if(b.isBoss){adventure.stats.bosses++;bossLevel++;unlockNewRarity();adventure.pendingEnding=bossLevel>ENEMIES.BOSS.length;}
  adventure.result={tag:'戰鬥勝利',title:`${defeated.name}，暫時下班。`,text:`你獲得 ${defeated.exp} 經驗值與 ${gold} 金幣。${b.isBoss?'新的旅途已經開啟。':'整理好行囊，再繼續下一段路。'}`,object:91};
  handleLootDrop(defeated,b.isBoss);saveAuto();

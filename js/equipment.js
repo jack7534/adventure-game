@@ -27,6 +27,7 @@ function equipmentComparison(loot){
   reasons.push(`失去原戒指能力「${current.name} Lv.${current.tier}」：${current.ability.desc}`);
   if(loot.tier<current.tier)reasons.push(`戒指等級 Lv.${current.tier} → Lv.${loot.tier}`);
  }
+ if(loot.type==='RING'){const oldSlots=petCapacity(current),newSlots=petCapacity(afterHero.equipment.RING);if(newSlots<oldSlots)reasons.push(`寵物出戰位 ${oldSlots} → ${newSlots}。超出位數的夥伴休息，不會被刪除。`);}
  return {before,after,reasons,risky:reasons.length>0,sameRing};
 }
 function formatStat(n){return Number(n.toFixed(1)).toString();}

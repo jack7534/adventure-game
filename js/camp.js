@@ -8,18 +8,12 @@ const CAMP_OFFERS=[
  {id:'scout',name:'偵察情報',price:12,description:'接下來 5 個戰鬥回合，直接看穿敵人下一招。重買不疊加。',canBuy:()=>adventure.scoutTurns===0,apply:()=>{adventure.scoutTurns=5;}}
 ];
 let campToken=0,campLockedUntil=0;
-function petAssistDamage(){return Math.max(2,Math.floor(hero.currentAttack*.25));}
-function updateCompanionPanel(){
- const active=!!adventure.flags.fox,el=$('companion-note');
- el.innerHTML=active?`<strong>🦊 嘴硬的小狐狸 · 已跟隨</strong><span>尋寶鼻：每次勝利額外 +2 金幣。</span><span>夾擊：戰鬥第 3、6、9…回合，追加 ${petAssistDamage()} 傷害（你 ATK 的 25%，至少 2 點）。</span><small>夾擊無視防禦／閃避，不觸發戒指與武器詞條；你或敵人倒下就不追加。</small>`:'<span>🦊 旅伴尚未加入。探索時幫助受困的小狐狸，即可獲得尋寶與戰鬥支援。</span>';
-}
-function petAssist(){
- const b=adventure.battle;
- if(!adventure.flags.fox||!b||b.settled||gameState!=='BATTLE_ACTION'||b.round%3!==0||b.petAssistRound===b.round||hero.hp<=0||!currentEnemy||currentEnemy.hp<=0)return 0;
- b.petAssistRound=b.round;const damage=Math.min(currentEnemy.hp,petAssistDamage());currentEnemy.hp-=damage;
- log(`🦊 小狐狸【夾擊】造成 ${damage} 傷害！無視防禦，沒有觸發額外連擊。`);
- animateClass($('companion-actor'),'pet-strike',420);floatingNumber(`🦊 −${damage}`);return damage;
-}
+function petAssistDamage(){return petValue("fox");}
+
+function updateCompanionPanel(){renderPetSummary();}
+
+function petAssist(){return runPetRound();}
+
 function openCamp(){if(gameState==='TITLE')return;renderCamp();$('camp-dialog').showModal();}
 function renderCamp(){
  const token=++campToken,canShop=gameState==='MAP',locked=Date.now()<campLockedUntil;

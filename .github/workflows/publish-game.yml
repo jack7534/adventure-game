@@ -30,6 +30,7 @@ jobs:
         run: |
           mkdir -p _site/js _site/css _site/assets
           cp index.html _site/index.html
+          cp version.json _site/version.json
           cp js/game.bundle.js _site/js/
           cp css/game.css _site/css/
           cp assets/* _site/assets/

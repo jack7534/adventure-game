@@ -201,34 +201,34 @@
 
     // === 武器詞條（12 個） ===
     const WEAPON_AFFIX_POOL = [
-        { id: 'W_EXTRA_HIT', name: '偷摸一把', desc: '物理攻擊時有 20% 機率多打一擊。', prereq: null },
-        { id: 'W_ATK_UP',    name: '知識就是力量', desc: '帶著一本書提高少量物理攻擊力，隨時可以用書本敲打敵人的頭。', prereq: null },
-        { id: 'W_MAGIC_UP',  name: '燃燒小宇宙🌀', desc: '提高少量魔法攻擊力。', prereq: null },
-        { id: 'W_ARMOR_PEN', name: '神速脫衣', desc: '砍擊時無視部分敵人防禦。', prereq: null },
-        { id: 'W_LIFESTEAL', name: '愛吃不辣的(Blood)', desc: '物理傷害的一部分會轉為回血。', prereq: null },
-        { id: 'W_BALANCE',   name: '再加把勁', desc: '平手時稍微提高我方判定勝率。', prereq: null },
-        { id: 'W_CRIT_UP',   name: '塞你巴掌', desc: '提高砍擊爆擊率。', prereq: null },
-        { id: 'W_DODGE_UP',  name: '6點了我先下班了', desc: '提高少量閃避率。', prereq: null },
-        { id: 'W_BRAVE',     name: '加班勞碌命', desc: '當 HP 低於 30% 時，物攻與爆擊率提升。', prereq: null },
-        { id: 'W_VETERAN',   name: '老練老屁股', desc: '砍擊時額外造成依魔攻比例的魔法傷害。', prereq: null },
-        { id: 'W_RAGE',      name: '火大亂砍', desc: '物理攻擊有小機率直接變成三連擊。', prereq: null },
-        { id: 'W_CHAIN',     name: '打了又打', desc: '同一回合連擊時，第二擊起傷害逐擊提高。', prereq: null }
+        { id: 'W_EXTRA_HIT', name: '偷摸一把', desc: '每次物理攻擊有 20% 機率多打一擊。', prereq: null },
+        { id: 'W_ATK_UP',    name: '知識就是力量', desc: '最終物理攻擊 ATK +12%。', prereq: null },
+        { id: 'W_MAGIC_UP',  name: '燃燒小宇宙🌀', desc: '基礎魔攻與武器精練魔攻合計 +10%，再計算戒指倍率。', prereq: null },
+        { id: 'W_ARMOR_PEN', name: '神速脫衣', desc: '砍擊忽略敵人 30% 物理防禦；不影響魔法或盾擊。', prereq: null },
+        { id: 'W_LIFESTEAL', name: '愛吃不辣的(Blood)', desc: '物理攻擊總傷害的 20% 轉成 HP，至少 1 點，不超過最大 HP。', prereq: null },
+        { id: 'W_BALANCE',   name: '再加把勁', desc: '平手勝率 +7 個百分點，總上限 100%。', prereq: null },
+        { id: 'W_CRIT_UP',   name: '塞你巴掌', desc: '砍擊爆擊率 +5 個百分點；爆擊造成 2 倍傷害。', prereq: null },
+        { id: 'W_DODGE_UP',  name: '6點了我先下班了', desc: '閃避率 +3 個百分點；顯示上限 75%。', prereq: null },
+        { id: 'W_BRAVE',     name: '加班勞碌命', desc: '目前 HP 不高於 30% 時，ATK +15%、砍擊爆擊率 +10 個百分點。', prereq: null },
+        { id: 'W_VETERAN',   name: '老練老屁股', desc: '每一段砍擊額外附加總魔攻的 30% 傷害，至少 1 點；不扣敵方魔防。', prereq: null },
+        { id: 'W_RAGE',      name: '火大亂砍', desc: '每次物理攻擊有 5% 機率變成至少 3 連擊。', prereq: null },
+        { id: 'W_CHAIN',     name: '打了又打', desc: '同次攻擊的第 2 段傷害 +15%、第 3 段 +30%，之後每段再加 15%。', prereq: null }
     ];
 
     // === 盾牌詞條（12 個，含「詞上加詞」） ===
     const SHIELD_AFFIX_POOL = [
-        { id: 'S_BLOCK',        name: '我擋~🛡️',       desc: '受到傷害時有 20% 機率減少 50% 傷害，觸發後續擋系效果。', prereq: null },
-        { id: 'S_MAGIC_GUARD',  name: '魔法胸罩',     desc: '施放魔法 / 盾擊時有 20% 機率獲得 3 回合 50% 減傷效果。', prereq: null },
-        { id: 'S_DEF_UP',       name: '厚臉皮',       desc: '提高少量防禦力。', prereq: null },
-        { id: 'S_TIE_UP',       name: '豹子通殺',     desc: '稍微提高平手勝率。', prereq: null },
-        { id: 'S_REFLECT',      name: '怎麼刺刺的',     desc: '受到傷害時反彈部分傷害給敵人。', prereq: null },
-        { id: 'S_DODGE_UP',     name: '正在忙別的案子',     desc: '提高少量閃避率。', prereq: null },
-        { id: 'S_BOSS_GUARD',   name: '癢癢滴',     desc: '對 Boss 受到的傷害略微降低。', prereq: null },
-        { id: 'S_SMALL_GUARD',  name: '不太痛',     desc: '對一般小怪受到的傷害略微降低。', prereq: null },
-        { id: 'S_REGEN',        name: '吃個麵包先',     desc: '每場戰鬥開始時獲得幾回合的小量回血。', prereq: null },
-        { id: 'S_MAT_BOOST',    name: 'YA~撿到十塊錢',     desc: '裝備被分解時，偶爾多掉一點素材。', prereq: null },
-        { id: 'S_BLOCK_STRIKE', name: '我再頂~💥',     desc: '需要「我擋~🛡️」，格檔成功時再追加一次盾擊。', prereq: 'S_BLOCK' },
-        { id: 'S_BLOCK_CRIT',   name: '我再砍~🔪',     desc: '需要「我擋~🛡️」，格檔成功時再補上一刀砍擊。', prereq: 'S_BLOCK' }
+        { id: 'S_BLOCK',        name: '我擋~🛡️',       desc: '每次受擊有 20% 機率減少 50% 傷害；格擋後可觸發追加攻擊。', prereq: null },
+        { id: 'S_MAGIC_GUARD',  name: '魔法胸罩',     desc: '魔法或盾擊命中時有 20% 機率取得護盾；接下來 3 次受擊減傷 50%，不是 3 個回合。', prereq: null },
+        { id: 'S_DEF_UP',       name: '厚臉皮',       desc: '防禦 DEF +10%，也提高依 DEF 計算的盾擊傷害。', prereq: null },
+        { id: 'S_TIE_UP',       name: '豹子通殺',     desc: '平手勝率 +5 個百分點，總上限 100%。', prereq: null },
+        { id: 'S_REFLECT',      name: '怎麼刺刺的',     desc: '受到傷害後反彈實際損失 HP 的 20%，至少 1 點；致命傷不會因此復活。', prereq: null },
+        { id: 'S_DODGE_UP',     name: '正在忙別的案子',     desc: '閃避率 +5 個百分點；顯示上限 75%。', prereq: null },
+        { id: 'S_BOSS_GUARD',   name: '癢癢滴',     desc: '受到正式 Boss 的傷害減少 10%。', prereq: null },
+        { id: 'S_SMALL_GUARD',  name: '不太痛',     desc: '受到非 Boss 敵人（含菁英）的傷害減少 10%。', prereq: null },
+        { id: 'S_REGEN',        name: '吃個麵包先',     desc: '每場戰鬥取得至少 3 回合的回復，每回合回復最大 HP 的 3%，至少 2 點。', prereq: null },
+        { id: 'S_MAT_BOOST',    name: 'YA~撿到十塊錢',     desc: '分解原本有素材價值的裝備時，有 30% 機率多得 1 份素材。', prereq: null },
+        { id: 'S_BLOCK_STRIKE', name: '我再頂~💥',     desc: '需有「我擋~」。成功格擋且自己仍存活時，追加依 DEF 計算的盾擊，可被閃避。', prereq: 'S_BLOCK' },
+        { id: 'S_BLOCK_CRIT',   name: '我再砍~🔪',     desc: '需有「我擋~」。成功格擋且自己仍存活時，追加砍擊，可爆擊、連擊與觸發武器詞條。', prereq: 'S_BLOCK' }
     ];
 
     function findAffix(pool, id) {

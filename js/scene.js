@@ -39,6 +39,7 @@ function drawLandscape(zone=0) {
   c.fillStyle='#eedc8d13'; c.fillRect(412,0,12,H);c.fillRect(450,0,23,H);
 }
 function setScene(mode='map', object=89) {
+  Music.sync();
   const zone=Math.min(2,Math.max(0,bossLevel-1)); $('stage').dataset.zone=zone;drawLandscape(zone);
   $('region-label').textContent=`✦ ${SCENES[zone].name}`;
   $('enemy-actor').hidden=mode!=='battle';$('enemy-hud').hidden=mode!=='battle';$('scene-object').hidden=mode==='battle';
@@ -51,7 +52,4 @@ function setScene(mode='map', object=89) {
 function animateClass(el,cls,duration=350){el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),duration);}
 function flashBattleView(type){if(type==='heal')animateClass($('stage'),'heal-flash',450);else animateClass($(type==='monster-hit'?'hero-actor':'enemy-actor'),'hit');}
 function floatingNumber(text,target='enemy'){const el=$('combat-float');el.textContent=text;el.style.left=target==='hero'?'23%':'66%';animateClass(el,'show',650);}
-function playTone(kind='hit') {
-  if(!audioEnabled)return;
-  try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();audioContext.resume();const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.type='triangle';o.frequency.setValueAtTime(kind==='reward'?660:kind==='heal'?440:180,t);o.frequency.exponentialRampToValueAtTime(kind==='reward'?990:90,t+.12);g.gain.setValueAtTime(.025,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.17);}catch{audioEnabled=false;}
-}
+function playTone(kind='hit'){Music.sfx(kind);}

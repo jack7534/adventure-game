@@ -1,7 +1,7 @@
 name: Game regression and playthrough tests
 on:
   push:
-    branches: [main, repair/v2-20261002]
+    branches: [main, repair/v2-20261002, repair/v2.1-20261002]
   workflow_dispatch:
 permissions:
   contents: read

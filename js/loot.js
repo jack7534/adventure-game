@@ -19,8 +19,8 @@ function salvage(eq){if(!eq||eq.name==='徒手'||eq.name==='無')return;const am
 function lootCard(eq,type,label,isNew){
  const cls=`Rarity-${eq.rarity}`;let desc,affixes='';
  if(type==='RING')desc=`Lv.${eq.tier} · ${eq.ability.desc}`;
- else{desc=`${type==='WEAPON'?'攻擊':'防禦'} +${getEffectivePower(eq,type)}${type==='SHIELD'?` · 精練 +${eq.refine||0}`:''}`;const pool=type==='WEAPON'?WEAPON_AFFIX_POOL:SHIELD_AFFIX_POOL;affixes=(eq.affixes||[]).map(id=>findAffix(pool,id)?.name||id).join('、')||'無原生詞條';}
- return `<div class="loot-card ${isNew?'new':''}"><small>${label} · ${RARITY_NAMES[eq.rarity]}</small><strong class="${cls}">${escapeHtml(eq.name)}</strong><p>${escapeHtml(desc)}</p>${affixes?`<p>${escapeHtml(affixes)}</p>`:''}</div>`;
+ else{desc=`${type==='WEAPON'?'攻擊':'防禦'} +${getEffectivePower(eq,type)}${type==='SHIELD'?` · 精練 +${eq.refine||0}`:''}`;affixes=affixLines(eq.affixes||[],type,'無原生詞條');}
+ return `<div class="loot-card ${isNew?'new':''}"><small>${label} · ${RARITY_NAMES[eq.rarity]}</small><strong class="${cls}">${escapeHtml(eq.name)}</strong><p>${escapeHtml(desc)}</p>${affixes?`<div class="loot-affixes">${affixes}</div>`:''}</div>`;
 }
 function renderLootDecision(){
  updateStatus();setScene('loot',91);const loot=newLoot,cur=hero.equipment[loot.type];
@@ -36,9 +36,11 @@ function renderLootDecision(){
   const delta=getEffectivePower(loot,loot.type)-getEffectivePower(cur,loot.type);
   note=`裝備本體${loot.type==='WEAPON'?'攻擊':'防禦'} ${delta>=0?'+':''}${delta}。`+(loot.type==='WEAPON'?'角色的武器精練與舊武器詞條全部保留。':'盾牌精練跟著盾牌，新盾從 +0 開始。請連詞條一起比較。');
  }
- mainView.insertAdjacentHTML('beforeend',`<p class="loot-note">${escapeHtml(note)}</p>`);
+ const comparison=equipmentComparison(loot);
+ mainView.insertAdjacentHTML('beforeend',comparisonMarkup(comparison)+`<p class="loot-note">${escapeHtml(note)}</p>`);
  commandMenu.hidden=true;commandMenu.style.display='none';decisionMenu.hidden=false;decisionMenu.style.display='flex';
- btnDecYes.innerHTML=`<strong>✓ ${escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small>`;btnDecNo.innerHTML=`<strong>保留目前裝備</strong><small>${loot.type==='RING'?'新戒指換成金幣':`分解新裝備 · 素材 ${RARITY_MATERIAL_VALUE[loot.rarity]||0}`}</small>`;
+ btnDecYes.classList.toggle('risky-equip',comparison.risky);btnDecNo.classList.toggle('recommended-keep',comparison.risky);
+ btnDecYes.innerHTML=`<strong>${comparison.risky?'⚠ 仍要換上（需再確認）':'✓ '+escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small>`;btnDecNo.innerHTML=`<strong>保留目前裝備</strong><small>${loot.type==='RING'?'新戒指換成金幣':`分解新裝備 · 素材 ${RARITY_MATERIAL_VALUE[loot.rarity]||0}`}</small>`;
  btnDecYes.disabled=btnDecNo.disabled=false;
  const uid=loot.uid;btnDecYes.onclick=()=>handleLootDecision('YES',uid);btnDecNo.onclick=()=>handleLootDecision('NO',uid);
  $('action-tip').textContent='尚未做決定的戰利品也會存檔。重整後可以接著選。';
@@ -46,7 +48,10 @@ function renderLootDecision(){
 function handleRingDecision(choice){handleLootDecision(choice);}
 function handleLootDecision(choice,uid=newLoot?.uid){
  if(gameState!=='LOOT_DECISION'||!newLoot||uid!==newLoot.uid||!['YES','NO'].includes(choice))return;
- const loot=newLoot;newLoot=null;gameState='LOOT_RESOLVING';disableCommands(true);adventure.stats.loot++;
+ const loot=newLoot,epoch=sessionEpoch,originalHero=hero;
+ if(choice==='YES'&&!confirmEquipmentLoss(loot,equipmentComparison(loot)))return;
+ if(epoch!==sessionEpoch||hero!==originalHero||gameState!=='LOOT_DECISION'||newLoot?.uid!==uid)return;
+ newLoot=null;gameState='LOOT_RESOLVING';disableCommands(true);adventure.stats.loot++;
  const type=loot.type,cur=hero.equipment[type];
  if(choice==='YES'){
   if(type==='RING'&&cur.ability.id===loot.ability.id&&cur.ability.id!=='NONE'){

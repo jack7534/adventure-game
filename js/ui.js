@@ -7,7 +7,6 @@ function initGameUI(){
  $('btn-guide').onclick=()=>$('guide-dialog').showModal();
  $('btn-records').onclick=openRecords;
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
- $('btn-sound').onclick=()=>{audioEnabled=!audioEnabled;$('btn-sound').setAttribute('aria-pressed',audioEnabled);$('btn-sound').querySelector('span').textContent=audioEnabled?'音效開':'音效關';if(audioEnabled)playTone('reward');};
- initSaveUI();
+ initSaveUI();initEnhancementUI();initMusic();
 }
 window.addEventListener('DOMContentLoaded',initGameUI);

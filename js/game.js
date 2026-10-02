@@ -28,11 +28,11 @@ function updateStatus(){
  eqDetailWeapon.textContent=`攻擊 +${getEffectivePower(hero.equipment.WEAPON,'WEAPON')} · 總魔攻 ${getMagicAttackValue()}`;
  eqDetailShield.textContent=`防禦 +${getEffectivePower(hero.equipment.SHIELD,'SHIELD')}`;
  const r=hero.equipment.RING;eqDetailRing.textContent=r.ability.id==='NONE'?'下一個寶箱，或許就有驚喜。':r.ability.desc;eqDetailRing.title=r.ability.desc;
- eqWeaponAffix.textContent=getAllWeaponAffixNames();eqShieldAffix.textContent=getShieldAffixNames();
+ eqWeaponAffix.innerHTML=affixLines([...getAllWeaponAffixSet()],'WEAPON');eqShieldAffix.innerHTML=affixLines(hero.equipment.SHIELD.affixes,'SHIELD');
  const buffs=[];if(hero.buffDamageUpTurns)buffs.push(['加持',hero.buffDamageUpTurns]);if(hero.regenTurns)buffs.push(['回復',hero.regenTurns]);if(hero.magicGuardTurns)buffs.push(['魔盾',hero.magicGuardTurns]);if(adventure.scoutTurns)buffs.push(['洞察',adventure.scoutTurns]);if(hero.burnTurns)buffs.push(['灼燒',hero.burnTurns,true]);if(hero.defDownTurns)buffs.push(['破甲',hero.defDownTurns,true]);
  $('buff-list').innerHTML=buffs.map(([n,t,bad])=>`<span class="buff ${bad?'debuff':''}">${n} ${t}</span>`).join('');
  $('quest-text').textContent=adventure.flags.parcel?'幫骷髏郵差送出遲到八十年的信。再往前走幾段，尋找路邊的小屋。':bossLevel>3?'三位首領都已落敗。世界和平了，但你的故事還可以繼續。':`下一個目標：${SCENES[bossLevel-1].boss}。建議 Lv.${SCENES[bossLevel-1].level}，先探索、強化裝備，再去挑戰。`;
- $('companion-note').textContent=adventure.flags.fox?'✧ 旅伴：嘴硬的小狐狸 · 勝利金幣 +2':'';
+ updateCompanionPanel();
  $('journey-track').innerHTML=SCENES.map((s,i)=>`<div class="journey-node ${bossLevel>i+1?'done':bossLevel===i+1?'active':''}" ${bossLevel===i+1?'aria-current="step"':''}><span class="node-number">${bossLevel>i+1?'✓':['I','II','III'][i]}</span><div><strong>${s.name}</strong><small>${bossLevel>i+1?'已完成':s.boss}</small></div></div>`).join('');
  $('time-label').textContent=['晨光','午後','暮色','星夜'][Math.floor(adventure.steps/8)%4];
 }
@@ -139,6 +139,7 @@ function handleBattleAction(playerMove){
  const tie=monsterMove===playerMove;const win=CLASH_RULES[playerMove]===monsterMove||(tie&&Math.random()<hero.currentTieWinRate/100);
  if(tie)log(win?'🤝 平手判定：你取得先機。':'🤝 平手判定：對手取得先機。');
  if(win)heroStrike(playerMove);else monsterAttack(monsterMove);
+ petAssist();
  if(previousBuff>0&&hero.buffDamageUpTurns===previousBuff){hero.buffDamageUpTurns--;if(!hero.buffDamageUpTurns)hero.buffDamageUpRate=0;}
  if(previousDef>0&&hero.defDownTurns===previousDef){hero.defDownTurns--;if(!hero.defDownTurns)hero.defDownRate=0;}
  if(adventure.scoutTurns>0)adventure.scoutTurns--;
@@ -154,7 +155,7 @@ function endBattle(result){
  b.settled=true;gameState='SETTLING';disableCommands(true);currentEnemy.hp=Math.max(0,currentEnemy.hp);
  if(result==='lose'){applyDeathPenalty();return;}
  const defeated={...currentEnemy};adventure.stats.wins++;const gold=(b.isBoss?20*bossLevel:randInt(4,8))+(adventure.flags.fox?2:0);adventure.gold+=gold;
- log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}。`);gainExp(defeated.exp);
+ log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}${adventure.flags.fox?'（含狐狸尋寶 +2）':''}。`);gainExp(defeated.exp);
  if(b.isBoss){adventure.stats.bosses++;bossLevel++;unlockNewRarity();adventure.pendingEnding=bossLevel>3;}
  adventure.result={tag:'戰鬥勝利',title:`${defeated.name}，暫時下班。`,text:`你獲得 ${defeated.exp} 經驗值與 ${gold} 金幣。${b.isBoss?'新的旅途已經開啟。':'整理好行囊，再繼續下一段路。'}`,object:91};
  handleLootDrop(defeated,b.isBoss);saveAuto();

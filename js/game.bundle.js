@@ -204,34 +204,34 @@
 
     // === 武器詞條（12 個） ===
     const WEAPON_AFFIX_POOL = [
-        { id: 'W_EXTRA_HIT', name: '偷摸一把', desc: '物理攻擊時有 20% 機率多打一擊。', prereq: null },
-        { id: 'W_ATK_UP',    name: '知識就是力量', desc: '帶著一本書提高少量物理攻擊力，隨時可以用書本敲打敵人的頭。', prereq: null },
-        { id: 'W_MAGIC_UP',  name: '燃燒小宇宙🌀', desc: '提高少量魔法攻擊力。', prereq: null },
-        { id: 'W_ARMOR_PEN', name: '神速脫衣', desc: '砍擊時無視部分敵人防禦。', prereq: null },
-        { id: 'W_LIFESTEAL', name: '愛吃不辣的(Blood)', desc: '物理傷害的一部分會轉為回血。', prereq: null },
-        { id: 'W_BALANCE',   name: '再加把勁', desc: '平手時稍微提高我方判定勝率。', prereq: null },
-        { id: 'W_CRIT_UP',   name: '塞你巴掌', desc: '提高砍擊爆擊率。', prereq: null },
-        { id: 'W_DODGE_UP',  name: '6點了我先下班了', desc: '提高少量閃避率。', prereq: null },
-        { id: 'W_BRAVE',     name: '加班勞碌命', desc: '當 HP 低於 30% 時，物攻與爆擊率提升。', prereq: null },
-        { id: 'W_VETERAN',   name: '老練老屁股', desc: '砍擊時額外造成依魔攻比例的魔法傷害。', prereq: null },
-        { id: 'W_RAGE',      name: '火大亂砍', desc: '物理攻擊有小機率直接變成三連擊。', prereq: null },
-        { id: 'W_CHAIN',     name: '打了又打', desc: '同一回合連擊時，第二擊起傷害逐擊提高。', prereq: null }
+        { id: 'W_EXTRA_HIT', name: '偷摸一把', desc: '每次物理攻擊有 20% 機率多打一擊。', prereq: null },
+        { id: 'W_ATK_UP',    name: '知識就是力量', desc: '最終物理攻擊 ATK +12%。', prereq: null },
+        { id: 'W_MAGIC_UP',  name: '燃燒小宇宙🌀', desc: '基礎魔攻與武器精練魔攻合計 +10%，再計算戒指倍率。', prereq: null },
+        { id: 'W_ARMOR_PEN', name: '神速脫衣', desc: '砍擊忽略敵人 30% 物理防禦；不影響魔法或盾擊。', prereq: null },
+        { id: 'W_LIFESTEAL', name: '愛吃不辣的(Blood)', desc: '物理攻擊總傷害的 20% 轉成 HP，至少 1 點，不超過最大 HP。', prereq: null },
+        { id: 'W_BALANCE',   name: '再加把勁', desc: '平手勝率 +7 個百分點，總上限 100%。', prereq: null },
+        { id: 'W_CRIT_UP',   name: '塞你巴掌', desc: '砍擊爆擊率 +5 個百分點；爆擊造成 2 倍傷害。', prereq: null },
+        { id: 'W_DODGE_UP',  name: '6點了我先下班了', desc: '閃避率 +3 個百分點；顯示上限 75%。', prereq: null },
+        { id: 'W_BRAVE',     name: '加班勞碌命', desc: '目前 HP 不高於 30% 時，ATK +15%、砍擊爆擊率 +10 個百分點。', prereq: null },
+        { id: 'W_VETERAN',   name: '老練老屁股', desc: '每一段砍擊額外附加總魔攻的 30% 傷害，至少 1 點；不扣敵方魔防。', prereq: null },
+        { id: 'W_RAGE',      name: '火大亂砍', desc: '每次物理攻擊有 5% 機率變成至少 3 連擊。', prereq: null },
+        { id: 'W_CHAIN',     name: '打了又打', desc: '同次攻擊的第 2 段傷害 +15%、第 3 段 +30%，之後每段再加 15%。', prereq: null }
     ];
 
     // === 盾牌詞條（12 個，含「詞上加詞」） ===
     const SHIELD_AFFIX_POOL = [
-        { id: 'S_BLOCK',        name: '我擋~🛡️',       desc: '受到傷害時有 20% 機率減少 50% 傷害，觸發後續擋系效果。', prereq: null },
-        { id: 'S_MAGIC_GUARD',  name: '魔法胸罩',     desc: '施放魔法 / 盾擊時有 20% 機率獲得 3 回合 50% 減傷效果。', prereq: null },
-        { id: 'S_DEF_UP',       name: '厚臉皮',       desc: '提高少量防禦力。', prereq: null },
-        { id: 'S_TIE_UP',       name: '豹子通殺',     desc: '稍微提高平手勝率。', prereq: null },
-        { id: 'S_REFLECT',      name: '怎麼刺刺的',     desc: '受到傷害時反彈部分傷害給敵人。', prereq: null },
-        { id: 'S_DODGE_UP',     name: '正在忙別的案子',     desc: '提高少量閃避率。', prereq: null },
-        { id: 'S_BOSS_GUARD',   name: '癢癢滴',     desc: '對 Boss 受到的傷害略微降低。', prereq: null },
-        { id: 'S_SMALL_GUARD',  name: '不太痛',     desc: '對一般小怪受到的傷害略微降低。', prereq: null },
-        { id: 'S_REGEN',        name: '吃個麵包先',     desc: '每場戰鬥開始時獲得幾回合的小量回血。', prereq: null },
-        { id: 'S_MAT_BOOST',    name: 'YA~撿到十塊錢',     desc: '裝備被分解時，偶爾多掉一點素材。', prereq: null },
-        { id: 'S_BLOCK_STRIKE', name: '我再頂~💥',     desc: '需要「我擋~🛡️」，格檔成功時再追加一次盾擊。', prereq: 'S_BLOCK' },
-        { id: 'S_BLOCK_CRIT',   name: '我再砍~🔪',     desc: '需要「我擋~🛡️」，格檔成功時再補上一刀砍擊。', prereq: 'S_BLOCK' }
+        { id: 'S_BLOCK',        name: '我擋~🛡️',       desc: '每次受擊有 20% 機率減少 50% 傷害；格擋後可觸發追加攻擊。', prereq: null },
+        { id: 'S_MAGIC_GUARD',  name: '魔法胸罩',     desc: '魔法或盾擊命中時有 20% 機率取得護盾；接下來 3 次受擊減傷 50%，不是 3 個回合。', prereq: null },
+        { id: 'S_DEF_UP',       name: '厚臉皮',       desc: '防禦 DEF +10%，也提高依 DEF 計算的盾擊傷害。', prereq: null },
+        { id: 'S_TIE_UP',       name: '豹子通殺',     desc: '平手勝率 +5 個百分點，總上限 100%。', prereq: null },
+        { id: 'S_REFLECT',      name: '怎麼刺刺的',     desc: '受到傷害後反彈實際損失 HP 的 20%，至少 1 點；致命傷不會因此復活。', prereq: null },
+        { id: 'S_DODGE_UP',     name: '正在忙別的案子',     desc: '閃避率 +5 個百分點；顯示上限 75%。', prereq: null },
+        { id: 'S_BOSS_GUARD',   name: '癢癢滴',     desc: '受到正式 Boss 的傷害減少 10%。', prereq: null },
+        { id: 'S_SMALL_GUARD',  name: '不太痛',     desc: '受到非 Boss 敵人（含菁英）的傷害減少 10%。', prereq: null },
+        { id: 'S_REGEN',        name: '吃個麵包先',     desc: '每場戰鬥取得至少 3 回合的回復，每回合回復最大 HP 的 3%，至少 2 點。', prereq: null },
+        { id: 'S_MAT_BOOST',    name: 'YA~撿到十塊錢',     desc: '分解原本有素材價值的裝備時，有 30% 機率多得 1 份素材。', prereq: null },
+        { id: 'S_BLOCK_STRIKE', name: '我再頂~💥',     desc: '需有「我擋~」。成功格擋且自己仍存活時，追加依 DEF 計算的盾擊，可被閃避。', prereq: 'S_BLOCK' },
+        { id: 'S_BLOCK_CRIT',   name: '我再砍~🔪',     desc: '需有「我擋~」。成功格擋且自己仍存活時，追加砍擊，可爆擊、連擊與觸發武器詞條。', prereq: 'S_BLOCK' }
     ];
 
     function findAffix(pool, id) {
@@ -1232,6 +1232,7 @@ function drawLandscape(zone=0) {
   c.fillStyle='#eedc8d13'; c.fillRect(412,0,12,H);c.fillRect(450,0,23,H);
 }
 function setScene(mode='map', object=89) {
+  Music.sync();
   const zone=Math.min(2,Math.max(0,bossLevel-1)); $('stage').dataset.zone=zone;drawLandscape(zone);
   $('region-label').textContent=`✦ ${SCENES[zone].name}`;
   $('enemy-actor').hidden=mode!=='battle';$('enemy-hud').hidden=mode!=='battle';$('scene-object').hidden=mode==='battle';
@@ -1244,10 +1245,7 @@ function setScene(mode='map', object=89) {
 function animateClass(el,cls,duration=350){el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),duration);}
 function flashBattleView(type){if(type==='heal')animateClass($('stage'),'heal-flash',450);else animateClass($(type==='monster-hit'?'hero-actor':'enemy-actor'),'hit');}
 function floatingNumber(text,target='enemy'){const el=$('combat-float');el.textContent=text;el.style.left=target==='hero'?'23%':'66%';animateClass(el,'show',650);}
-function playTone(kind='hit') {
-  if(!audioEnabled)return;
-  try{audioContext??=new (window.AudioContext||window.webkitAudioContext)();audioContext.resume();const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.type='triangle';o.frequency.setValueAtTime(kind==='reward'?660:kind==='heal'?440:180,t);o.frequency.exponentialRampToValueAtTime(kind==='reward'?990:90,t+.12);g.gain.setValueAtTime(.025,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.17);}catch{audioEnabled=false;}
-}
+function playTone(kind='hit'){Music.sfx(kind);}
 
 ;
 
@@ -1256,7 +1254,7 @@ function playTone(kind='hit') {
 const choice=(text,hint,act,enabled=()=>true)=>({text,hint,act,enabled});
 const EVENTS={
  fox:{title:'一隻假裝不需要幫忙的狐狸',tag:'森林來客',object:123,text:'捕獸夾旁的小狐狸瞪著你。「我只是在研究這個機關。」牠的尾巴卻抖得很誠實。',available:()=>!adventure.flags.fox,
- choices:()=>[choice('分牠一點乾糧','花費 3 金幣 · 結識旅伴',()=>{adventure.gold-=3;adventure.flags.fox=true;adventure.flags.foxAt=adventure.steps;resultEvent('牠決定「順路」跟著你','小狐狸替你嗅出路邊零錢。往後每次戰鬥勝利，多得 2 金幣。',123);},()=>adventure.gold>=3),choice('徒手拆開機關','損失 10% 最大 HP，最低留 1 HP',()=>{hero.hp=Math.max(1,hero.hp-Math.max(1,Math.floor(hero.maxHp*.1)));adventure.flags.fox=true;adventure.flags.foxAt=adventure.steps;resultEvent('手指痛，心裡倒是暖的','狐狸咬住你的披風：好啦，牠加入隊伍。每次勝利額外找到 2 金幣。',123);}),choice('留下安全標記','不付代價 · 繼續前進',()=>resultEvent('你在樹上刻下求援的箭頭','至少，下個路過的人不會再錯過牠。',123))]},
+ choices:()=>[choice('分牠一點乾糧','花費 3 金幣 · 結識旅伴',()=>{adventure.gold-=3;adventure.flags.fox=true;adventure.flags.foxAt=adventure.steps;resultEvent('牠決定「順路」跟著你','小狐狸替你嗅出路邊零錢。往後每次戰鬥勝利，多得 2 金幣；戰鬥第 3、6、9…回合還會幫忙夾擊。',123);},()=>adventure.gold>=3),choice('徒手拆開機關','損失 10% 最大 HP，最低留 1 HP',()=>{hero.hp=Math.max(1,hero.hp-Math.max(1,Math.floor(hero.maxHp*.1)));adventure.flags.fox=true;adventure.flags.foxAt=adventure.steps;resultEvent('手指痛，心裡倒是暖的','狐狸咬住你的披風：好啦，牠加入隊伍。每次勝利額外找到 2 金幣；戰鬥第 3、6、9…回合還會幫忙夾擊。',123);}),choice('留下安全標記','不付代價 · 繼續前進',()=>resultEvent('你在樹上刻下求援的箭頭','至少，下個路過的人不會再錯過牠。',123))]},
  foxGift:{title:'小狐狸有一份「路上撿的」禮物',tag:'約定的回音',object:123,text:'牠把一包亮晶晶的東西放在你腳邊，然後很忙似的看向別處。',available:()=>false,
  choices:()=>[choice('收下閃亮的禮物','獲得一枚戒指',()=>{adventure.flags.foxGift=true;giveEventLoot('RING','狐狸藏起來的寶物');}),choice('拿去交換補給','獲得 15 金幣並恢復 HP',()=>{adventure.flags.foxGift=true;adventure.gold+=15;healFully();resultEvent('一起吃飽，才有力氣繼續','狐狸堅稱自己沒有搖尾巴。你獲得 15 金幣，HP 恢復全滿。',123);}),choice('一起把它埋起來','獲得武器、盾牌素材各 3',()=>{adventure.flags.foxGift=true;addMaterials('WEAPON',3);addMaterials('SHIELD',3);resultEvent('新的藏寶地點誕生了','整理包裹時找到武器、盾牌素材各 3。狐狸滿意地踩了踩土。',89);})]},
  forge:{title:'只收零件，不收加班費的鐵匠',tag:'路邊工坊',object:100,text:'鐵匠敲了兩下空鍋：「裝備可以壞，手藝不能壞。你的包裡有沒有不要的螺絲？」',
@@ -1335,11 +1333,11 @@ function updateStatus(){
  eqDetailWeapon.textContent=`攻擊 +${getEffectivePower(hero.equipment.WEAPON,'WEAPON')} · 總魔攻 ${getMagicAttackValue()}`;
  eqDetailShield.textContent=`防禦 +${getEffectivePower(hero.equipment.SHIELD,'SHIELD')}`;
  const r=hero.equipment.RING;eqDetailRing.textContent=r.ability.id==='NONE'?'下一個寶箱，或許就有驚喜。':r.ability.desc;eqDetailRing.title=r.ability.desc;
- eqWeaponAffix.textContent=getAllWeaponAffixNames();eqShieldAffix.textContent=getShieldAffixNames();
+ eqWeaponAffix.innerHTML=affixLines([...getAllWeaponAffixSet()],'WEAPON');eqShieldAffix.innerHTML=affixLines(hero.equipment.SHIELD.affixes,'SHIELD');
  const buffs=[];if(hero.buffDamageUpTurns)buffs.push(['加持',hero.buffDamageUpTurns]);if(hero.regenTurns)buffs.push(['回復',hero.regenTurns]);if(hero.magicGuardTurns)buffs.push(['魔盾',hero.magicGuardTurns]);if(adventure.scoutTurns)buffs.push(['洞察',adventure.scoutTurns]);if(hero.burnTurns)buffs.push(['灼燒',hero.burnTurns,true]);if(hero.defDownTurns)buffs.push(['破甲',hero.defDownTurns,true]);
  $('buff-list').innerHTML=buffs.map(([n,t,bad])=>`<span class="buff ${bad?'debuff':''}">${n} ${t}</span>`).join('');
  $('quest-text').textContent=adventure.flags.parcel?'幫骷髏郵差送出遲到八十年的信。再往前走幾段，尋找路邊的小屋。':bossLevel>3?'三位首領都已落敗。世界和平了，但你的故事還可以繼續。':`下一個目標：${SCENES[bossLevel-1].boss}。建議 Lv.${SCENES[bossLevel-1].level}，先探索、強化裝備，再去挑戰。`;
- $('companion-note').textContent=adventure.flags.fox?'✧ 旅伴：嘴硬的小狐狸 · 勝利金幣 +2':'';
+ updateCompanionPanel();
  $('journey-track').innerHTML=SCENES.map((s,i)=>`<div class="journey-node ${bossLevel>i+1?'done':bossLevel===i+1?'active':''}" ${bossLevel===i+1?'aria-current="step"':''}><span class="node-number">${bossLevel>i+1?'✓':['I','II','III'][i]}</span><div><strong>${s.name}</strong><small>${bossLevel>i+1?'已完成':s.boss}</small></div></div>`).join('');
  $('time-label').textContent=['晨光','午後','暮色','星夜'][Math.floor(adventure.steps/8)%4];
 }
@@ -1446,6 +1444,7 @@ function handleBattleAction(playerMove){
  const tie=monsterMove===playerMove;const win=CLASH_RULES[playerMove]===monsterMove||(tie&&Math.random()<hero.currentTieWinRate/100);
  if(tie)log(win?'🤝 平手判定：你取得先機。':'🤝 平手判定：對手取得先機。');
  if(win)heroStrike(playerMove);else monsterAttack(monsterMove);
+ petAssist();
  if(previousBuff>0&&hero.buffDamageUpTurns===previousBuff){hero.buffDamageUpTurns--;if(!hero.buffDamageUpTurns)hero.buffDamageUpRate=0;}
  if(previousDef>0&&hero.defDownTurns===previousDef){hero.defDownTurns--;if(!hero.defDownTurns)hero.defDownRate=0;}
  if(adventure.scoutTurns>0)adventure.scoutTurns--;
@@ -1461,7 +1460,7 @@ function endBattle(result){
  b.settled=true;gameState='SETTLING';disableCommands(true);currentEnemy.hp=Math.max(0,currentEnemy.hp);
  if(result==='lose'){applyDeathPenalty();return;}
  const defeated={...currentEnemy};adventure.stats.wins++;const gold=(b.isBoss?20*bossLevel:randInt(4,8))+(adventure.flags.fox?2:0);adventure.gold+=gold;
- log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}。`);gainExp(defeated.exp);
+ log(`🏆 擊敗 ${defeated.name}！金幣 +${gold}${adventure.flags.fox?'（含狐狸尋寶 +2）':''}。`);gainExp(defeated.exp);
  if(b.isBoss){adventure.stats.bosses++;bossLevel++;unlockNewRarity();adventure.pendingEnding=bossLevel>3;}
  adventure.result={tag:'戰鬥勝利',title:`${defeated.name}，暫時下班。`,text:`你獲得 ${defeated.exp} 經驗值與 ${gold} 金幣。${b.isBoss?'新的旅途已經開啟。':'整理好行囊，再繼續下一段路。'}`,object:91};
  handleLootDrop(defeated,b.isBoss);saveAuto();
@@ -1496,8 +1495,8 @@ function salvage(eq){if(!eq||eq.name==='徒手'||eq.name==='無')return;const am
 function lootCard(eq,type,label,isNew){
  const cls=`Rarity-${eq.rarity}`;let desc,affixes='';
  if(type==='RING')desc=`Lv.${eq.tier} · ${eq.ability.desc}`;
- else{desc=`${type==='WEAPON'?'攻擊':'防禦'} +${getEffectivePower(eq,type)}${type==='SHIELD'?` · 精練 +${eq.refine||0}`:''}`;const pool=type==='WEAPON'?WEAPON_AFFIX_POOL:SHIELD_AFFIX_POOL;affixes=(eq.affixes||[]).map(id=>findAffix(pool,id)?.name||id).join('、')||'無原生詞條';}
- return `<div class="loot-card ${isNew?'new':''}"><small>${label} · ${RARITY_NAMES[eq.rarity]}</small><strong class="${cls}">${escapeHtml(eq.name)}</strong><p>${escapeHtml(desc)}</p>${affixes?`<p>${escapeHtml(affixes)}</p>`:''}</div>`;
+ else{desc=`${type==='WEAPON'?'攻擊':'防禦'} +${getEffectivePower(eq,type)}${type==='SHIELD'?` · 精練 +${eq.refine||0}`:''}`;affixes=affixLines(eq.affixes||[],type,'無原生詞條');}
+ return `<div class="loot-card ${isNew?'new':''}"><small>${label} · ${RARITY_NAMES[eq.rarity]}</small><strong class="${cls}">${escapeHtml(eq.name)}</strong><p>${escapeHtml(desc)}</p>${affixes?`<div class="loot-affixes">${affixes}</div>`:''}</div>`;
 }
 function renderLootDecision(){
  updateStatus();setScene('loot',91);const loot=newLoot,cur=hero.equipment[loot.type];
@@ -1513,9 +1512,11 @@ function renderLootDecision(){
   const delta=getEffectivePower(loot,loot.type)-getEffectivePower(cur,loot.type);
   note=`裝備本體${loot.type==='WEAPON'?'攻擊':'防禦'} ${delta>=0?'+':''}${delta}。`+(loot.type==='WEAPON'?'角色的武器精練與舊武器詞條全部保留。':'盾牌精練跟著盾牌，新盾從 +0 開始。請連詞條一起比較。');
  }
- mainView.insertAdjacentHTML('beforeend',`<p class="loot-note">${escapeHtml(note)}</p>`);
+ const comparison=equipmentComparison(loot);
+ mainView.insertAdjacentHTML('beforeend',comparisonMarkup(comparison)+`<p class="loot-note">${escapeHtml(note)}</p>`);
  commandMenu.hidden=true;commandMenu.style.display='none';decisionMenu.hidden=false;decisionMenu.style.display='flex';
- btnDecYes.innerHTML=`<strong>✓ ${escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small>`;btnDecNo.innerHTML=`<strong>保留目前裝備</strong><small>${loot.type==='RING'?'新戒指換成金幣':`分解新裝備 · 素材 ${RARITY_MATERIAL_VALUE[loot.rarity]||0}`}</small>`;
+ btnDecYes.classList.toggle('risky-equip',comparison.risky);btnDecNo.classList.toggle('recommended-keep',comparison.risky);
+ btnDecYes.innerHTML=`<strong>${comparison.risky?'⚠ 仍要換上（需再確認）':'✓ '+escapeHtml(title)}</strong><small>${escapeHtml(hint)}</small>`;btnDecNo.innerHTML=`<strong>保留目前裝備</strong><small>${loot.type==='RING'?'新戒指換成金幣':`分解新裝備 · 素材 ${RARITY_MATERIAL_VALUE[loot.rarity]||0}`}</small>`;
  btnDecYes.disabled=btnDecNo.disabled=false;
  const uid=loot.uid;btnDecYes.onclick=()=>handleLootDecision('YES',uid);btnDecNo.onclick=()=>handleLootDecision('NO',uid);
  $('action-tip').textContent='尚未做決定的戰利品也會存檔。重整後可以接著選。';
@@ -1523,7 +1524,10 @@ function renderLootDecision(){
 function handleRingDecision(choice){handleLootDecision(choice);}
 function handleLootDecision(choice,uid=newLoot?.uid){
  if(gameState!=='LOOT_DECISION'||!newLoot||uid!==newLoot.uid||!['YES','NO'].includes(choice))return;
- const loot=newLoot;newLoot=null;gameState='LOOT_RESOLVING';disableCommands(true);adventure.stats.loot++;
+ const loot=newLoot,epoch=sessionEpoch,originalHero=hero;
+ if(choice==='YES'&&!confirmEquipmentLoss(loot,equipmentComparison(loot)))return;
+ if(epoch!==sessionEpoch||hero!==originalHero||gameState!=='LOOT_DECISION'||newLoot?.uid!==uid)return;
+ newLoot=null;gameState='LOOT_RESOLVING';disableCommands(true);adventure.stats.loot++;
  const type=loot.type,cur=hero.equipment[type];
  if(choice==='YES'){
   if(type==='RING'&&cur.ability.id===loot.ability.id&&cur.ability.id!=='NONE'){
@@ -1598,7 +1602,7 @@ function cleanAdventure(value){
  for(const key of ['wins','deaths','events','loot','bosses','rests'])out.stats[key]=validNumber(a.stats?.[key]);
  if(!Array.isArray(a.logs)||a.logs.length>80)throw new Error('冒險手札過長');out.logs=a.logs.map(s=>validText(s,1600));
  if(a.result){const r=validObject(a.result);out.result={title:validText(r.title,200),text:validText(r.text,1800),tag:validText(r.tag,100),object:validNumber(r.object,0,129)};}else out.result=null;
- if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss)};}else out.battle=null;
+ if(a.battle){const b=validObject(a.battle);if(!Object.hasOwn(MOVE_NAMES,b.nextMove))throw new Error('下一回合出招無效');out.battle={id:validNumber(b.id,1),settled:validBool(b.settled),round:validNumber(b.round,1),nextMove:b.nextMove,isBoss:validBool(b.isBoss),petAssistRound:validNumber(b.petAssistRound??0,0,b.round)};}else out.battle=null;
  return out;
 }
 function validateSave(doc){
@@ -1691,6 +1695,212 @@ function openRecords(){
 
 ;
 
+/* === equipment.js === */
+/* Read-only equipment previews and loss-aware confirmation. No salvage or RNG in previews. */
+const EQUIP_STATS=[['atk','攻擊'],['def','防禦／盾擊'],['matk','魔攻'],['dodge','閃避 %'],['crit','爆擊 %'],['tie','平手勝率 %']];
+function affixLines(ids,type,empty='無詞條'){
+ const pool=type==='WEAPON'?WEAPON_AFFIX_POOL:SHIELD_AFFIX_POOL;
+ const unique=[...new Set(ids||[])];
+ return unique.length?unique.map(id=>{const a=findAffix(pool,id);return a?`<span class="affix-effect"><b>${escapeHtml(a.name)}</b><span>${escapeHtml(a.desc)}</span></span>`:'';}).join(''):`<span class="affix-empty">${escapeHtml(empty)}</span>`;
+}
+function equipClone(value){const clone=JSON.parse(JSON.stringify(value));if(clone.equipment)restoreRingAbility(clone.equipment.RING);if(clone.type==='RING'||clone.ability)restoreRingAbility(clone);return clone;}
+function withHeroStats(target){
+ const actual=hero;
+ try{hero=target;calculateHeroStats();return {atk:hero.currentAttack,def:hero.currentDefense,matk:getMagicAttackValue(),dodge:hero.currentDodge,crit:getHeroCritRate(),tie:hero.currentTieWinRate};}
+ finally{hero=actual;}
+}
+function equipmentComparison(loot){
+ const current=hero.equipment[loot.type],beforeHero=equipClone(hero),afterHero=equipClone(hero),newItem=equipClone(loot);
+ const sameRing=loot.type==='RING'&&current.ability.id!=='NONE'&&current.ability.id===loot.ability.id;
+ if(sameRing){const ring=afterHero.equipment.RING;ring.tier=Math.min(4,Math.max(current.tier+(current.tier<4?1:0),loot.tier));if(RARITY_ORDER.indexOf(loot.rarity)>RARITY_ORDER.indexOf(ring.rarity))ring.rarity=loot.rarity;}
+ else{if(loot.type==='WEAPON')newItem.affixes=[...new Set([...(newItem.affixes||[]),...(current.affixes||[])])];afterHero.equipment[loot.type]=newItem;}
+ const before=withHeroStats(beforeHero),after=withHeroStats(afterHero),reasons=[];
+ for(const [id,label] of EQUIP_STATS){if(after[id]<before[id]-.001)reasons.push(`${label} ${formatStat(before[id])} → ${formatStat(after[id])}（${formatStat(after[id]-before[id])}）`);}
+ if(!sameRing&&RARITY_ORDER.indexOf(loot.rarity)<RARITY_ORDER.indexOf(current.rarity))reasons.push(`稀有度 ${RARITY_NAMES[current.rarity]} → ${RARITY_NAMES[loot.rarity]}`);
+ if(loot.type==='SHIELD'){
+  if((current.refine||0)>(loot.refine||0))reasons.push(`盾牌精練 +${current.refine} → +${loot.refine||0}`);
+  for(const id of current.affixes||[])if(!(loot.affixes||[]).includes(id)){const a=findAffix(SHIELD_AFFIX_POOL,id);if(a)reasons.push(`失去「${a.name}」：${a.desc}`);}
+ }
+ if(loot.type==='RING'&&!sameRing&&current.ability.id!=='NONE'){
+  reasons.push(`失去原戒指能力「${current.name} Lv.${current.tier}」：${current.ability.desc}`);
+  if(loot.tier<current.tier)reasons.push(`戒指等級 Lv.${current.tier} → Lv.${loot.tier}`);
+ }
+ return {before,after,reasons,risky:reasons.length>0,sameRing};
+}
+function formatStat(n){return Number(n.toFixed(1)).toString();}
+function comparisonMarkup(c){
+ return `<section class="equip-impact ${c.risky?'has-risk':''}" aria-label="換裝能力比較"><h3>${c.risky?'⚠ 這次換裝有能力下降或效果損失':'換上後的角色能力'}</h3><div class="impact-table"><div class="impact-head"><span>能力</span><span>目前</span><span>換上後</span><span>變化</span></div>${EQUIP_STATS.map(([id,label])=>{const delta=c.after[id]-c.before[id];return `<div class="impact-row ${delta<-.001?'loss':delta>.001?'gain':''}"><span>${label}</span><span>${formatStat(c.before[id])}</span><span>${formatStat(c.after[id])}</span><b>${delta>0?'+':''}${formatStat(delta)}</b></div>`;}).join('')}</div>${c.reasons.length?`<div class="risk-reasons">${c.reasons.map(t=>`<p>⚠ ${escapeHtml(t)}</p>`).join('')}</div>`:''}<p class="impact-footnote">以上按目前 HP／增益與換裝後的裝備計算，尚未加入分解舊裝備後可能產生的自動精練。詞條不是只看攻擊數字就能判斷好壞。</p></section>`;
+}
+function confirmEquipmentLoss(loot,c){
+ if(!c.risky)return true;
+ const text=`⚠ 要放棄目前的好裝備嗎？\n\n${hero.equipment[loot.type].name} → ${loot.name}\n\n${c.reasons.join('\n')}\n\n${loot.type==='RING'?'原戒指將換成金幣':'原裝備將被分解，不能直接換回'}。\n按「取消」保留現況並返回比較；確定仍要換上才按「確定」。`;
+ return window.confirm(text);
+}
+
+;
+
+/* === camp.js === */
+/* Gold has visible uses; purchases are map-only, saved atomically and click-token checked. */
+const CAMP_OFFERS=[
+ {id:'weapon',name:'武器零件包',price:12,description:'武器素材 +5。已有武器時立即自動精練；徒手時保留素材。',apply:()=>addMaterials('WEAPON',5)},
+ {id:'shield',name:'盾牌零件包',price:12,description:'盾牌素材 +5。已有盾牌時立即自動精練；空手時保留素材。',apply:()=>addMaterials('SHIELD',5)},
+ {id:'rations',name:'暖心便當',price:10,description:'接下來 5 個戰鬥回合，回復最大 HP 的 10%，至少 3 點。重買不疊加。',canBuy:()=>hero.regenTurns===0,apply:()=>{hero.regenTurns=5;hero.regenAmount=Math.max(3,Math.floor(hero.maxHp*.1));}},
+ {id:'scout',name:'偵察情報',price:12,description:'接下來 5 個戰鬥回合，直接看穿敵人下一招。重買不疊加。',canBuy:()=>adventure.scoutTurns===0,apply:()=>{adventure.scoutTurns=5;}}
+];
+let campToken=0,campLockedUntil=0;
+function petAssistDamage(){return Math.max(2,Math.floor(hero.currentAttack*.25));}
+function updateCompanionPanel(){
+ const active=!!adventure.flags.fox,el=$('companion-note');
+ el.innerHTML=active?`<strong>🦊 嘴硬的小狐狸 · 已跟隨</strong><span>尋寶鼻：每次勝利額外 +2 金幣。</span><span>夾擊：戰鬥第 3、6、9…回合，追加 ${petAssistDamage()} 傷害（你 ATK 的 25%，至少 2 點）。</span><small>夾擊無視防禦／閃避，不觸發戒指與武器詞條；你或敵人倒下就不追加。</small>`:'<span>🦊 旅伴尚未加入。探索時幫助受困的小狐狸，即可獲得尋寶與戰鬥支援。</span>';
+}
+function petAssist(){
+ const b=adventure.battle;
+ if(!adventure.flags.fox||!b||b.settled||gameState!=='BATTLE_ACTION'||b.round%3!==0||b.petAssistRound===b.round||hero.hp<=0||!currentEnemy||currentEnemy.hp<=0)return 0;
+ b.petAssistRound=b.round;const damage=Math.min(currentEnemy.hp,petAssistDamage());currentEnemy.hp-=damage;
+ log(`🦊 小狐狸【夾擊】造成 ${damage} 傷害！無視防禦，沒有觸發額外連擊。`);
+ animateClass($('companion-actor'),'pet-strike',420);floatingNumber(`🦊 −${damage}`);return damage;
+}
+function openCamp(){if(gameState==='TITLE')return;renderCamp();$('camp-dialog').showModal();}
+function renderCamp(){
+ const token=++campToken,canShop=gameState==='MAP',locked=Date.now()<campLockedUntil;
+ $('camp-balance').textContent=`目前持有 ${adventure.gold} 金幣`;
+ $('camp-warning').textContent=canShop?'營地可隨時補給。路上遇見的鐵匠有更便宜的 8 金幣零件。':'現在只能查看。請先完成戰鬥、事件或裝備選擇，回到地圖再購買。';
+ $('camp-offers').replaceChildren();
+ for(const offer of CAMP_OFFERS){const row=document.createElement('section');row.className='camp-offer';const ready=!offer.canBuy||offer.canBuy();row.innerHTML=`<div><h3>${escapeHtml(offer.name)}</h3><p>${escapeHtml(offer.description)}</p></div>`;const btn=document.createElement('button');btn.className='secondary';btn.textContent=ready?`${offer.price} 金幣 · 購買`:'效果尚未用完';btn.dataset.offer=offer.id;btn.disabled=!canShop||locked||!ready||adventure.gold<offer.price;btn.onclick=()=>buyCampItem(offer.id,token);row.append(btn);$('camp-offers').append(row);}
+ $('camp-pet').innerHTML=$('companion-note').innerHTML;
+}
+function buyCampItem(id,token){
+ const offer=CAMP_OFFERS.find(o=>o.id===id);
+ if(token!==campToken||!$('camp-dialog').open||gameState!=='MAP'||Date.now()<campLockedUntil||!offer||adventure.gold<offer.price||(offer.canBuy&&!offer.canBuy()))return false;
+ const epoch=sessionEpoch;campLockedUntil=Date.now()+450;campToken++;adventure.gold-=offer.price;offer.apply();log(`◉ 營地補給：${offer.name}，花費 ${offer.price} 金幣。`);updateStatus();saveAuto();renderCamp();
+ setTimeout(()=>{if(epoch===sessionEpoch&&$('camp-dialog').open)renderCamp();},480);return true;
+}
+function initEnhancementUI(){
+ // Give every long modal its own scrollable body and a sticky, opaque header.
+ for(const dialog of document.querySelectorAll('dialog.modal')){const header=dialog.querySelector(':scope > .modal-top');if(!header)continue;const body=document.createElement('div');body.className='modal-body';while(header.nextSibling)body.append(header.nextSibling);dialog.append(body);}
+ $('btn-camp').onclick=$('btn-gold-help').onclick=openCamp;
+ $('guide-affixes').innerHTML=`<h3>武器詞條 · 原作 12 種</h3>${affixLines(WEAPON_AFFIX_POOL.map(a=>a.id),'WEAPON')}<h3>盾牌詞條 · 原作 12 種</h3>${affixLines(SHIELD_AFFIX_POOL.map(a=>a.id),'SHIELD')}`;
+ updateCompanionPanel();
+}
+
+;
+
+/* === music.js === */
+/* Original music for this game. Generated by Web Audio; no external tracks or requests. */
+const GAME_SCORES={
+ explore:{name:'林間小步舞',bpm:112,root:60,scale:[0,2,4,5,7,9,11],chords:[0,3,4,0,5,3,4,0],lead:'triangle',energy:0,
+ motifs:[[4,-1,6,-1,7,-1,9,7,6,-1,4,-1,2,-1,4,-1],[3,-1,5,-1,7,5,-1,3,2,-1,1,-1,0,-1,2,-1],[4,-1,6,7,-1,9,-1,7,6,4,-1,2,1,-1,2,-1],[2,-1,4,-1,6,-1,4,2,1,-1,0,-1,0,-1,-1,-1]]},
+ battle:{name:'小徑交鋒',bpm:144,root:57,scale:[0,2,3,5,7,8,10],chords:[0,5,3,4,0,5,6,4],lead:'square',energy:1,
+ motifs:[[0,0,4,-1,7,6,4,-1,3,4,6,-1,4,2,0,-1],[5,-1,7,5,4,-1,2,4,3,-1,4,3,2,1,0,-1],[0,2,4,7,-1,9,7,6,4,-1,6,7,6,4,2,-1],[3,4,6,-1,4,2,1,-1,0,2,4,2,0,-1,0,-1]]},
+ lich:{name:'不死巫妖・永夜鐘聲',bpm:154,root:62,scale:[0,2,3,5,7,8,11],chords:[0,5,3,4,0,2,5,4],lead:'sine',energy:2,
+ motifs:[[7,-1,6,7,9,-1,7,6,4,3,4,-1,6,4,3,1],[5,4,3,-1,2,3,5,-1,7,6,4,3,1,-1,0,-1],[0,4,7,6,7,9,10,-1,9,7,6,4,3,4,6,-1],[6,4,3,1,0,-1,6,-1,7,6,4,-1,1,0,-1,-1]]},
+ dragon:{name:'火焰巨龍・熾翼追擊',bpm:168,root:50,scale:[0,2,3,5,7,8,10],chords:[0,0,5,6,3,5,4,4],lead:'sawtooth',energy:3,
+ motifs:[[7,7,7,9,10,-1,9,7,6,7,9,10,11,-1,9,7],[5,5,7,9,10,9,7,-1,6,6,7,9,10,7,6,-1],[3,4,5,7,9,7,5,-1,4,5,6,7,10,9,7,-1],[6,7,9,10,9,7,6,4,7,6,4,-1,0,0,7,-1]]},
+ ancient:{name:'遠古魔神・終焉脈動',bpm:180,root:47,scale:[0,1,3,5,7,8,10],chords:[0,1,0,5,3,1,6,0],lead:'square',energy:4,
+ motifs:[[7,8,7,4,7,-1,6,4,3,4,6,7,8,-1,7,6],[8,7,4,3,1,0,1,-1,4,6,7,8,10,8,7,-1],[0,0,7,0,8,7,6,4,3,3,10,3,11,10,8,7],[6,7,8,10,11,10,8,7,6,4,3,1,0,-1,0,-1]]},
+ victory:{name:'終於可以休假了',bpm:124,root:60,scale:[0,2,4,5,7,9,11],chords:[0,4,5,3,0,3,4,0],lead:'triangle',energy:0,
+ motifs:[[0,-1,2,4,7,-1,7,-1,9,-1,7,-1,4,-1,-1,-1],[4,-1,6,-1,7,9,11,-1,9,-1,7,-1,6,-1,-1,-1],[5,-1,7,-1,9,7,5,-1,4,-1,2,-1,0,-1,2,-1],[4,6,7,-1,9,-1,7,-1,4,-1,2,-1,0,-1,-1,-1]]}
+};
+const MUSIC_PREF_KEY='jack-adventure.audio.v1';
+function readMusicPrefs(){try{const p=JSON.parse(localStorage.getItem(MUSIC_PREF_KEY)||'{}');return {music:typeof p.music==='boolean'?p.music:true,sfx:typeof p.sfx==='boolean'?p.sfx:false,musicVolume:Number.isFinite(p.musicVolume)?Math.max(0,Math.min(1,p.musicVolume)):.32,sfxVolume:Number.isFinite(p.sfxVolume)?Math.max(0,Math.min(1,p.sfxVolume)):.45};}catch{return {music:true,sfx:false,musicVolume:.32,sfxVolume:.45};}}
+function scorePitch(track,degree,octave=0){const scale=track.scale,n=scale.length;return track.root+scale[((degree%n)+n)%n]+12*Math.floor(degree/n)+12*octave;}
+function frequency(midi){return 440*2**((midi-69)/12);}
+function trackForScene(){if(['BATTLE','BATTLE_ACTION'].includes(gameState)&&currentEnemy){if(adventure.battle?.isBoss)return {'不死巫妖':'lich','火焰巨龍':'dragon','遠古魔神':'ancient'}[currentEnemy.name]||'battle';return 'battle';}return gameState==='CREDITS'?'victory':'explore';}
+const Music={
+ prefs:readMusicPrefs(),ctx:null,master:null,musicGain:null,sfxGain:null,noise:null,bus:null,timer:null,step:0,nextTime:0,track:null,unlocked:false,scheduled:0,switches:0,
+ ensure(){
+  if(this.ctx)return this.ctx;
+  const Context=window.AudioContext||window.webkitAudioContext;if(!Context)throw new Error('此瀏覽器不支援音樂合成');
+  const c=this.ctx=new Context(),compressor=c.createDynamicsCompressor();compressor.threshold.value=-18;compressor.knee.value=12;compressor.ratio.value=4;compressor.attack.value=.003;compressor.release.value=.18;
+  this.master=c.createGain();this.master.gain.value=.26;this.master.connect(compressor);compressor.connect(c.destination);
+  this.musicGain=c.createGain();this.musicGain.gain.value=this.prefs.musicVolume;this.musicGain.connect(this.master);
+  this.sfxGain=c.createGain();this.sfxGain.gain.value=this.prefs.sfxVolume;this.sfxGain.connect(this.master);
+  // Private deterministic noise does not consume gameplay Math.random().
+  this.noise=c.createBuffer(1,Math.floor(c.sampleRate*.24),c.sampleRate);const a=this.noise.getChannelData(0);let seed=92117;for(let i=0;i<a.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;a[i]=((seed/4294967296)*2-1)*(1-i/a.length);}
+  return c;
+ },
+ unlock(){
+  this.unlocked=true;
+  try{if(!this.prefs.music&&!this.prefs.sfx){this.updateUI();return;}const c=this.ensure();Promise.resolve(c.resume()).then(()=>{if(!document.hidden)this.sync();}).catch(()=>this.updateUI());}catch{this.updateUI();}
+ },
+ savePrefs(){try{localStorage.setItem(MUSIC_PREF_KEY,JSON.stringify(this.prefs));}catch{}},
+ setPreference(key,value){
+  if(['music','sfx'].includes(key))this.prefs[key]=!!value;else if(['musicVolume','sfxVolume'].includes(key)&&Number.isFinite(value))this.prefs[key]=Math.max(0,Math.min(1,value));else return;
+  this.savePrefs();if(this.ctx){this.musicGain.gain.setTargetAtTime(this.prefs.musicVolume,this.ctx.currentTime,.035);this.sfxGain.gain.setTargetAtTime(this.prefs.sfxVolume,this.ctx.currentTime,.035);}
+  this.unlock();this.sync();this.updateUI();
+ },
+ sync(){
+  const desired=trackForScene();
+  if(!this.unlocked||!this.prefs.music||this.prefs.musicVolume===0||document.hidden||!this.ctx||this.ctx.state!=='running'){this.stop();this.updateUI();return;}
+  if(this.track===desired&&this.timer!==null)return;
+  this.stop();this.track=desired;this.step=0;this.nextTime=this.ctx.currentTime+.045;this.switches++;
+  const gain=this.ctx.createGain();gain.gain.setValueAtTime(0,this.ctx.currentTime);gain.gain.linearRampToValueAtTime(1,this.ctx.currentTime+.18);gain.connect(this.musicGain);this.bus={gain,voices:new Set()};
+  this.tick();this.timer=setInterval(()=>this.tick(),80);this.updateUI();
+ },
+ stop(){
+  if(this.timer!==null){clearInterval(this.timer);this.timer=null;}
+  if(this.bus&&this.ctx){const bus=this.bus,now=this.ctx.currentTime;bus.gain.gain.cancelScheduledValues(now);bus.gain.gain.setTargetAtTime(0,now,.035);for(const voice of bus.voices){try{voice.stop(now+.15);}catch{}}setTimeout(()=>bus.gain.disconnect(),200);}
+  this.bus=null;this.track=null;
+ },
+ pause(){this.stop();if(this.ctx?.state==='running')this.ctx.suspend().catch(()=>{});this.updateUI();},
+ tick(){
+  if(!this.bus||!this.track||!this.ctx||this.ctx.state!=='running')return;
+  const now=this.ctx.currentTime,track=GAME_SCORES[this.track],beat=60/track.bpm,stepDuration=beat/4;
+  if(this.nextTime<now-.25)this.nextTime=now+.03;
+  let count=0;while(this.nextTime<now+.18&&count++<12){this.scheduleStep(track,this.step,this.nextTime,stepDuration,this.bus);this.step=(this.step+1)%256;this.nextTime+=stepDuration;}
+ },
+ note(midi,time,duration,type,volume,bus,cutoff=2400){
+  if(!this.ctx||bus.voices.size>80)return;const c=this.ctx,o=c.createOscillator(),gain=c.createGain(),filter=c.createBiquadFilter();o.type=type;o.frequency.value=frequency(midi);filter.type='lowpass';filter.frequency.value=cutoff;filter.Q.value=.5;
+  gain.gain.setValueAtTime(0,time);gain.gain.linearRampToValueAtTime(volume,time+.012);gain.gain.setValueAtTime(volume*.7,time+Math.max(.018,duration*.45));gain.gain.exponentialRampToValueAtTime(.0001,time+duration+.08);
+  o.connect(filter);filter.connect(gain);gain.connect(bus.gain);bus.voices.add(o);o.onended=()=>{bus.voices.delete(o);o.disconnect();filter.disconnect();gain.disconnect();};o.start(time);o.stop(time+duration+.1);this.scheduled++;
+ },
+ drum(kind,time,volume,bus){
+  if(!this.ctx||bus.voices.size>80)return;const c=this.ctx,g=c.createGain();g.connect(bus.gain);let source,filter;
+  if(kind==='kick'){source=c.createOscillator();source.type='sine';source.frequency.setValueAtTime(115,time);source.frequency.exponentialRampToValueAtTime(38,time+.12);source.connect(g);g.gain.setValueAtTime(volume,time);g.gain.exponentialRampToValueAtTime(.0001,time+.17);}
+  else{source=c.createBufferSource();source.buffer=this.noise;filter=c.createBiquadFilter();filter.type='highpass';filter.frequency.value=kind==='hat'?6700:1200;source.connect(filter);filter.connect(g);g.gain.setValueAtTime(volume,time);g.gain.exponentialRampToValueAtTime(.0001,time+(kind==='hat'?.035:.12));}
+  bus.voices.add(source);source.onended=()=>{bus.voices.delete(source);source.disconnect();g.disconnect();if(filter)filter.disconnect();};source.start(time);source.stop(time+.2);this.scheduled++;
+ },
+ scheduleStep(t,index,time,d,bus){
+  const step=index%16,bar=Math.floor(index/16),chord=t.chords[bar%t.chords.length],motif=t.motifs[bar%4],degree=motif[step],lift=bar>=8&&bar%4===2?7:0;
+  if(degree>=0){this.note(scorePitch(t,degree+lift,1),time,d*(step===14?2.4:1.45),t.lead,t.energy>1?.12:.16,bus,t.energy>=3?1800:3400);if(t.energy===2)this.note(scorePitch(t,degree,0),time,d*1.8,'triangle',.07,bus);}
+  if(step%(t.energy>=3?2:4)===0)this.note(scorePitch(t,chord+(step%8===4?4:0),-1),time,d*1.65,'triangle',.30,bus,650);
+  if(step===0||step===8){for(const offset of [0,2,4])this.note(scorePitch(t,chord+offset),time,d*6,'triangle',.065,bus,1200);}
+  if(step%2===1&&(t.energy>0||bar%2===1)){const degree=chord+[0,2,4,7][Math.floor(step/2)%4];this.note(scorePitch(t,degree,1),time,d*.65,'sine',t.energy>=2?.075:.07,bus);}
+  if(t.energy===0){if(step===0||step===8)this.drum('kick',time,.10,bus);if(step===4||step===12)this.drum('hat',time,.05,bus);}
+  else{if(step===0||step===8||(t.energy>=3&&[6,10].includes(step)))this.drum('kick',time,.38,bus);if(step===4||step===12||(bar%4===3&&step>=13&&t.energy>=2))this.drum('snare',time,.22,bus);if(step%(t.energy>=3?1:2)===0)this.drum('hat',time,.065,bus);}
+  if(t.energy===4&&[3,7,11,15].includes(step))this.note(scorePitch(t,chord+7,1),time,d*.8,'sawtooth',.055,bus,1100);
+ },
+ sfx(kind){
+  if(!this.unlocked||!this.prefs.sfx||this.prefs.sfxVolume===0||document.hidden)return;
+  try{const c=this.ensure();if(c.state!=='running')return;const bus={gain:this.sfxGain,voices:new Set()};this.note(kind==='reward'?84:kind==='heal'?76:52,c.currentTime+.005,.11,'triangle',.20,bus);}catch{}
+ },
+ updateUI(){
+  const active=this.track&&this.timer!==null,title=active?GAME_SCORES[this.track].name:(!this.prefs.music?'音樂已關閉':document.hidden?'背景分頁已暫停':this.unlocked?'等待播放':'開始／繼續冒險後播放');
+  if($('music-now'))$('music-now').textContent=title;
+  if($('music-status'))$('music-status').textContent=active?'♫ '+GAME_SCORES[this.track].name:'♫ '+title;
+  for(const key of ['music','sfx']){const el=$(key+'-enabled');if(el)el.checked=this.prefs[key];const volume=$(key+'-volume');if(volume)volume.value=Math.round(this.prefs[key+'Volume']*100);const label=$(key+'-volume-value');if(label)label.textContent=`${Math.round(this.prefs[key+'Volume']*100)}%`;}
+ }
+};
+function initMusic(){
+ $('btn-sound').onclick=()=>{Music.unlock();Music.updateUI();$('audio-dialog').showModal();};
+ for(const key of ['music','sfx']){
+  $(key+'-enabled').onchange=e=>Music.setPreference(key,e.target.checked);
+  $(key+'-volume').oninput=e=>Music.setPreference(key+'Volume',Number(e.target.value)/100);
+ }
+ for(const id of ['btn-new-game','btn-continue','btn-title-import','btn-title-slots']){
+  const button=$(id),previous=button.onclick;
+  button.onclick=function(e){Music.unlock();return previous?.call(this,e);};
+ }
+ document.addEventListener('visibilitychange',()=>{
+  document.body.classList.toggle('page-hidden',document.hidden);
+  if(document.hidden){Music.pause();saveAuto();}else if(Music.unlocked)Music.unlock();
+ });
+ window.addEventListener('pagehide',()=>{Music.pause();saveAuto();});
+ Music.updateUI();
+}
+
+;
+
 /* === ui.js === */
 /* Initialize the visible game controls after the page is ready. */
 function initGameUI(){
@@ -1701,8 +1911,7 @@ function initGameUI(){
  $('btn-guide').onclick=()=>$('guide-dialog').showModal();
  $('btn-records').onclick=openRecords;
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
- $('btn-sound').onclick=()=>{audioEnabled=!audioEnabled;$('btn-sound').setAttribute('aria-pressed',audioEnabled);$('btn-sound').querySelector('span').textContent=audioEnabled?'音效開':'音效關';if(audioEnabled)playTone('reward');};
- initSaveUI();
+ initSaveUI();initEnhancementUI();initMusic();
 }
 window.addEventListener('DOMContentLoaded',initGameUI);
 

@@ -1,6 +1,6 @@
 {
   "name": "jack-adventure-game",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "private": true,
   "description": "勇者模擬器・暮光旅途：可存檔的像素冒險",
   "scripts": {

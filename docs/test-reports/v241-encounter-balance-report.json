@@ -1,0 +1,663 @@
+{
+  "results": [
+    {
+      "name": "Profile evaluation neither mutates hero nor consumes gameplay RNG",
+      "pass": true
+    },
+    {
+      "name": "Opening chapter levels 1 through 7 retain their original ordinary enemy budgets",
+      "pass": true
+    },
+    {
+      "name": "Mid-game normal enemies survive more than the previous tiny HP budget",
+      "pass": true
+    },
+    {
+      "name": "Strong attack upgrades raise monster HP sublinearly and not its attack",
+      "pass": true
+    },
+    {
+      "name": "Magic equipment also contributes to encounter HP",
+      "pass": true
+    },
+    {
+      "name": "Defense and maximum HP raise pressure without copying dodge or tie chances",
+      "pass": true
+    },
+    {
+      "name": "Current injury, temporary damage buff and armor-break do not reroll strength",
+      "pass": true
+    },
+    {
+      "name": "Active damage pets contribute partially; resting pets do not",
+      "pass": true
+    },
+    {
+      "name": "Rock, skeleton, wolf and bat keep different defenses and evasion",
+      "pass": true
+    },
+    {
+      "name": "Monsters freeze at encounter start and survive a real save round-trip",
+      "pass": true
+    },
+    {
+      "name": "Existing unscaled fight loads with its original numbers",
+      "pass": true
+    },
+    {
+      "name": "Bosses remain fixed regardless of hero equipment",
+      "pass": true
+    },
+    {
+      "name": "Elite encounters scale and still guarantee loot",
+      "pass": true
+    },
+    {
+      "name": "Malformed adaptive level is rejected without touching the ongoing battle",
+      "pass": true
+    }
+  ],
+  "examples": [
+    {
+      "level": 8,
+      "chapter": 1,
+      "name": "哥布林",
+      "hero": {
+        "hp": 48,
+        "atk": 79,
+        "def": 59,
+        "magic": 48
+      },
+      "before": {
+        "hp": 65,
+        "atk": 29,
+        "def": 11,
+        "mDef": 17
+      },
+      "after": {
+        "hp": 88,
+        "atk": 60,
+        "def": 12,
+        "mDef": 18
+      },
+      "nominalHit": 1
+    },
+    {
+      "level": 8,
+      "chapter": 1,
+      "name": "骷髏兵",
+      "hero": {
+        "hp": 48,
+        "atk": 79,
+        "def": 59,
+        "magic": 48
+      },
+      "before": {
+        "hp": 91,
+        "atk": 29,
+        "def": 22,
+        "mDef": 8
+      },
+      "after": {
+        "hp": 112,
+        "atk": 60,
+        "def": 23,
+        "mDef": 9
+      },
+      "nominalHit": 1
+    },
+    {
+      "level": 8,
+      "chapter": 1,
+      "name": "野狼",
+      "hero": {
+        "hp": 48,
+        "atk": 79,
+        "def": 59,
+        "magic": 48
+      },
+      "before": {
+        "hp": 85,
+        "atk": 29,
+        "def": 8,
+        "mDef": 33
+      },
+      "after": {
+        "hp": 109,
+        "atk": 60,
+        "def": 9,
+        "mDef": 34
+      },
+      "nominalHit": 1
+    },
+    {
+      "level": 8,
+      "chapter": 1,
+      "name": "石頭人",
+      "hero": {
+        "hp": 48,
+        "atk": 79,
+        "def": 59,
+        "magic": 48
+      },
+      "before": {
+        "hp": 121,
+        "atk": 29,
+        "def": 42,
+        "mDef": 6
+      },
+      "after": {
+        "hp": 151,
+        "atk": 60,
+        "def": 43,
+        "mDef": 6
+      },
+      "nominalHit": 1
+    },
+    {
+      "level": 8,
+      "chapter": 1,
+      "name": "蝙蝠",
+      "hero": {
+        "hp": 48,
+        "atk": 79,
+        "def": 59,
+        "magic": 48
+      },
+      "before": {
+        "hp": 44,
+        "atk": 29,
+        "def": 6,
+        "mDef": 11
+      },
+      "after": {
+        "hp": 68,
+        "atk": 60,
+        "def": 6,
+        "mDef": 12
+      },
+      "nominalHit": 1
+    },
+    {
+      "level": 12,
+      "chapter": 2,
+      "name": "哥布林",
+      "hero": {
+        "hp": 64,
+        "atk": 87,
+        "def": 67,
+        "magic": 64
+      },
+      "before": {
+        "hp": 86,
+        "atk": 42,
+        "def": 13,
+        "mDef": 20
+      },
+      "after": {
+        "hp": 209,
+        "atk": 74,
+        "def": 16,
+        "mDef": 24
+      },
+      "nominalHit": 7
+    },
+    {
+      "level": 12,
+      "chapter": 2,
+      "name": "骷髏兵",
+      "hero": {
+        "hp": 64,
+        "atk": 87,
+        "def": 67,
+        "magic": 64
+      },
+      "before": {
+        "hp": 122,
+        "atk": 42,
+        "def": 26,
+        "mDef": 10
+      },
+      "after": {
+        "hp": 230,
+        "atk": 74,
+        "def": 31,
+        "mDef": 13
+      },
+      "nominalHit": 7
+    },
+    {
+      "level": 12,
+      "chapter": 2,
+      "name": "野狼",
+      "hero": {
+        "hp": 64,
+        "atk": 87,
+        "def": 67,
+        "magic": 64
+      },
+      "before": {
+        "hp": 113,
+        "atk": 42,
+        "def": 10,
+        "mDef": 40
+      },
+      "after": {
+        "hp": 242,
+        "atk": 74,
+        "def": 13,
+        "mDef": 46
+      },
+      "nominalHit": 7
+    },
+    {
+      "level": 12,
+      "chapter": 2,
+      "name": "石頭人",
+      "hero": {
+        "hp": 64,
+        "atk": 87,
+        "def": 67,
+        "magic": 64
+      },
+      "before": {
+        "hp": 162,
+        "atk": 42,
+        "def": 50,
+        "mDef": 7
+      },
+      "after": {
+        "hp": 334,
+        "atk": 74,
+        "def": 53,
+        "mDef": 9
+      },
+      "nominalHit": 7
+    },
+    {
+      "level": 12,
+      "chapter": 2,
+      "name": "蝙蝠",
+      "hero": {
+        "hp": 64,
+        "atk": 87,
+        "def": 67,
+        "magic": 64
+      },
+      "before": {
+        "hp": 59,
+        "atk": 42,
+        "def": 7,
+        "mDef": 13
+      },
+      "after": {
+        "hp": 189,
+        "atk": 74,
+        "def": 9,
+        "mDef": 16
+      },
+      "nominalHit": 7
+    },
+    {
+      "level": 19,
+      "chapter": 3,
+      "name": "哥布林",
+      "hero": {
+        "hp": 92,
+        "atk": 101,
+        "def": 81,
+        "magic": 92
+      },
+      "before": {
+        "hp": 124,
+        "atk": 65,
+        "def": 17,
+        "mDef": 25
+      },
+      "after": {
+        "hp": 333,
+        "atk": 97,
+        "def": 22,
+        "mDef": 32
+      },
+      "nominalHit": 16
+    },
+    {
+      "level": 19,
+      "chapter": 3,
+      "name": "骷髏兵",
+      "hero": {
+        "hp": 92,
+        "atk": 101,
+        "def": 81,
+        "magic": 92
+      },
+      "before": {
+        "hp": 175,
+        "atk": 65,
+        "def": 34,
+        "mDef": 13
+      },
+      "after": {
+        "hp": 370,
+        "atk": 97,
+        "def": 41,
+        "mDef": 17
+      },
+      "nominalHit": 16
+    },
+    {
+      "level": 19,
+      "chapter": 3,
+      "name": "野狼",
+      "hero": {
+        "hp": 92,
+        "atk": 101,
+        "def": 81,
+        "magic": 92
+      },
+      "before": {
+        "hp": 163,
+        "atk": 65,
+        "def": 13,
+        "mDef": 51
+      },
+      "after": {
+        "hp": 381,
+        "atk": 97,
+        "def": 17,
+        "mDef": 60
+      },
+      "nominalHit": 16
+    },
+    {
+      "level": 19,
+      "chapter": 3,
+      "name": "石頭人",
+      "hero": {
+        "hp": 92,
+        "atk": 101,
+        "def": 81,
+        "magic": 92
+      },
+      "before": {
+        "hp": 233,
+        "atk": 65,
+        "def": 63,
+        "mDef": 8
+      },
+      "after": {
+        "hp": 554,
+        "atk": 97,
+        "def": 67,
+        "mDef": 12
+      },
+      "nominalHit": 16
+    },
+    {
+      "level": 19,
+      "chapter": 3,
+      "name": "蝙蝠",
+      "hero": {
+        "hp": 92,
+        "atk": 101,
+        "def": 81,
+        "magic": 92
+      },
+      "before": {
+        "hp": 86,
+        "atk": 65,
+        "def": 8,
+        "mDef": 17
+      },
+      "after": {
+        "hp": 314,
+        "atk": 97,
+        "def": 12,
+        "mDef": 22
+      },
+      "nominalHit": 16
+    },
+    {
+      "level": 26,
+      "chapter": 4,
+      "name": "哥布林",
+      "hero": {
+        "hp": 120,
+        "atk": 115,
+        "def": 95,
+        "magic": 120
+      },
+      "before": {
+        "hp": 163,
+        "atk": 88,
+        "def": 20,
+        "mDef": 31
+      },
+      "after": {
+        "hp": 414,
+        "atk": 118,
+        "def": 26,
+        "mDef": 38
+      },
+      "nominalHit": 23
+    },
+    {
+      "level": 26,
+      "chapter": 4,
+      "name": "骷髏兵",
+      "hero": {
+        "hp": 120,
+        "atk": 115,
+        "def": 95,
+        "magic": 120
+      },
+      "before": {
+        "hp": 229,
+        "atk": 88,
+        "def": 41,
+        "mDef": 15
+      },
+      "after": {
+        "hp": 487,
+        "atk": 118,
+        "def": 49,
+        "mDef": 20
+      },
+      "nominalHit": 23
+    },
+    {
+      "level": 26,
+      "chapter": 4,
+      "name": "野狼",
+      "hero": {
+        "hp": 120,
+        "atk": 115,
+        "def": 95,
+        "magic": 120
+      },
+      "before": {
+        "hp": 213,
+        "atk": 88,
+        "def": 15,
+        "mDef": 61
+      },
+      "after": {
+        "hp": 473,
+        "atk": 118,
+        "def": 20,
+        "mDef": 71
+      },
+      "nominalHit": 23
+    },
+    {
+      "level": 26,
+      "chapter": 4,
+      "name": "石頭人",
+      "hero": {
+        "hp": 120,
+        "atk": 115,
+        "def": 95,
+        "magic": 120
+      },
+      "before": {
+        "hp": 305,
+        "atk": 88,
+        "def": 77,
+        "mDef": 10
+      },
+      "after": {
+        "hp": 712,
+        "atk": 118,
+        "def": 83,
+        "mDef": 14
+      },
+      "nominalHit": 23
+    },
+    {
+      "level": 26,
+      "chapter": 4,
+      "name": "蝙蝠",
+      "hero": {
+        "hp": 120,
+        "atk": 115,
+        "def": 95,
+        "magic": 120
+      },
+      "before": {
+        "hp": 112,
+        "atk": 88,
+        "def": 10,
+        "mDef": 20
+      },
+      "after": {
+        "hp": 390,
+        "atk": 118,
+        "def": 14,
+        "mDef": 26
+      },
+      "nominalHit": 23
+    },
+    {
+      "level": 34,
+      "chapter": 5,
+      "name": "哥布林",
+      "hero": {
+        "hp": 152,
+        "atk": 131,
+        "def": 111,
+        "magic": 152
+      },
+      "before": {
+        "hp": 206,
+        "atk": 115,
+        "def": 25,
+        "mDef": 37
+      },
+      "after": {
+        "hp": 513,
+        "atk": 142,
+        "def": 31,
+        "mDef": 45
+      },
+      "nominalHit": 31
+    },
+    {
+      "level": 34,
+      "chapter": 5,
+      "name": "骷髏兵",
+      "hero": {
+        "hp": 152,
+        "atk": 131,
+        "def": 111,
+        "magic": 152
+      },
+      "before": {
+        "hp": 290,
+        "atk": 115,
+        "def": 49,
+        "mDef": 18
+      },
+      "after": {
+        "hp": 634,
+        "atk": 142,
+        "def": 59,
+        "mDef": 24
+      },
+      "nominalHit": 31
+    },
+    {
+      "level": 34,
+      "chapter": 5,
+      "name": "野狼",
+      "hero": {
+        "hp": 152,
+        "atk": 131,
+        "def": 111,
+        "magic": 152
+      },
+      "before": {
+        "hp": 270,
+        "atk": 115,
+        "def": 18,
+        "mDef": 74
+      },
+      "after": {
+        "hp": 579,
+        "atk": 142,
+        "def": 24,
+        "mDef": 85
+      },
+      "nominalHit": 31
+    },
+    {
+      "level": 34,
+      "chapter": 5,
+      "name": "石頭人",
+      "hero": {
+        "hp": 152,
+        "atk": 131,
+        "def": 111,
+        "magic": 152
+      },
+      "before": {
+        "hp": 386,
+        "atk": 115,
+        "def": 92,
+        "mDef": 12
+      },
+      "after": {
+        "hp": 901,
+        "atk": 142,
+        "def": 104,
+        "mDef": 17
+      },
+      "nominalHit": 31
+    },
+    {
+      "level": 34,
+      "chapter": 5,
+      "name": "蝙蝠",
+      "hero": {
+        "hp": 152,
+        "atk": 131,
+        "def": 111,
+        "magic": 152
+      },
+      "before": {
+        "hp": 142,
+        "atk": 115,
+        "def": 12,
+        "mDef": 25
+      },
+      "after": {
+        "hp": 489,
+        "atk": 142,
+        "def": 17,
+        "mDef": 31
+      },
+      "nominalHit": 31
+    }
+  ],
+  "errors": []
+}

@@ -18,7 +18,7 @@ const RUN_WEATHER=[
  {id:'wind',name:'亂吹的風',desc:'普通敵人物攻 +8%，經驗值 +10%。'},
  {id:'glow',name:'地脈打嗝',desc:'普通敵人 HP +10%，掉寶率 +8%。'}
 ];
-const ROUTE_KINDS={battle:{icon:'⚔',name:'不太友善的小徑',hint:'普通戰鬥 · 經驗與裝備',weight:5},event:{icon:'?',name:'有人在喊你的名字',hint:'隨機劇情 · 選擇會有後續',weight:5},elite:{icon:'☠',name:'門口貼滿警告的巷子',hint:'菁英挑戰 · 高風險高報酬',weight:2},treasure:{icon:'✧',name:'閃閃發光的不明物',hint:'寶物、素材或小小惡作劇',weight:3},rest:{icon:'♨',name:'冒煙的流動食堂',hint:'恢復 35% HP · 補給',weight:2},relic:{icon:'◈',name:'神明的失物招領',hint:'選擇一件旅途奇物 · 最多 5 件',weight:2}};
+const ROUTE_KINDS={battle:{icon:'⚔',name:'不太友善的小徑',hint:'普通戰鬥 · 經驗與裝備',weight:5},event:{icon:'?',name:'有人在喊你的名字',hint:'隨機劇情 · 選擇會有後續',weight:5},elite:{icon:'☠',name:'菁英據點',hint:'直接開戰 · 強敵警告 · 勝利必掉裝備',weight:2},treasure:{icon:'✧',name:'閃閃發光的不明物',hint:'寶物、素材或小小惡作劇',weight:3},rest:{icon:'♨',name:'冒煙的流動食堂',hint:'恢復 35% HP · 補給',weight:2},relic:{icon:'◈',name:'神明的失物招領',hint:'選擇一件旅途奇物 · 最多 5 件',weight:2}};
 const CHAPTER_STORIES=[
  ['世界末日，請先抽號碼牌','村長交給你一張「世界和平申請書」。第一關不是魔王，是管印章的巫妖。牠已經死了，卻還不肯下班。'],
  ['印章蓋好了，紙卻燒起來','巫妖的章總算到手。紙上多了一句：「請巨龍烘乾後再送件。」這個世界連行政流程都會噴火。'],
@@ -35,15 +35,52 @@ function currentWeather(){const e=ensureExpedition();if(!e.weather)e.weather=RUN
 function relicBonus(key){return (adventure.expedition?.relics||[]).reduce((sum,id)=>sum+(RUN_RELICS[id]?.stat===key?RUN_RELICS[id].value:0),0);}
 function expeditionDamageRate(){return 1;}
 function applyExpeditionStats(){if(!adventure?.expedition)return;hero.currentAttack=Math.floor(hero.currentAttack*(1+relicBonus('atk')));hero.currentDefense=Math.floor(hero.currentDefense*(1+relicBonus('def')));hero.currentMagicAtk=Math.floor(hero.currentMagicAtk*(1+relicBonus('matk')));hero.currentDodge=Math.min(75,hero.currentDodge+relicBonus('dodge'));hero.currentTieWinRate=Math.min(100,hero.currentTieWinRate+relicBonus('tie'));}
-function generateRoutes(){const e=ensureExpedition();if(e.choices.length)return;const pool=Object.keys(ROUTE_KINDS);const picks=[];while(picks.length<3){const weighted=pool.filter(x=>!picks.includes(x)).flatMap(id=>Array(ROUTE_KINDS[id].weight).fill(id));picks.push(runPick(weighted));}e.generation++;e.choices=picks.map((kind,i)=>({kind,id:`${e.chapter}-${e.generation}-${i}`,flavor:Math.floor(runRandom()*4)}));saveAuto();}
+// Two explicit combat routes, one peaceful story/supply route. Never reroll existing offers.
+const BATTLE_TRAILS=[
+ {name:'森林怪蹤',hint:'普通怪物 · 直接開戰',place:'forest',enemies:[0,1]},
+ {name:'荒野巡獵',hint:'普通怪物 · 直接開戰',place:'road',enemies:[2,3]},
+ {name:'洞穴掃蕩',hint:'普通怪物 · 直接開戰',place:'cave',enemies:[1,4]},
+ {name:'沼澤清剿',hint:'普通怪物 · 直接開戰',place:'marsh',enemies:[0,2,3,4]}
+];
+function generateRoutes(){
+ const e=ensureExpedition();if(e.choices.length)return;
+ const support=['event','treasure','rest','relic'].flatMap(id=>Array(ROUTE_KINDS[id].weight).fill(id));
+ const firstFlavor=Math.floor(runRandom()*BATTLE_TRAILS.length);
+ const secondFlavor=(firstFlavor+1+Math.floor(runRandom()*3))%BATTLE_TRAILS.length;
+ const secondKind=hero.level>=4&&runRandom()<.35?'elite':'battle';
+ const picks=[{kind:'battle',flavor:firstFlavor},{kind:secondKind,flavor:secondFlavor},{kind:runPick(support),flavor:Math.floor(runRandom()*4)}];
+ e.generation++;e.choices=picks.map((c,i)=>({kind:c.kind,id:`${e.chapter}-${e.generation}-${i}`,flavor:c.flavor}));saveAuto();
+}
+function routeCard(c,i){
+ const trail=c.kind==='battle'?BATTLE_TRAILS[c.flavor]:null;
+ return {text:`${ROUTE_KINDS[c.kind].icon} ${trail?.name||ROUTE_KINDS[c.kind].name}`,hint:trail?.hint||ROUTE_KINDS[c.kind].hint,value:i};
+}
 function enterRoutes(){if(gameState!=='MAP')return;generateRoutes();gameState='ROUTE';renderRoutes();saveAuto();}
-function renderRoutes(){const e=ensureExpedition(),weather=currentWeather();setScene('map',88);story('CHOOSE YOUR PATH',`第 ${e.chapter} 章 · 這次要往哪裡走？`,`${weather.name}：${weather.desc}`,`首領通行線索 ${e.clues}/${requiredClues()} · 路線一旦出現就會保存，重新整理不重抽。`);const id=e.generation;setCommands(...e.choices.map((c,i)=>({text:`${ROUTE_KINDS[c.kind].icon} ${ROUTE_KINDS[c.kind].name}`,hint:ROUTE_KINDS[c.kind].hint,value:i})),i=>chooseRoute(i,id),'ROUTE');mainView.insertAdjacentHTML('beforeend','<button id="route-back" class="text-button">先回營地準備</button>');$('route-back').onclick=()=>{gameState='MAP';renderMap();saveAuto();};syncActionDock();}
+function renderRoutes(){const e=ensureExpedition(),weather=currentWeather();setScene('map',88);story('CHOOSE YOUR PATH',`第 ${e.chapter} 章 · 這次要往哪裡走？`,`${weather.name}：${weather.desc}`,`首領通行線索 ${e.clues}/${requiredClues()} · 新岔路為 2 條戰鬥、1 條事件／補給；已出現的選項仍保留。`);const id=e.generation;setCommands(...e.choices.map(routeCard),i=>chooseRoute(i,id),'ROUTE');mainView.insertAdjacentHTML('beforeend','<button id="route-back" class="text-button">先回營地準備</button>');$('route-back').onclick=()=>{gameState='MAP';renderMap();saveAuto();};syncActionDock();}
 function chooseRoute(index,generation=ensureExpedition().generation){
  const e=ensureExpedition();if(gameState!=='ROUTE'||generation!==e.generation||!Number.isInteger(index)||!e.choices[index])return;
- const c=e.choices[index];gameState='MAP_ACTION';disableCommands(true);e.choices=[];e.depth++;e.clues=Math.min(requiredClues(),e.clues+1);e.lastRoute=c.kind;e.history.push(`${e.chapter}:${c.kind}`);e.history=e.history.slice(-120);adventure.steps++;countTurn();e.place=c.kind==='battle'?runPick(['forest','road','cave','marsh']):c.kind==='elite'?'road':c.kind==='treasure'?'cave':c.kind==='rest'?'camp':'ruins';
- if(c.kind==='battle')startSmallBattle();else if(c.kind==='elite')enterEvent('elite');else if(c.kind==='event')enterEvent(pickEvent());else if(c.kind==='rest'){const n=healFraction(.35);if(runRandom()<.4)e.antidotes=Math.min(5,e.antidotes+1);resultEvent('你坐下來，世界沒有因此毀滅',`恢復 ${n} HP。老闆娘：「飯要吃，世界也要救，順序別搞錯。」`,86);}else if(c.kind==='relic'){prepareRelicOffers();enterEvent('relic_shrine');}else{if(runRandom()<.65)giveEventLoot(runPick(['WEAPON','SHIELD','RING']),'路邊失物招領');else enterEvent(runPick(['chest','living_luggage','receipt_duel']));}
+ const c=e.choices[index];resolveRouteSelection(c);
+}
+function resolveRouteSelection(c){
+ const e=ensureExpedition();gameState='MAP_ACTION';disableCommands(true);e.choices=[];e.depth++;e.clues=Math.min(requiredClues(),e.clues+1);e.lastRoute=c.kind;e.history.push(`${e.chapter}:${c.kind}`);e.history=e.history.slice(-120);adventure.steps++;countTurn();e.place=c.kind==='battle'?BATTLE_TRAILS[c.flavor].place:c.kind==='elite'?'road':c.kind==='treasure'?'cave':c.kind==='rest'?'camp':'ruins';
+ if(c.kind==='battle')startSmallBattle(runPick(BATTLE_TRAILS[c.flavor].enemies));else if(c.kind==='elite')startEliteBattle();else if(c.kind==='event')enterEvent(pickEvent());else if(c.kind==='rest'){const n=healFraction(.35);if(runRandom()<.4)e.antidotes=Math.min(5,e.antidotes+1);resultEvent('你坐下來，世界沒有因此毀滅',`恢復 ${n} HP。老闆娘：「飯要吃，世界也要救，順序別搞錯。」`,86);}else if(c.kind==='relic'){prepareRelicOffers();enterEvent('relic_shrine');}else{if(runRandom()<.65)giveEventLoot(runPick(['WEAPON','SHIELD','RING']),'路邊失物招領');else enterEvent(runPick(['chest','living_luggage','receipt_duel']));}
  updateStatus();saveAuto();
 }
+function canContinueHunt(){
+ return gameState==='RESULT'&&!newLoot&&hero.hp>0&&!!adventure.battle?.settled&&!adventure.battle.isBoss&&currentEnemy?.hp===0;
+}
+function continueHunt(){
+ if(!canContinueHunt())return;
+ const flavor=Math.floor(runRandom()*BATTLE_TRAILS.length);
+ resolveRouteSelection({kind:'battle',flavor});
+}
+function afterHuntChoice(action){
+ if(!canContinueHunt())return;
+ if(action==='hunt'){continueHunt();return;}
+ if(action==='routes'){enterMap();if(gameState==='MAP')enterRoutes();return;}
+ if(action==='camp')enterMap();
+}
+
 function prepareRelicOffers(){const e=ensureExpedition(),pool=Object.keys(RUN_RELICS).filter(id=>!e.relics.includes(id));e.relicOffers=[];while(e.relicOffers.length<Math.min(3,pool.length)){const id=runPick(pool.filter(id=>!e.relicOffers.includes(id)));e.relicOffers.push(id);}}
 function takeRelic(index){const e=ensureExpedition(),id=e.relicOffers[index];if(!id)return;if(e.relics.length>=5){adventure.gold+=18;resultEvent('神明說，你的背包已經夠吵了','奇物已達 5 件，改拿 18 金幣，不會強制丟掉舊奇物。',84);}else{e.relics.push(id);resultEvent(`收下「${RUN_RELICS[id].name}」`,RUN_RELICS[id].desc,84);}e.relicOffers=[];updateStatus();saveAuto();}
 function chapterIntro(){const e=ensureExpedition();if(!e.pendingIntro)return false;e.pendingIntro=false;const s=CHAPTER_STORIES[e.chapter-1];adventure.result={tag:`第 ${e.chapter} 章`,title:s[0],text:s[1],object:84,portraitKey:e.chapter===4?'smith':'sage'};gameState='RESULT';renderResult();saveAuto();return true;}

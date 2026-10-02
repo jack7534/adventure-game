@@ -1,0 +1,1254 @@
+{
+  "note": "Five deterministic seeds. Actions use visible buttons and displayed enemy information. No stat boosts; only elapsed clock and animation delay accelerated.",
+  "runs": [
+    {
+      "seed": 1,
+      "cleared": true,
+      "actions": 985,
+      "turns": 798,
+      "level": 35,
+      "bosses": 5,
+      "deaths": 6,
+      "events": 4,
+      "loot": 70,
+      "relics": [
+        "lucky_coin",
+        "tin_bell",
+        "red_quill",
+        "glasses"
+      ],
+      "routeHistory": [
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:relic",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "3:relic",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle"
+      ],
+      "bossAttempts": [
+        {
+          "boss": 1,
+          "level": 7,
+          "atk": 57,
+          "def": 50,
+          "matk": 44
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "atk": 94,
+          "def": 64,
+          "matk": 70
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "atk": 95,
+          "def": 76,
+          "matk": 74
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "atk": 103,
+          "def": 66,
+          "matk": 79
+        },
+        {
+          "boss": 2,
+          "level": 15,
+          "atk": 106,
+          "def": 81,
+          "matk": 89
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "atk": 182,
+          "def": 99,
+          "matk": 157
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "atk": 184,
+          "def": 106,
+          "matk": 161
+        },
+        {
+          "boss": 4,
+          "level": 26,
+          "atk": 197,
+          "def": 126,
+          "matk": 203
+        },
+        {
+          "boss": 4,
+          "level": 27,
+          "atk": 198,
+          "def": 127,
+          "matk": 206
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "atk": 214,
+          "def": 149,
+          "matk": 250
+        }
+      ],
+      "defeats": [
+        {
+          "boss": 2,
+          "level": 12,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "isBoss": true
+        },
+        {
+          "boss": 4,
+          "level": 23,
+          "isBoss": false
+        },
+        {
+          "boss": 4,
+          "level": 26,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "seed": 7,
+      "cleared": true,
+      "actions": 1207,
+      "turns": 1005,
+      "level": 37,
+      "bosses": 5,
+      "deaths": 9,
+      "events": 4,
+      "loot": 80,
+      "relics": [
+        "filter",
+        "red_quill",
+        "receipt",
+        "feather"
+      ],
+      "routeHistory": [
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle"
+      ],
+      "bossAttempts": [
+        {
+          "boss": 1,
+          "level": 7,
+          "atk": 62,
+          "def": 40,
+          "matk": 45
+        },
+        {
+          "boss": 1,
+          "level": 8,
+          "atk": 64,
+          "def": 41,
+          "matk": 48
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "atk": 72,
+          "def": 50,
+          "matk": 65
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "atk": 92,
+          "def": 53,
+          "matk": 75
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "atk": 95,
+          "def": 55,
+          "matk": 80
+        },
+        {
+          "boss": 2,
+          "level": 15,
+          "atk": 98,
+          "def": 56,
+          "matk": 90
+        },
+        {
+          "boss": 2,
+          "level": 16,
+          "atk": 99,
+          "def": 64,
+          "matk": 94
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "atk": 117,
+          "def": 79,
+          "matk": 121
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "atk": 125,
+          "def": 82,
+          "matk": 132
+        },
+        {
+          "boss": 3,
+          "level": 21,
+          "atk": 128,
+          "def": 84,
+          "matk": 137
+        },
+        {
+          "boss": 4,
+          "level": 26,
+          "atk": 173,
+          "def": 169,
+          "matk": 185
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "atk": 190,
+          "def": 198,
+          "matk": 278
+        },
+        {
+          "boss": 5,
+          "level": 35,
+          "atk": 193,
+          "def": 200,
+          "matk": 283
+        },
+        {
+          "boss": 5,
+          "level": 36,
+          "atk": 211,
+          "def": 203,
+          "matk": 322
+        }
+      ],
+      "defeats": [
+        {
+          "boss": 1,
+          "level": 7,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 15,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 35,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "seed": 42,
+      "cleared": true,
+      "actions": 962,
+      "turns": 810,
+      "level": 35,
+      "bosses": 5,
+      "deaths": 7,
+      "events": 4,
+      "loot": 73,
+      "relics": [
+        "filter",
+        "red_quill",
+        "lunchbox",
+        "receipt"
+      ],
+      "routeHistory": [
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle"
+      ],
+      "bossAttempts": [
+        {
+          "boss": 1,
+          "level": 7,
+          "atk": 55,
+          "def": 33,
+          "matk": 47
+        },
+        {
+          "boss": 1,
+          "level": 8,
+          "atk": 56,
+          "def": 37,
+          "matk": 51
+        },
+        {
+          "boss": 1,
+          "level": 9,
+          "atk": 86,
+          "def": 40,
+          "matk": 54
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "atk": 91,
+          "def": 50,
+          "matk": 73
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "atk": 92,
+          "def": 51,
+          "matk": 78
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "atk": 130,
+          "def": 67,
+          "matk": 133
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "atk": 133,
+          "def": 89,
+          "matk": 136
+        },
+        {
+          "boss": 3,
+          "level": 21,
+          "atk": 137,
+          "def": 93,
+          "matk": 139
+        },
+        {
+          "boss": 4,
+          "level": 26,
+          "atk": 153,
+          "def": 161,
+          "matk": 183
+        },
+        {
+          "boss": 4,
+          "level": 27,
+          "atk": 156,
+          "def": 163,
+          "matk": 187
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "atk": 176,
+          "def": 194,
+          "matk": 250
+        }
+      ],
+      "defeats": [
+        {
+          "boss": 1,
+          "level": 7,
+          "isBoss": true
+        },
+        {
+          "boss": 1,
+          "level": 8,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 16,
+          "isBoss": false
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "isBoss": true
+        },
+        {
+          "boss": 4,
+          "level": 26,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "seed": 31415,
+      "cleared": true,
+      "actions": 726,
+      "turns": 592,
+      "level": 35,
+      "bosses": 5,
+      "deaths": 4,
+      "events": 4,
+      "loot": 64,
+      "relics": [
+        "blue_cup",
+        "glasses",
+        "lunchbox",
+        "tin_bell"
+      ],
+      "routeHistory": [
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle"
+      ],
+      "bossAttempts": [
+        {
+          "boss": 1,
+          "level": 7,
+          "atk": 44,
+          "def": 36,
+          "matk": 112
+        },
+        {
+          "boss": 1,
+          "level": 8,
+          "atk": 63,
+          "def": 37,
+          "matk": 148
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "atk": 71,
+          "def": 55,
+          "matk": 192
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "atk": 72,
+          "def": 58,
+          "matk": 200
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "atk": 75,
+          "def": 60,
+          "matk": 213
+        },
+        {
+          "boss": 3,
+          "level": 19,
+          "atk": 94,
+          "def": 122,
+          "matk": 109
+        },
+        {
+          "boss": 4,
+          "level": 26,
+          "atk": 156,
+          "def": 168,
+          "matk": 192
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "atk": 178,
+          "def": 216,
+          "matk": 225
+        }
+      ],
+      "defeats": [
+        {
+          "boss": 1,
+          "level": 7,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "seed": 8675309,
+      "cleared": true,
+      "actions": 1625,
+      "turns": 1366,
+      "level": 40,
+      "bosses": 5,
+      "deaths": 18,
+      "events": 4,
+      "loot": 103,
+      "relics": [
+        "tin_bell",
+        "filter",
+        "map",
+        "red_quill"
+      ],
+      "routeHistory": [
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:battle",
+        "1:relic",
+        "1:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "2:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "3:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "4:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle",
+        "5:battle"
+      ],
+      "bossAttempts": [
+        {
+          "boss": 1,
+          "level": 7,
+          "atk": 48,
+          "def": 46,
+          "matk": 46
+        },
+        {
+          "boss": 2,
+          "level": 12,
+          "atk": 92,
+          "def": 57,
+          "matk": 74
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "atk": 93,
+          "def": 58,
+          "matk": 79
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "atk": 96,
+          "def": 59,
+          "matk": 83
+        },
+        {
+          "boss": 2,
+          "level": 15,
+          "atk": 98,
+          "def": 66,
+          "matk": 92
+        },
+        {
+          "boss": 2,
+          "level": 16,
+          "atk": 99,
+          "def": 73,
+          "matk": 95
+        },
+        {
+          "boss": 2,
+          "level": 17,
+          "atk": 110,
+          "def": 68,
+          "matk": 102
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "atk": 122,
+          "def": 88,
+          "matk": 122
+        },
+        {
+          "boss": 3,
+          "level": 21,
+          "atk": 125,
+          "def": 91,
+          "matk": 127
+        },
+        {
+          "boss": 3,
+          "level": 22,
+          "atk": 128,
+          "def": 97,
+          "matk": 132
+        },
+        {
+          "boss": 3,
+          "level": 23,
+          "atk": 131,
+          "def": 103,
+          "matk": 146
+        },
+        {
+          "boss": 4,
+          "level": 27,
+          "atk": 140,
+          "def": 113,
+          "matk": 163
+        },
+        {
+          "boss": 4,
+          "level": 28,
+          "atk": 142,
+          "def": 127,
+          "matk": 169
+        },
+        {
+          "boss": 4,
+          "level": 29,
+          "atk": 144,
+          "def": 135,
+          "matk": 174
+        },
+        {
+          "boss": 4,
+          "level": 30,
+          "atk": 162,
+          "def": 140,
+          "matk": 217
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "atk": 171,
+          "def": 173,
+          "matk": 238
+        },
+        {
+          "boss": 5,
+          "level": 35,
+          "atk": 173,
+          "def": 182,
+          "matk": 242
+        },
+        {
+          "boss": 5,
+          "level": 36,
+          "atk": 176,
+          "def": 185,
+          "matk": 245
+        },
+        {
+          "boss": 5,
+          "level": 37,
+          "atk": 178,
+          "def": 187,
+          "matk": 262
+        },
+        {
+          "boss": 5,
+          "level": 38,
+          "atk": 181,
+          "def": 193,
+          "matk": 280
+        },
+        {
+          "boss": 5,
+          "level": 39,
+          "atk": 183,
+          "def": 211,
+          "matk": 299
+        }
+      ],
+      "defeats": [
+        {
+          "boss": 2,
+          "level": 12,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 13,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 14,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 15,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 15,
+          "isBoss": false
+        },
+        {
+          "boss": 2,
+          "level": 16,
+          "isBoss": true
+        },
+        {
+          "boss": 2,
+          "level": 16,
+          "isBoss": false
+        },
+        {
+          "boss": 3,
+          "level": 20,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 21,
+          "isBoss": true
+        },
+        {
+          "boss": 3,
+          "level": 22,
+          "isBoss": true
+        },
+        {
+          "boss": 4,
+          "level": 27,
+          "isBoss": true
+        },
+        {
+          "boss": 4,
+          "level": 28,
+          "isBoss": true
+        },
+        {
+          "boss": 4,
+          "level": 29,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 34,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 35,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 36,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 37,
+          "isBoss": true
+        },
+        {
+          "boss": 5,
+          "level": 38,
+          "isBoss": true
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

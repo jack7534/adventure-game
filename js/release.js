@@ -20,7 +20,7 @@ async function checkRelease(manual=false){
  finally{clearTimeout(timer);checkingRelease=false;}
 }
 function initReleaseUI(){
- const bar=document.createElement('div');bar.className='release-strip';bar.innerHTML=`<strong id="client-version">v${APP_RELEASE.version} · 馭獸同行</strong><span id="release-message">32 種造型 · 8 種寵物 · 五章冒險</span><button id="check-update" class="text-button">檢查更新</button><button id="update-game" class="secondary" hidden>存檔並更新</button>`;
+ const bar=document.createElement('div');bar.className='release-strip';bar.innerHTML=`<strong id="client-version">v${APP_RELEASE.version} · 馭獸同行</strong><span id="release-message">雙戰鬥路線 · 連續獵怪 · 中後期配裝適應</span><button id="check-update" class="text-button">檢查更新</button><button id="update-game" class="secondary" hidden>存檔並更新</button>`;
  document.querySelector('.topbar').after(bar);$('check-update').onclick=()=>checkRelease(true);$('update-game').onclick=reloadLatestRelease;
  const welcome=document.createElement('small');welcome.className='welcome-version';welcome.textContent=`v${APP_RELEASE.version} · 32 種造型／馭獸同行`;
  document.querySelector('.welcome-actions').prepend(welcome);checkRelease(false);

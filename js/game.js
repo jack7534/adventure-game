@@ -47,7 +47,7 @@ function processMaterials(){
 }
 function enterMap(){gameState='MAP';currentEnemy=null;adventure.battle=null;adventure.eventId=null;adventure.result=null;ensureExpedition();if(chapterIntro())return;updateStatus();renderMap();saveAuto();}
 
-function renderMap(){const e=ensureExpedition(),done=bossLevel>ENEMIES.BOSS.length,d=ENEMIES.BOSS[bossLevel-1];setScene('map',88);story('THE ROAD AHEAD',done?'五份和平合約，這次終於蓋完了。':CHAPTER_STORIES[e.chapter-1][0],done?'自由探索仍然開放。換個稱號開始新旅程，會遇到不同天氣、路線與奇物。':CHAPTER_STORIES[e.chapter-1][1],done?'每一段旅途，都值得被記住。':`建議 Lv.${d.target} · 通行線索 ${e.clues}/${requiredClues()} · ${d.trait}`);setCommands({text:'? 選擇探索路線',hint:'三條分岔 · 戰鬥、奇物與荒唐遭遇',value:'Small'},{text:done?'✓ 五章已完成':`⚑ 挑戰${d.name}`,hint:done?'仍可自由探索':e.clues<requiredClues()?`還需 ${requiredClues()-e.clues} 條探索線索`:`建議 Lv.${d.target} · 查看強項再出發`,value:'Boss',disabled:done||e.clues<requiredClues()},{text:'♨ 營火休息',hint:'HP 全滿 · 清除毒與負面狀態',value:'Heal'},handleMapAction,'MAP');checkHealCooldown();updateExpeditionPanel();$('action-tip').textContent='等級不是硬門檻；裝備、奇物、解毒與讀招才是勝負關鍵。';syncActionDock();}
+function renderMap(){const e=ensureExpedition(),done=bossLevel>ENEMIES.BOSS.length,d=ENEMIES.BOSS[bossLevel-1];setScene('map',88);story('THE ROAD AHEAD',done?'五份和平合約，這次終於蓋完了。':CHAPTER_STORIES[e.chapter-1][0],done?'自由探索仍然開放。換個稱號開始新旅程，會遇到不同天氣、路線與奇物。':CHAPTER_STORIES[e.chapter-1][1],done?'每一段旅途，都值得被記住。':`建議 Lv.${d.target} · 通行線索 ${e.clues}/${requiredClues()} · ${d.trait}`);setCommands({text:'? 選擇探索路線',hint:'2 條戰鬥路 · 1 條事件／補給',value:'Small'},{text:done?'✓ 五章已完成':`⚑ 挑戰${d.name}`,hint:done?'仍可自由探索':e.clues<requiredClues()?`還需 ${requiredClues()-e.clues} 條探索線索`:`建議 Lv.${d.target} · 查看強項再出發`,value:'Boss',disabled:done||e.clues<requiredClues()},{text:'♨ 營火休息',hint:'HP 全滿 · 清除毒與負面狀態',value:'Heal'},handleMapAction,'MAP');checkHealCooldown();updateExpeditionPanel();$('action-tip').textContent='等級不是硬門檻；裝備、奇物、解毒與讀招才是勝負關鍵。';syncActionDock();}
 
 function checkHealCooldown(){clearTimeout(healCooldownTimer);if(gameState!=='MAP')return;const left=lastHealTime+4000-Date.now();btn3.disabled=left>0;if(left>0){btn3.querySelector('small').textContent=`整理營地中 · ${Math.ceil(left/1000)} 秒`;const epoch=sessionEpoch;healCooldownTimer=setTimeout(()=>{if(epoch===sessionEpoch&&gameState==='MAP')checkHealCooldown();},Math.min(1000,left));}else btn3.querySelector('small').textContent='HP 全滿 · 清除灼燒與破甲';}
 function handleMapAction(action){
@@ -66,7 +66,18 @@ function confirmTitle(){
  const parts=resolveTitleParts();hero.name=hero.title=`${parts[0]}的${parts[1]}${parts[2]}`;applyStartingIdentity(parts,$('hero-look-select')?.value||'auto');
  $('titleSelectBox').hidden=true;$('app-shell').inert=false;redrawLog();log(`🧾 ${hero.title}，歡迎踏上旅程。這次，進度會替你記住。`);enterMap();saveCheckpoint();
 }
-function renderResult(){updateStatus();const r=adventure.result;setScene('event',r?.object??89);story(r?.tag||'休息一下',r?.title||'這一段路，走完了。',r?.text||'先整理一下行囊，再繼續走吧。');setCommands({text:'繼續旅程 →',hint:'回到小徑，決定下一步',value:'continue'},null,null,()=>{if(adventure.pendingEnding)showCredits();else enterMap();},gameState);$('action-tip').textContent='這一頁不會自動消失。看完了，再往前走。';}
+function renderResult(){
+ updateStatus();const r=adventure.result;setScene('event',r?.object??89);
+ story(r?.tag||'休息一下',r?.title||'這一段路，走完了。',r?.text||'先整理一下行囊，再繼續走吧。');
+ if(canContinueHunt()){
+  setCommands({text:'⚔ 繼續獵怪',hint:'直接進下一場 · 不會自動回血',value:'hunt'},{text:'? 換條路探索',hint:'2 條戰鬥 · 1 條事件／補給',value:'routes'},{text:'♨ 回營地準備',hint:'休息、商店、編隊',value:'camp'},afterHuntChoice,'RESULT');
+  $('action-tip').textContent='戰利品已處理，現在可以直接接著打。HP、毒與補給會接續，不強制連戰。';
+ }else{
+  setCommands({text:'繼續旅程 →',hint:'回到小徑，決定下一步',value:'continue'},null,null,()=>{if(adventure.pendingEnding)showCredits();else enterMap();},gameState);
+  $('action-tip').textContent='這一頁不會自動消失。看完了，再往前走。';
+ }
+ syncActionDock();
+}
 function renderCurrent(){updateStatus();redrawLog();if(gameState==='MAP')renderMap();else if(gameState==='ROUTE')renderRoutes();else if(gameState==='BATTLE')renderBattle();else if(gameState==='EVENT')renderEvent();else if(gameState==='LOOT_DECISION')renderLootDecision();else if(gameState==='CREDITS')renderCredits();else renderResult();}
 
 function createBattle(enemy,isBoss=false){
@@ -80,12 +91,13 @@ function createBattle(enemy,isBoss=false){
 function startSmallBattle(index){
  const zone=Math.min(4,bossLevel-1),e=ENEMIES.SMALL[Number.isInteger(index)?index:randInt(0,ENEMIES.SMALL.length-1)],rank=Math.min(SCENES[zone].level+1,Math.max([1,7,12,19,26][zone],hero.level-1));
  const xp=Math.max(8,Math.floor(hero.expToNextLevel*(hero.level>SCENES[zone].level+2?.10:.30)));let data={...e,hp:Math.round(e.hp*(1+(rank-1)*.17)),atk:Math.round(9+(rank-1)*3.3),def:Math.round(e.def*(1+(rank-1)*.065)),mDef:Math.round(e.mDef*(1+(rank-1)*.065)),exp:xp};
+ data=scaleSmallEncounter(data,e,zone);
  const weather=currentWeather();if(weather.id==='fog')data.dodge+=5;if(weather.id==='rain'){data.atk=Math.floor(data.atk*.95);data.mDef=Math.floor(data.mDef*1.1);}if(weather.id==='wind'){data.atk=Math.floor(data.atk*1.08);data.exp=Math.floor(data.exp*1.1);}if(weather.id==='glow'){data.hp=Math.floor(data.hp*1.1);data.lootChance=Math.min(1,data.lootChance+.08);}
  const mod=runPick(['plain','fierce','armored','nimble']);if(mod==='fierce'){data.atk=Math.floor(data.atk*1.18);data.hp=Math.floor(data.hp*.9);}if(mod==='armored'){data.def=Math.floor(data.def*1.3);data.dodge=Math.max(0,data.dodge-10);}if(mod==='nimble'){data.dodge=Math.min(70,data.dodge+10);data.def=Math.floor(data.def*.8);}data.modifier=mod;
  createBattle(data);
 }
 
-function startEliteBattle(){const index=Math.min(4,bossLevel-1),e=ENEMIES.BOSS[index];createBattle({...e,bossId:null,name:['迷路的牛頭人菁英','度假中的迷你九頭蛇','被縮小的遠古小魔神','剛打卡的裝甲看守','欠債的骰子騎士'][index],hp:Math.floor(e.hp*.34),atk:Math.floor(e.atk*.80),def:Math.floor(e.def*.8),mDef:Math.floor(e.mDef*.7),exp:Math.max(18,Math.floor(hero.expToNextLevel*.48)),lootChance:1,elite:true});}
+function startEliteBattle(){const index=Math.min(4,bossLevel-1),e=ENEMIES.BOSS[index];const data={...e,bossId:null,name:['迷路的牛頭人菁英','度假中的迷你九頭蛇','被縮小的遠古小魔神','剛打卡的裝甲看守','欠債的骰子騎士'][index],hp:Math.floor(e.hp*.34),atk:Math.floor(e.atk*.80),def:Math.floor(e.def*.8),mDef:Math.floor(e.mDef*.7),exp:Math.max(18,Math.floor(hero.expToNextLevel*.48)),lootChance:1,elite:true};createBattle(scaleSmallEncounter(data,null,index,true));}
 
 function startBossBattle(){if(bossLevel>ENEMIES.BOSS.length)return;createBattle({...ENEMIES.BOSS[bossLevel-1]},true);}
 function rollEnemyMove(bias){const r=Math.random(),b=bias||{'⚔️':.34,'🌠':.33,'🛡️':.33};return r<b['⚔️']?'⚔️':r<b['⚔️']+b['🌠']?'🌠':'🛡️';}
@@ -98,7 +110,7 @@ function updateBattleView(){
 }
 function renderBattle(){
  setScene('battle');updateBattleView();const e=currentEnemy;
- story(adventure.battle.isBoss?'CHAPTER BOSS':'A CHANCE ENCOUNTER',`${e.name} 擋住了去路。`,`物防 ${e.def} · 魔防 ${e.mDef} · 閃避 ${e.dodge}%`,hasExactIntent()?'對手的破綻已經露出。用克制招式把握這一回合。':'砍擊克魔法，魔法克盾擊，盾擊克砍擊。每第 3 回合可看穿下一招。');
+ story(adventure.battle.isBoss?'CHAPTER BOSS':'A CHANCE ENCOUNTER',`${e.name} 擋住了去路。`,`物攻 ${e.atk} · 物防 ${e.def} · 魔防 ${e.mDef} · 閃避 ${e.dodge}%${e.adaptiveLevel?' · 入場配裝適應 Lv.'+e.adaptiveLevel:''}`,hasExactIntent()?'對手的破綻已經露出。用克制招式把握這一回合。':'砍擊克魔法，魔法克盾擊，盾擊克砍擊。每第 3 回合可看穿下一招。');
  setCommands({text:'⚔️ 砍擊',hint:`物理 ${Math.max(1,hero.currentAttack-e.def)} 起 · 可爆擊`,value:'⚔️'},{text:'🌠 魔法',hint:`魔法 ${Math.max(1,getMagicAttackValue()-e.mDef)} 起 · 不會被閃避`,value:'🌠'},{text:'🛡️ 盾擊',hint:`防禦 ${hero.currentDefense} · 無視防禦`,value:'🛡️'},handleBattleAction,'BATTLE');
  if(activeBoss())mainView.insertAdjacentHTML('beforeend',bossTacticMarkup());$('action-tip').textContent=`戰鬥第 ${adventure.battle.round} 回合 · 平手勝率 ${hero.currentTieWinRate.toFixed(0)}%${activeBoss()?' · 留意特殊招式預告':''}`;syncTactics();syncActionDock();
 }

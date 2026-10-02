@@ -1,0 +1,129 @@
+{
+  "results": [
+    {
+      "name": "Every newly generated route set contains two direct combat choices and one support choice",
+      "pass": true
+    },
+    {
+      "name": "Levels 1 to 3 offer ordinary fights, not mandatory elite enemies",
+      "pass": true
+    },
+    {
+      "name": "Ordinary combat cards have different terrain names",
+      "pass": true
+    },
+    {
+      "name": "Level 4 onward can generate both elite and ordinary second routes",
+      "pass": true
+    },
+    {
+      "name": "All peaceful categories remain discoverable",
+      "pass": true
+    },
+    {
+      "name": "Ordinary card starts combat immediately",
+      "pass": true
+    },
+    {
+      "name": "Elite card starts a stronger fight, not a dialogue detour",
+      "pass": true
+    },
+    {
+      "name": "An already offered old peaceful route is not replaced on load",
+      "pass": true
+    },
+    {
+      "name": "New route save/reload keeps terrain, choices and RNG",
+      "pass": true
+    },
+    {
+      "name": "Ordinary victory exposes hunt, alternative route and camp controls",
+      "pass": true
+    },
+    {
+      "name": "Continue hunting starts once and carries HP, poison and consumables forward",
+      "pass": true
+    },
+    {
+      "name": "Pending loot blocks fast continuation until the decision is resolved",
+      "pass": true
+    },
+    {
+      "name": "Saved victory resumes the same continuation choices without another reward",
+      "pass": true
+    },
+    {
+      "name": "Return to camp remains available and does not force a second fight",
+      "pass": true
+    },
+    {
+      "name": "Alternative route selection remains available after victory",
+      "pass": true
+    },
+    {
+      "name": "Boss victory never offers unannounced ordinary continuation",
+      "pass": true
+    },
+    {
+      "name": "Defeat, escape and peaceful story results do not become forced fights",
+      "pass": true
+    }
+  ],
+  "distribution": {
+    "offers": 3000,
+    "combat": 2000,
+    "peaceful": 1000,
+    "elite": 382
+  },
+  "views": [
+    {
+      "width": 1280,
+      "height": 900,
+      "scroll": 0,
+      "ok": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "scroll": 100000,
+      "ok": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scroll": 0,
+      "ok": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scroll": 100000,
+      "ok": true
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "scroll": 0,
+      "ok": true
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "scroll": 100000,
+      "ok": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "scroll": 0,
+      "ok": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "scroll": 100000,
+      "ok": true
+    }
+  ],
+  "errors": []
+}

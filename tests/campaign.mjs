@@ -46,7 +46,12 @@ const runs=await page.evaluate(async()=>{
     (take?btnDecYes:btnDecNo).click();
    }else if(['RESULT','DEFEAT'].includes(gameState)){
     if(gameState==='DEFEAT'){defeats.push({boss:bossLevel,level:hero.level,isBoss:!!adventure.battle?.isBoss});if(adventure.battle?.isBoss)lastFailed[bossLevel]=Math.min(40,hero.level+1);}
-    btn1.click();
+    if(canContinueHunt()){
+     const ready=bossLevel<=5&&hero.level>=Math.max(SCENES[bossLevel-1].level,lastFailed[bossLevel]||0)&&ensureExpedition().clues>=requiredClues();
+     if(hero.hp<hero.maxHp*.9||hero.poisonStacks>0||ready)btn3.click();
+     else if(ensureExpedition().relics.length<4)btn2.click();
+     else btn1.click();
+    }else btn1.click();
    }else throw Error(`Unplayable state ${gameState}`);
    const saved=captureSave();if(!saved)throw Error('Missing save at '+gameState);parseSave(JSON.stringify(saved));
    for(const v of Object.values(hero))if(typeof v==='number'&&!Number.isFinite(v))throw Error('Nonfinite stat');

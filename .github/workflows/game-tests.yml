@@ -1,0 +1,30 @@
+name: Game regression and playthrough tests
+on:
+  push:
+    branches: [main, repair/v2-20261002]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: game-tests-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - run: npx playwright-core install --with-deps chromium
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: game-test-reports
+          path: |
+            test-results/*-report.json
+            test-results/*.png
+          retention-days: 7

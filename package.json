@@ -1,0 +1,14 @@
+{
+  "name": "jack-adventure-game",
+  "version": "2.0.0",
+  "private": true,
+  "description": "勇者模擬器・暮光旅途：可存檔的像素冒險",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node tests/run.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

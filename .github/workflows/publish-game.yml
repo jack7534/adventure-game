@@ -1,0 +1,42 @@
+name: Publish verified game to Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: game-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - run: npx playwright-core install --with-deps chromium
+      - run: npm test
+      - run: git diff --exit-code -- index.html js/game.bundle.js
+      - name: Package runtime only
+        run: |
+          mkdir -p _site/js _site/css _site/assets
+          cp index.html _site/index.html
+          cp js/game.bundle.js _site/js/
+          cp css/game.css _site/css/
+          cp assets/* _site/assets/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy verified game
+        id: deployment
+        uses: actions/deploy-pages@v4

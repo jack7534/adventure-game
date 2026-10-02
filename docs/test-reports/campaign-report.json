@@ -1,0 +1,71 @@
+{
+  "note": "Five deterministic seeds. Actions use visible buttons and displayed enemy information. No stat boosts; only elapsed clock and animation delay accelerated.",
+  "runs": [
+    {
+      "seed": 1,
+      "cleared": true,
+      "actions": 292,
+      "turns": 169,
+      "level": 17,
+      "paragon": 0,
+      "bosses": 3,
+      "deaths": 0,
+      "events": 27,
+      "loot": 34,
+      "simulatedMinutes": 5
+    },
+    {
+      "seed": 7,
+      "cleared": true,
+      "actions": 262,
+      "turns": 156,
+      "level": 17,
+      "paragon": 0,
+      "bosses": 3,
+      "deaths": 0,
+      "events": 24,
+      "loot": 29,
+      "simulatedMinutes": 5
+    },
+    {
+      "seed": 42,
+      "cleared": true,
+      "actions": 285,
+      "turns": 166,
+      "level": 17,
+      "paragon": 0,
+      "bosses": 3,
+      "deaths": 0,
+      "events": 27,
+      "loot": 34,
+      "simulatedMinutes": 5
+    },
+    {
+      "seed": 31415,
+      "cleared": true,
+      "actions": 278,
+      "turns": 160,
+      "level": 17,
+      "paragon": 0,
+      "bosses": 3,
+      "deaths": 0,
+      "events": 31,
+      "loot": 29,
+      "simulatedMinutes": 5
+    },
+    {
+      "seed": 8675309,
+      "cleared": true,
+      "actions": 333,
+      "turns": 210,
+      "level": 17,
+      "paragon": 0,
+      "bosses": 3,
+      "deaths": 0,
+      "events": 32,
+      "loot": 28,
+      "simulatedMinutes": 6
+    }
+  ],
+  "errors": []
+}

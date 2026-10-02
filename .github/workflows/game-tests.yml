@@ -20,6 +20,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx playwright-core install --with-deps chromium
       - run: npm test
+      - run: git diff --exit-code -- index.html js/game.bundle.js
       - uses: actions/upload-artifact@v4
         if: always()
         with:
